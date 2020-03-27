@@ -1,3 +1,4 @@
+altgraph==0.17
 certifi==2019.11.28
 chardet==3.0.4
 configparser==4.0.2
