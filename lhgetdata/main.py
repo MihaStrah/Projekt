@@ -5,8 +5,6 @@ import schedule
 import time
 import datetime
 
-
-
 def job():
     dateToday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
     print("DATETIME: ", datetime.datetime.now(), " ::: Job in progress ... getting flights for date: ", dateToday)
@@ -16,8 +14,7 @@ def job():
     print("DATETIME: ", datetime.datetime.now(), "End of job, all flights processed for date: ", dateToday)
     return
 
-#schedule.every().day.at("21:00").do(job)
-schedule.every().minute.at(":00").do(job)
+schedule.every().day.at("21:00").do(job)
 
 while True:
     schedule.run_pending()
