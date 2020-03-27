@@ -2,7 +2,7 @@ import mysql.connector as mariadb
 import time
 
 def writeOneFlightToSql(flight,id):
-    host, port, databse, user, password = readDBAccount()
+    host, port, database, user, password = readDBAccount()
     i = 0
     while i < 10:
         try:
@@ -12,13 +12,28 @@ def writeOneFlightToSql(flight,id):
         except:
             i = i + 1
             time.sleep(10)
-            print("retry " + str(i))
+            if (i>3):
+                time.sleep(180)
+            if (i>5):
+                time.sleep(600)
+            print("Retry DB " + str(i))
             pass
-    try:
-        cursor.execute("INSERT INTO allflightsstatus (depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus,flightnumberkey) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (flight.depairport,flight.depscheduled,flight.depscheduledUTC,flight.depactual,flight.depactualUTC,flight.depterminal,flight.depgate,flight.deptimestatus,flight.arrairport,flight.arrscheduled,flight.arrscheduledUTC,flight.arractual,flight.arractualUTC,flight.arrterminal,flight.arrgate,flight.arrtimestatus,flight.aircraftcode,flight.aircraftreg,flight.airlineid,flight.flightnumber,flight.flightstatus,id))
-        print("successful write to database")
-    except mariadb.Error as error:
-        print("Mariadb Error: {}".format(error))
+
+    i = 0
+    while i < 10:
+        try:
+            cursor.execute("INSERT INTO allflightsstatus (depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus,flightnumberkey) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (flight.depairport,flight.depscheduled,flight.depscheduledUTC,flight.depactual,flight.depactualUTC,flight.depterminal,flight.depgate,flight.deptimestatus,flight.arrairport,flight.arrscheduled,flight.arrscheduledUTC,flight.arractual,flight.arractualUTC,flight.arrterminal,flight.arrgate,flight.arrtimestatus,flight.aircraftcode,flight.aircraftreg,flight.airlineid,flight.flightnumber,flight.flightstatus,id))
+            print("successful write to database")
+            i = 10
+        except mariadb.Error as error:
+            i = i + 1
+            time.sleep(10)
+            if (i > 3):
+                time.sleep(180)
+            if (i > 5):
+                time.sleep(600)
+            print("Mariadb Error: {}".format(error))
+            print("Retry DB INSERT " + str(i))
 
     mariadb_connection.commit()
     mariadb_connection.close()

@@ -15,10 +15,8 @@ def getFlightStatusWriteSql(token,flights,allids,date,wait):
         print(url)
         bearer = "Bearer " + token
         headers = {"Authorization":bearer, "Accept":"application/json"}
-        print (bearer)
         i = 0
         while i<10:
-            print(str(i))
             try:
                 request = requests.get(url=url, headers=headers)
                 print(request)
@@ -27,7 +25,11 @@ def getFlightStatusWriteSql(token,flights,allids,date,wait):
                 i = 10
             except:
                 time.sleep(10)
-                print("retry " + str(i))
+                if (i > 3):
+                    time.sleep(180)
+                if (i > 5):
+                    time.sleep(600)
+                print("Retry LH " + str(i))
                 i = i + 1
                 pass
 
@@ -127,7 +129,6 @@ def getFlightStatusWriteSql(token,flights,allids,date,wait):
         writeOneFlightToSql(newstatus,id)
 
         print(str(a) + " done. Processed flight " + str(flight) + " with ID " + id + ", " + str(len(flights)-a) + " remaining")
-
 
         #wait because of API limitations
         time.sleep(wait)

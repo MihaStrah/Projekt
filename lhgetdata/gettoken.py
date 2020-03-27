@@ -30,7 +30,11 @@ def getNewToken():
             i=10
         except:
             time.sleep(10)
-            print("retry " + str(i))
+            if (i>3):
+                time.sleep(180)
+            if (i>5):
+                time.sleep(600)
+            print("Retry LH token " + str(i))
             i = i + 1
             pass
 
@@ -40,14 +44,10 @@ def getNewToken():
 def readLHAccount():
     import os
     path = os.path.abspath(os.path.dirname(__file__))
-    print(path)
     fullpath = os.path.join(path, "authentication/LHaccount.txt")
-    print(fullpath)
     f = open(fullpath, "r")
     lines = f.read().splitlines()
     id = lines[0]
-    print(id)
     secret = lines[1]
-    print(secret)
     f.close()
     return id,secret
