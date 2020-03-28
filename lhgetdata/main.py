@@ -14,7 +14,7 @@ def job():
     print("DATETIME: ", datetime.datetime.now(), "End of job, all flights processed for date: ", dateToday)
     return
 
-schedule.every().day.at("21:00").do(job)
+schedule.every().day.at("22:00").do(job)
 
 while True:
     schedule.run_pending()
