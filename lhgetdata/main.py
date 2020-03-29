@@ -23,7 +23,7 @@ def job():
 #spremeni datum nazaj na dan prej ko spremeniš uro!
 
 #testno
-schedule.every().hour.at(":35").do(job)
+schedule.every().hour.at(":40").do(job)
 
 
 
