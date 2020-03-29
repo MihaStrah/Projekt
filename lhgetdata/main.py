@@ -7,7 +7,7 @@ import datetime
 
 def job():
     print("DATETIME: ", datetime.datetime.now(), " checking hour")
-    if (datetime.datetime.now.strftime("%H") == "00"):
+    if (datetime.datetime.now().strftime("%H") == "00"):
         print("DATETIME: ", datetime.datetime.now(), " hour is 00")
         #dateToday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
         dateToday = (datetime.date.today() - datetime.timedelta(days=2)).strftime("%Y-%m-%d")
@@ -23,7 +23,7 @@ def job():
 #spremeni datum nazaj na dan prej ko spremeniš uro!
 
 #testno
-schedule.every().hour.at(":40").do(job)
+schedule.every().hour.at(":45").do(job)
 
 
 
