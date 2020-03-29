@@ -10,7 +10,7 @@ def job():
     if (datetime.datetime.now.strftime("%H") == "00"):
         print("DATETIME: ", datetime.datetime.now(), "hour is 00", dateToday)
         #dateToday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
-        dateToday = (datetime.date.today()).strftime("%Y-%m-%d")
+        dateToday = (datetime.date.today() - datetime.timedelta(days=2)).strftime("%Y-%m-%d")
         print("DATETIME: ", datetime.datetime.now(), " ::: Job in progress ... getting flights for date: ", dateToday)
         token = getNewToken()
         allflights, allids = getAllFLights()
@@ -23,7 +23,7 @@ def job():
 #spremeni datum nazaj na dan prej ko spremeniš uro!
 
 #testno
-schedule.every().hour.at(":31").do(job)
+schedule.every().hour.at(":35").do(job)
 
 
 
