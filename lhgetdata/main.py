@@ -6,7 +6,8 @@ import time
 import datetime
 
 def job():
-    dateToday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    #dateToday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    dateToday = (datetime.date.today()).strftime("%Y-%m-%d")
     print("DATETIME: ", datetime.datetime.now(), " ::: Job in progress ... getting flights for date: ", dateToday)
     token = getNewToken()
     allflights, allids = getAllFLights()
@@ -14,7 +15,8 @@ def job():
     print("DATETIME: ", datetime.datetime.now(), "End of job, all flights processed for date: ", dateToday)
     return
 
-schedule.every().day.at("22:00").do(job)
+schedule.every().day.at("00:30").do(job)
+#spremeni datum nazaj na dan prej ko spremeniš uro!
 
 while True:
     schedule.run_pending()
