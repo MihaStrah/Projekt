@@ -20,9 +20,9 @@ def job():
         sendTG = telegram_bot_sendtext(notification)
         print("TELEGRAM BOT: ", sendTG)
 
-        # token = getNewToken()
-        # allflights, allids = getAllFLights()
-        # getFlightStatusWriteSql(token,allflights,allids,dateFlight,3)
+        token = getNewToken()
+        allflights, allids = getAllFLights()
+        getFlightStatusWriteSql(token,allflights,allids,dateFlight,3)
 
         notification = "DATETIME: {} ::: End of job, all flights processed for date: {}".format(datetime.datetime.now(), dateFlight)
         print(notification)
