@@ -2,6 +2,7 @@ import requests, json
 import datetime
 import time
 import oauth2 as oauth
+import re
 
 def getFlightStatus(flight, date):
     token = getToken()
@@ -10,9 +11,13 @@ def getFlightStatus(flight, date):
 
 
 def getFlight(token, flight, date):
-    url = 'https://api.lufthansa.com/v1/operations/flightstatus' + '/' + flight + '/' + date
+    date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
+    flight = re.search("^[A-z][A-z][0-9]{1,4}$", flight).group()
+
+
+    url = (f"https://api.lufthansa.com/v1/operations/flightstatus/{flight}/{date}")
     print(url)
-    bearer = "Bearer " + token
+    bearer = (f"Bearer {token}")
     headers = {"Authorization":bearer, "Accept":"application/json"}
     print (bearer)
     i = 0
@@ -24,7 +29,7 @@ def getFlight(token, flight, date):
             print(data)
             i = 10
         except:
-            time.sleep(2)
+            time.sleep(5)
             print("retry " + str(i))
             i = i + 1
             pass

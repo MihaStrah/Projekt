@@ -1,5 +1,8 @@
 import logging
+import datetime
+import re
 from getflight import getFlightStatus
+from sqldata import getSQLFlightStatus
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           ConversationHandler)
@@ -29,7 +32,8 @@ def flight(update, context):
 
 
 def flightdate(update, context):
-    reply_keyboard = [['2020-03-30', '2020-03-31', '2020-04-01']]
+
+    reply_keyboard = [[str(datetime.date.today() - datetime.timedelta(days=1)), str(datetime.date.today()), str(datetime.date.today() + datetime.timedelta(days=1))]]
     user = update.message.from_user
     logger.info("FLight of %s: %s", user.first_name, update.message.text)
     context.user_data['flight'] = update.message.text
@@ -39,11 +43,20 @@ def flightdate(update, context):
 
 
 def flightstatus(update, context):
-    reply_keyboard = [['Departure', 'Arrival', 'Equipment']]
+    reply_keyboard = [['Departure', 'Arrival', 'Equipment', 'Done']]
     user = update.message.from_user
     logger.info("Date of %s: %s", user.first_name, update.message.text)
     context.user_data['flightdate'] = update.message.text
-    flightstatus = getFlightStatus(context.user_data["flight"], context.user_data["flightdate"])
+
+    datestring = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", context.user_data['flightdate']).group()
+    date = datetime.datetime.strptime(datestring, '%Y-%m-%d')
+    if ((datetime.datetime.now() - datetime.timedelta(days=3)) < date):
+        flightstatus = getFlightStatus(context.user_data["flight"], context.user_data["flightdate"])
+        logger.info("Getting flight from LH for %s: flight: %s, date: %s", user.first_name, context.user_data["flight"], context.user_data["flightdate"])
+    else:
+        flightstatus = getSQLFlightStatus(context.user_data["flight"], context.user_data["flightdate"])
+        logger.info("Getting flight from DB for %s: flight: %s, date: %s", user.first_name, context.user_data["flight"], context.user_data["flightdate"])
+
     context.user_data['flightstatus'] = flightstatus
     if (flightstatus.depairport != ""):
         update.message.reply_text('{} {}\n'
