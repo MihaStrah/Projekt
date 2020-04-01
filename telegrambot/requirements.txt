@@ -6,7 +6,8 @@ decorator==4.4.2
 future==0.18.2
 httplib2==0.17.0
 idna==2.9
-oauth2
+mysql-connector==2.2.9
+oauth2==1.9.0.post1
 pycparser==2.20
 python-oauth2==1.1.1
 python-telegram-bot==12.5.1
