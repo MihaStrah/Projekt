@@ -59,6 +59,9 @@ def flightstatus(update, context):
 
     context.user_data['flightstatus'] = flightstatus
     if (flightstatus.depairport != ""):
+        global flightstatuscodes, flightstatusdef
+        if (flightstatus.flightstatusdef in flightstatuscodes):
+            flightstatus.flightstatusdef = flightstatusdef[flightstatuscodes.index(flightstatus.flightstatusdef)]
         update.message.reply_text('{} {}\n'
                                   '{} -> {}\n'
                                   'Status: {}'.format(context.user_data["flight"],context.user_data["flightdate"],flightstatus.depairport,flightstatus.arrairport,flightstatus.flightstatusdef), reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
@@ -74,7 +77,11 @@ def departure(update, context):
     user = update.message.from_user
     logger.info("Option of %s: %s", user.first_name, update.message.text)
     flightstatus = context.user_data['flightstatus']
-    update.message.reply_text('Scheduled: {}\n'
+    global timestatuscodes, timestatusdef
+    if (flightstatus.deptimestatusdef in timestatuscodes):
+        flightstatus.deptimestatusdef = timestatusdef[timestatuscodes.index(flightstatus.deptimestatusdef)]
+    update.message.reply_text('Departure: {} ->\n'
+                                  'Scheduled: {}\n'
                                   'Actual: {}\n'
                                   'Time Status: {}\n'
                                   'Terminal: {}\n'
@@ -87,7 +94,11 @@ def arrival(update, context):
     user = update.message.from_user
     logger.info("Option of %s: %s", user.first_name, update.message.text)
     flightstatus = context.user_data['flightstatus']
-    update.message.reply_text('Scheduled: {}\n'
+    global timestatuscodes, timestatusdef
+    if (flightstatus.arrtimestatusdef in timestatuscodes):
+        flightstatus.arrtimestatusdef = timestatusdef[timestatuscodes.index(flightstatus.arrtimestatusdef)]
+    update.message.reply_text('Arrival: -> {}\n'
+                                  'Scheduled: {}\n'
                                   'Actual: {}\n'
                                   'Time Status: {}\n'
                                   'Terminal: {}\n'
@@ -100,9 +111,9 @@ def equipment(update, context):
     user = update.message.from_user
     logger.info("Option of %s: %s", user.first_name, update.message.text)
     flightstatus = context.user_data['flightstatus']
-    update.message.reply_text('Operating Carrier Flight: {}{}\n'
+    update.message.reply_text( 'Operating Carrier Flight: {}{}\n'
                                   'Aircraft: {}\n'
-                                  'Aircraft Registration\n'.format(flightstatus.airlineid,flightstatus.flightnumber,flightstatus.aircraftcode,flightstatus.aircraftreg), reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+                                  'Aircraft Registration: {}\n'.format(flightstatus.airlineid,flightstatus.flightnumber,flightstatus.aircraftcode,flightstatus.aircraftreg), reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return STATUSMORE
 
@@ -164,6 +175,12 @@ def readTGAccount():
     bot_token = lines[0]
     f.close()
     return bot_token
+
+flightstatuscodes = ["CD","DP","LD","RT","NA",]
+flightstatusdef = ["Flight Cancelled","Flight Departed","Flight Landed","Flight Rerouted","No status",]
+timestatuscodes = ["FE","NI","OT","DL","NO",]
+timestatusdef = ["Flight Early","Next Information","Flight On Time","Flight Delayed","No status",]
+
 
 if __name__ == '__main__':
     main()
