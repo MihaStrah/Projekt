@@ -3,7 +3,7 @@ import datetime
 import re
 from getflight import getFlightStatus
 from sqldata import getSQLFlightStatus
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, Message)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           ConversationHandler)
 
@@ -18,7 +18,7 @@ START, FLIGHT, FLIGHTDATE, STATUSMORE = range(4)
 def start(update, context):
     reply_keyboard = [['OK']]
     update.message.reply_text(
-        'Hello, I can check flight status :)', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+        'Hello, I can check a flight status for you!', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return START
 
@@ -26,7 +26,7 @@ def start(update, context):
 def flight(update, context):
     reply_keyboard = [['LH3526', 'LH122', 'EN8860']]
     update.message.reply_text(
-        'Flight Number (LH000):', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+        'Flight Number <i>(LH000)</i>:', parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return FLIGHT
 
@@ -37,7 +37,7 @@ def flightdate(update, context):
     user = update.message.from_user
     logger.info("FLight of %s: %s", user.first_name, update.message.text)
     context.user_data['flight'] = update.message.text
-    update.message.reply_text('Flight Date (YYYY-MM-DD):', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+    update.message.reply_text('Flight Date <i>(YYYY-MM-DD)</i>:',parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return FLIGHTDATE
 
@@ -62,9 +62,9 @@ def flightstatus(update, context):
         global flightstatuscodes, flightstatusdef
         if (flightstatus.flightstatusdef in flightstatuscodes):
             flightstatus.flightstatusdef = flightstatusdef[flightstatuscodes.index(flightstatus.flightstatusdef)]
-        update.message.reply_text('{} {}\n'
-                                  '{} -> {}\n'
-                                  'Status: {}'.format(context.user_data["flight"],context.user_data["flightdate"],flightstatus.depairport,flightstatus.arrairport,flightstatus.flightstatusdef), reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+        update.message.reply_text('<b>{}</b> 🛩 {}\n'
+                                  '<b>{}</b> -> <b>{}</b>\n'
+                                  'Status: <b>{}</b>'.format(context.user_data["flight"],context.user_data["flightdate"],flightstatus.depairport,flightstatus.arrairport,flightstatus.flightstatusdef), parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     else:
         reply_keyboard = [['LH3526', 'LH122', 'EN8860']]
         update.message.reply_text('This flight does not exist, try another!', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
@@ -77,15 +77,25 @@ def departure(update, context):
     user = update.message.from_user
     logger.info("Option of %s: %s", user.first_name, update.message.text)
     flightstatus = context.user_data['flightstatus']
+
+
     global timestatuscodes, timestatusdef
     if (flightstatus.deptimestatusdef in timestatuscodes):
         flightstatus.deptimestatusdef = timestatusdef[timestatuscodes.index(flightstatus.deptimestatusdef)]
-    update.message.reply_text('Departure: {} ->\n'
-                                  'Scheduled: {}\n'
-                                  'Actual: {}\n'
-                                  'Time Status: {}\n'
-                                  'Terminal: {}\n'
-                                  'Gate: {}'.format(flightstatus.depscheduled,flightstatus.depactual,flightstatus.deptimestatusdef,flightstatus.depterminal,flightstatus.depgate), reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+    try:
+        depscheduled = datetime.datetime.strptime((flightstatus.depscheduled), "%Y-%m-%dT%H:%M").strftime("%Y-%m-%d  %H:%M")
+    except:
+        depscheduled = flightstatus.depscheduled
+    try:
+        depactual = datetime.datetime.strptime((flightstatus.depactual), "%Y-%m-%dT%H:%M").strftime("%Y-%m-%d  %H:%M")
+    except:
+        depactual = flightstatus.depactual
+    update.message.reply_text('Departure: <b>{}</b> 🛫\n'
+                                  'Scheduled: <b>{}</b>\n'
+                                  'Actual: <b>{}</b>\n'
+                                  'Time Status: <b>{}</b>\n'
+                                  'Terminal: <b>{}</b> '
+                                  'Gate: <b>{}</b>'.format(flightstatus.depairport,depscheduled,depactual,flightstatus.deptimestatusdef,flightstatus.depterminal,flightstatus.depgate), parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return STATUSMORE
 
@@ -97,12 +107,20 @@ def arrival(update, context):
     global timestatuscodes, timestatusdef
     if (flightstatus.arrtimestatusdef in timestatuscodes):
         flightstatus.arrtimestatusdef = timestatusdef[timestatuscodes.index(flightstatus.arrtimestatusdef)]
-    update.message.reply_text('Arrival: -> {}\n'
-                                  'Scheduled: {}\n'
-                                  'Actual: {}\n'
-                                  'Time Status: {}\n'
-                                  'Terminal: {}\n'
-                                  'Gate: {}'.format(flightstatus.arrscheduled,flightstatus.arractual,flightstatus.arrtimestatusdef,flightstatus.arrterminal,flightstatus.arrgate), reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+    try:
+        arrscheduled = datetime.datetime.strptime((flightstatus.arrscheduled), "%Y-%m-%dT%H:%M").strftime("%Y-%m-%d  %H:%M")
+    except:
+        arrscheduled = flightstatus.arrscheduled
+    try:
+        arractual = datetime.datetime.strptime((flightstatus.arractual), "%Y-%m-%dT%H:%M").strftime("%Y-%m-%d  %H:%M")
+    except:
+        arractual = flightstatus.arractual
+    update.message.reply_text('Arrival: 🛬 <b>{}</b>\n'
+                                  'Scheduled: <b>{}</b>\n'
+                                  'Actual: <b>{}</b>\n'
+                                  'Time Status: <b>{}</b>\n'
+                                  'Terminal: <b>{}</b> '
+                                  'Gate: <b>{}</b>'.format(flightstatus.arrairport,arrscheduled,arractual,flightstatus.arrtimestatusdef,flightstatus.arrterminal,flightstatus.arrgate), parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return STATUSMORE
 
@@ -111,9 +129,9 @@ def equipment(update, context):
     user = update.message.from_user
     logger.info("Option of %s: %s", user.first_name, update.message.text)
     flightstatus = context.user_data['flightstatus']
-    update.message.reply_text( 'Operating Carrier Flight: {}{}\n'
-                                  'Aircraft: {}\n'
-                                  'Aircraft Registration: {}\n'.format(flightstatus.airlineid,flightstatus.flightnumber,flightstatus.aircraftcode,flightstatus.aircraftreg), reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+    update.message.reply_text( 'Operating Carrier Flight: <b>{}{}</b>\n'
+                                  'Aircraft: <b>{}</b>\n'
+                                  'Aircraft Registration: <b>{}</b>\n'.format(flightstatus.airlineid,flightstatus.flightnumber,flightstatus.aircraftcode,flightstatus.aircraftreg), parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return STATUSMORE
 
@@ -176,10 +194,10 @@ def readTGAccount():
     f.close()
     return bot_token
 
-flightstatuscodes = ["CD","DP","LD","RT","NA",]
-flightstatusdef = ["Flight Cancelled","Flight Departed","Flight Landed","Flight Rerouted","No status",]
-timestatuscodes = ["FE","NI","OT","DL","NO",]
-timestatusdef = ["Flight Early","Next Information","Flight On Time","Flight Delayed","No status",]
+flightstatuscodes = ["CD","DP","LD","RT","NA"]
+flightstatusdef = ["Flight Cancelled","Flight Departed","Flight Landed","Flight Rerouted","No status"]
+timestatuscodes = ["FE","NI","OT","DL","NO"]
+timestatusdef = ["Flight Early","Next Information","Flight On Time","Flight Delayed","No status"]
 
 
 if __name__ == '__main__':
