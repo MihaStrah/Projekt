@@ -67,7 +67,7 @@ def flightstatus(update, context):
             flightstatus.flightstatusdef = flightstatusdef[flightstatuscodes.index(flightstatus.flightstatusdef)]
         update.message.reply_text('<b>{}</b> 🛩 {}\n'
                                   '<b>{}</b> -> <b>{}</b>\n'
-                                  'Status: <b>{}</b>'.format(context.user_data["flight"],context.user_data["flightdate"],flightstatus.depairport,flightstatus.arrairport,flightstatus.flightstatusdef), parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+                                  'Status: <b>{}</b>'.format(context.user_data["flight"].upper(),context.user_data["flightdate"],flightstatus.depairport,flightstatus.arrairport,flightstatus.flightstatusdef), parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     else:
         reply_keyboard = [['LH3526', 'LH122', 'EN8860']]
         update.message.reply_text('This flight does not exist, try another!', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
@@ -178,14 +178,18 @@ def main():
 
             START: [MessageHandler(Filters.text, flight)],
 
-            FLIGHT: [MessageHandler(Filters.regex('^[A-z][A-z][0-9]{1,4}$'), flightdate)],
+            FLIGHT: [MessageHandler(Filters.regex('^[A-z][A-z][0-9]{1,4}$'), flightdate),
+                     MessageHandler(Filters.regex('^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'), flightstatus)],
 
-            FLIGHTDATE: [MessageHandler(Filters.regex('^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'), flightstatus)],
+            FLIGHTDATE: [MessageHandler(Filters.regex('^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'), flightstatus),
+                         MessageHandler(Filters.regex('^[A-z][A-z][0-9]{1,4}$'), flightdate)],
 
             STATUSMORE: [MessageHandler(Filters.regex('^Departure$'), departure),
                          MessageHandler(Filters.regex('^Arrival$'), arrival),
                          MessageHandler(Filters.regex('^Equipment$'), equipment),
-                         MessageHandler(Filters.regex('^Done$'), flight)]
+                         MessageHandler(Filters.regex('^Done$'), flight),
+                         MessageHandler(Filters.regex('^[A-z][A-z][0-9]{1,4}$'), flightdate),
+                         MessageHandler(Filters.regex('^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'), flightstatus)],
         },
 
         fallbacks=[CommandHandler('cancel', cancel),CommandHandler('start', start)]

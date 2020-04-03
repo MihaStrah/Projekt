@@ -136,7 +136,16 @@ def getFlight(token, flight, date):
     except:
         flightstatusdef = ""
 
-    newstatus = flight_status(depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,deptimestatusdef,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,arrtimestatusdef,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus,flightstatusdef)
+    newstatus = flight_status(depairport, depscheduled, depscheduledUTC, depactual, depactualUTC, depterminal, depgate,
+                              deptimestatus, deptimestatusdef, arrairport, arrscheduled, arrscheduledUTC, arractual,
+                              arractualUTC, arrterminal, arrgate, arrtimestatus, arrtimestatusdef, aircraftcode,
+                              aircraftreg, airlineid, flightnumber, flightstatus, flightstatusdef)
+
+    #check status for operating carrier flight if not operating carrier
+    operating = (f"{newstatus.airlineid}{newstatus.flightnumber}")
+    if (operating != flight.upper() and operating != ""):
+        newstatus = getFlight(token, operating, date)
+
     return newstatus
 
 

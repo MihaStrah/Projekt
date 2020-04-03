@@ -54,6 +54,7 @@ def getAircraftImage(registration):
     icao24 = getSQLicao24(registration)
     try:
         URL = (f"https://www.airport-data.com/api/ac_thumb.json?m={icao24}&n=1")
+        print(URL)
         r = requests.get(url=URL)
         data = r.json()
         print(data)
@@ -61,6 +62,35 @@ def getAircraftImage(registration):
         aircraftimage = aircraftimage.replace('/thumbnails', '')
     except:
         aircraftimage=""
+
+    if (aircraftimage == ""):
+        try:
+            #try with registration with "-"
+            N=1
+            registration = registration[ : N] + "-" + registration[N : ]
+            URL = (f"https://www.airport-data.com/api/ac_thumb.json?r={registration}&n=1")
+            print(URL)
+            r = requests.get(url=URL)
+            data = r.json()
+            print(data)
+            aircraftimage = data["data"][0]["image"]
+            aircraftimage = aircraftimage.replace('/thumbnails', '')
+        except:
+            aircraftimage = ""
+        if (aircraftimage == ""):
+            try:
+                # try with registration with "-"
+                N = 2
+                registration = registration[: N] + "-" + registration[N:]
+                URL = (f"https://www.airport-data.com/api/ac_thumb.json?r={registration}&n=1")
+                print(URL)
+                r = requests.get(url=URL)
+                data = r.json()
+                print(data)
+                aircraftimage = data["data"][0]["image"]
+                aircraftimage = aircraftimage.replace('/thumbnails', '')
+            except:
+                aircraftimage = ""
 
     return aircraftimage
 
