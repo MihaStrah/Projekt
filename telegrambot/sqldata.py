@@ -47,7 +47,7 @@ def getSQLFlightStatus(flight,date):
         if returnrow is None:
             newstatus = flight_status("","","","","","","","","","","","","","","","","","","","","","","","")
         else:
-            newstatus = flight_status(returnrow[0],returnrow[1],returnrow[2],returnrow[3],returnrow[4],returnrow[5],returnrow[6],returnrow[7],"",returnrow[8],returnrow[9],returnrow[10],returnrow[11],returnrow[12],returnrow[13],returnrow[14],"",returnrow[15],returnrow[16],returnrow[17],returnrow[18],returnrow[19],"",returnrow[20])
+            newstatus = flight_status(returnrow[0],returnrow[1],returnrow[2],returnrow[3],returnrow[4],returnrow[5],returnrow[6],returnrow[7],returnrow[7],returnrow[8],returnrow[9],returnrow[10],returnrow[11],returnrow[12],returnrow[13],returnrow[14],returnrow[15],returnrow[15],returnrow[16],returnrow[17],returnrow[18],returnrow[19],returnrow[20],returnrow[20])
 
     return newstatus
 

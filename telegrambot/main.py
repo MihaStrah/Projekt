@@ -1,7 +1,8 @@
 import logging
 import datetime
 import re
-from getflight import getFlightStatus
+from opensky import getAircraftImage
+from getflight import getFlightStatus, getAircraftModel
 from sqldata import getSQLFlightStatus
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, Message)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
@@ -18,7 +19,7 @@ START, FLIGHT, FLIGHTDATE, STATUSMORE = range(4)
 def start(update, context):
     reply_keyboard = [['OK']]
     update.message.reply_text(
-        'Hello, I can check a flight status for you!', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+        'Hello, I can check a flight status for you!', parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return START
 
@@ -47,6 +48,8 @@ def flightstatus(update, context):
     user = update.message.from_user
     logger.info("Date of %s: %s", user.first_name, update.message.text)
     context.user_data['flightdate'] = update.message.text
+    #delete previous aircraftmodel data
+    context.user_data['aircraftmodel'] = ""
 
     datestring = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", context.user_data['flightdate']).group()
     date = datetime.datetime.strptime(datestring, '%Y-%m-%d')
@@ -129,10 +132,21 @@ def equipment(update, context):
     user = update.message.from_user
     logger.info("Option of %s: %s", user.first_name, update.message.text)
     flightstatus = context.user_data['flightstatus']
+    try:
+        aircraftmodel = context.user_data['aircraftmodel']
+    except:
+        aircraftmodel = flightstatus.aircraftcode
+    if (len(aircraftmodel) < 4):
+        aircraftmodel = getAircraftModel(flightstatus.aircraftcode)
+        context.user_data['aircraftmodel'] = aircraftmodel
     update.message.reply_text( 'Operating Carrier Flight: <b>{}{}</b>\n'
                                   'Aircraft: <b>{}</b>\n'
-                                  'Aircraft Registration: <b>{}</b>\n'.format(flightstatus.airlineid,flightstatus.flightnumber,flightstatus.aircraftcode,flightstatus.aircraftreg), parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
-
+                                  'Aircraft Registration: <b>{}</b>\n'.format(flightstatus.airlineid,flightstatus.flightnumber,aircraftmodel,flightstatus.aircraftreg), parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+    logger.info("Getting aircraft image for registration  %s for user %s", flightstatus.aircraftreg, user.first_name)
+    aircraftimage = getAircraftImage(flightstatus.aircraftreg)
+    logger.info("Sending aircraft image on link  %s for user %s", aircraftimage, user.first_name)
+    if (aircraftimage != ""):
+        update.message.reply_photo(photo=(f"{aircraftimage}"))
     return STATUSMORE
 
 def cancel(update, context):
@@ -151,6 +165,7 @@ def error(update, context):
 
 
 def main():
+
     bot_token = readTGAccount()
     updater = Updater(bot_token, use_context=True)
 

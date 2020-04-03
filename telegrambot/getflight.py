@@ -9,6 +9,11 @@ def getFlightStatus(flight, date):
     flightstatus = getFlight(token, flight, date)
     return flightstatus
 
+def getAircraftModel(aircraftcode):
+    token = getToken()
+    aircraftmodel = getAircraft(token, aircraftcode)
+    return aircraftmodel
+
 
 def getFlight(token, flight, date):
     date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
@@ -133,6 +138,35 @@ def getFlight(token, flight, date):
 
     newstatus = flight_status(depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,deptimestatusdef,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,arrtimestatusdef,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus,flightstatusdef)
     return newstatus
+
+
+
+def getAircraft(token, aircraftcode):
+    url = (f"https://api.lufthansa.com/v1/mds-references/aircraft/{aircraftcode}")
+    print(url)
+    bearer = (f"Bearer {token}")
+    headers = {"Authorization":bearer, "Accept":"application/json"}
+    print (bearer)
+    i = 0
+    while i<10:
+        try:
+            request = requests.get(url = url, headers = headers)
+            print(request)
+            data = request.json()
+            print(data)
+            i = 10
+        except:
+            time.sleep(5)
+            print("retry " + str(i))
+            i = i + 1
+            pass
+
+    try:
+        aircraftmodel = data['AircraftResource']['AircraftSummaries']['AircraftSummary']['Names']['Name']['$']
+    except:
+        aircraftmodel = aircraftcode
+
+    return aircraftmodel
 
 
 token = "null"
