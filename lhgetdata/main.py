@@ -11,8 +11,8 @@ def job():
     print("DATETIME: ", datetime.datetime.now(), " checking hour")
 
     # workaround
-    if (datetime.datetime.now().strftime("%H") == "21"):
-        print("DATETIME: ", datetime.datetime.now(), " Hour is 21")
+    if (datetime.datetime.now().strftime("%H") == "11"):
+        print("DATETIME: ", datetime.datetime.now(), " Hour is 11")
 
         dateFlight = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
@@ -49,12 +49,8 @@ def job():
 
 # schedule.every().day.at("21:01").do(job) NE DELA
 # workaround
-schedule.every().hour.at(":01").do(job)
+schedule.every().hour.at(":05").do(job)
 
 while True:
     schedule.run_pending()
     time.sleep(1)  # wait one second
-
-
-
-
