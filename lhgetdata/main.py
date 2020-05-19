@@ -49,7 +49,7 @@ def job():
 
 # schedule.every().day.at("21:01").do(job) NE DELA
 # workaround
-schedule.every().hour.at(":05").do(job)
+schedule.every().hour.at(":10").do(job)
 
 while True:
     schedule.run_pending()
