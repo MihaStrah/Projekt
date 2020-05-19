@@ -2,6 +2,9 @@ import requests, json
 import datetime
 import time
 from writetosql import writeOneFlightToSql
+import logging
+
+logger = logging.getLogger(__name__)
 
 def getFlightStatusWriteSql(token,flights,allids,date,wait):
     a=0
@@ -11,25 +14,30 @@ def getFlightStatusWriteSql(token,flights,allids,date,wait):
         idn=idn+1
         a=a+1
         url = 'https://api.lufthansa.com/v1/operations/flightstatus' + '/' + flight + '/' + date
-        print(url)
+        #print(url)
         bearer = "Bearer " + token
         headers = {"Authorization":bearer, "Accept":"application/json"}
         i = 0
         while i<10:
             try:
                 request = requests.get(url=url, headers=headers)
-                print(request)
+                #print(request)
                 data = request.json()
-                print(data)
+                #print(data)
                 i = 10
+                logger.info("Successfull request to Lufthansa API for flight:  %s, date: %s ; %s", flight, date, data)
             except:
                 time.sleep(10)
                 if (i > 3):
                     time.sleep(180)
                 if (i > 5):
                     time.sleep(600)
-                print("Retry LH " + str(i))
+                #print("Retry LH " + str(i))
                 i = i + 1
+                if (i == 10):
+                    logger.error("Error (abort) request to Lufthansa API for flight:  %s, date: %s", flight, date)
+                else:
+                    logger.info("Retry request to Lufthansa API for flight:  %s, date: %s", flight, date)
                 pass
 
         try:
@@ -127,15 +135,14 @@ def getFlightStatusWriteSql(token,flights,allids,date,wait):
         operating = (f"{newstatus.airlineid}{newstatus.flightnumber}")
         if (operating != flight.upper() and operating != ""):
             getFlightStatusWriteSqlOperatingRetry(token, operating, id, date, wait)
-            print(str(a) + " done. Processed flight " + str(flight) + " with ID " + id + ", " + str(
-                len(flights) - a) + " remaining !THIS WAS INSERTED WITH OPERATING RETRY BEACUSE OF OPERATING FLIGHT MISMATCH!")
+            #print(str(a) + " done. Processed flight " + str(flight) + " with ID " + id + ", " + str(len(flights) - a) + " remaining !THIS WAS INSERTED WITH OPERATING RETRY BEACUSE OF OPERATING FLIGHT MISMATCH!")
+            logger.info("Processed flight: %s, date: %s ; %s remaining ; !THIS WAS INSERTED WITH OPERATING RETRY BEACUSE OF OPERATING FLIGHT MISMATCH!", flight, date, (len(flights) - a))
 
         else:
             writeOneFlightToSql(newstatus, id)
-            print(str(a) + " done. Processed flight " + str(flight) + " with ID " + id + ", " + str(
-                len(flights) - a) + " remaining")
-
-        #wait because of API limitations
+            #print(str(a) + " done. Processed flight " + str(flight) + " with ID " + id + ", " + str(len(flights) - a) + " remaining")
+            logger.info("Processed flight: %s, date: %s ; %s remaining", flight, date, (len(flights) - a))
+            #wait because of API limitations
         time.sleep(wait)
 
     return
@@ -143,25 +150,30 @@ def getFlightStatusWriteSql(token,flights,allids,date,wait):
 
 def getFlightStatusWriteSqlOperatingRetry(token, flight, id, date, wait):
     url = 'https://api.lufthansa.com/v1/operations/flightstatus' + '/' + flight + '/' + date
-    print(url)
+    #print(url)
     bearer = "Bearer " + token
     headers = {"Authorization": bearer, "Accept": "application/json"}
     i = 0
     while i < 10:
         try:
             request = requests.get(url=url, headers=headers)
-            print(request)
+            #print(request)
             data = request.json()
-            print(data)
+            #print(data)
             i = 10
+            logger.info("Successfull (operating retry) request to Lufthansa API for flight:  %s, date: %s ; %s", flight, date, data)
         except:
             time.sleep(10)
             if (i > 3):
                 time.sleep(180)
             if (i > 5):
                 time.sleep(600)
-            print("Retry LH " + str(i))
+            #print("Retry LH " + str(i))
             i = i + 1
+            if (i == 10):
+                logger.error("Error (abort) (operating retry) request to Lufthansa API for flight:  %s, date: %s", flight, date)
+            else:
+                logger.info("Retry (operating retry) request to Lufthansa API for flight:  %s, date: %s", flight, date)
             pass
 
     try:
@@ -261,7 +273,9 @@ def getFlightStatusWriteSqlOperatingRetry(token, flight, id, date, wait):
 
     operating = (f"{newstatus.airlineid}{newstatus.flightnumber}")
     if (operating != flight.upper() and operating != ""):
-        print("!!!! ERROR !!!! operating is not the same, but should be (operating retry), writing anyway")
+        #print("!!!! ERROR !!!! operating is not the same, but should be (operating retry), writing anyway")
+        logger.error("Operating is not the same, but should be (operating retry), writing anyway ; flight:  %s, date: %s", flight, date)
+
 
     writeOneFlightToSql(newstatus, id)
 
@@ -275,36 +289,44 @@ def getFlightStatusWriteSqlOperatingRetry(token, flight, id, date, wait):
 def getFlightCodeshares(token,flight,date,wait):
     time.sleep(wait)
     url = 'https://api.lufthansa.com/v1/operations/customerflightinformation' + '/' + flight + '/' + date
-    print(url)
+    #print(url)
     bearer = "Bearer " + token
     headers = {"Authorization":bearer, "Accept":"application/json"}
     i = 0
     while i<10:
         try:
             request = requests.get(url=url, headers=headers)
-            print(request)
+            #print(request)
             data = request.json()
-            print(data)
+            #print(data)
             i = 10
+            logger.info("Successfull request to Lufthansa API for CODESHARE flight:  %s, date: %s ; %s", flight, date, data)
         except:
             time.sleep(10)
             if (i > 3):
                 time.sleep(180)
             if (i > 5):
                 time.sleep(600)
-            print("Retry LH " + str(i))
+            #print("Retry LH " + str(i))
             i = i + 1
+            if (i == 10):
+                logger.error("Error (abort) (operating retry) request to Lufthansa API for CODESHARE flight:  %s, date: %s", flight, date)
+            else:
+                logger.info("Retry (operating retry) request to Lufthansa API for CODESHARE flight:  %s, date: %s",
+                            flight, date)
             pass
+
     codeshares = []
     codeshares.clear()
     try:
         flightcodeshares = data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']
-        print("codeshares : ", flightcodeshares)
+        #print("codeshares : ", flightcodeshares)
         for flightcodeshare in flightcodeshares:
             codeshares.append([flightcodeshare['AirlineID'],flightcodeshare['FlightNumber']])
-            print(flightcodeshare['AirlineID'], flightcodeshare['FlightNumber'])
+            #print(flightcodeshare['AirlineID'], flightcodeshare['FlightNumber'])
     except:
         codeshares.clear()
+        logger.error("Unsuccessful parsing codeshares")
 
     return codeshares
 
