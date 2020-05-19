@@ -8,7 +8,7 @@ httplib2==0.17.0
 idna==2.9
 LatLon==1.0.2
 mysql-connector==2.2.9
-oauth2==1.9.0.post1
+oauth2.3==1.5.211
 pycparser==2.20
 pyproj==2.6.0
 python-oauth2==1.1.1
