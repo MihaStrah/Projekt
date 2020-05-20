@@ -15,7 +15,7 @@ from openskyAPI import getAirplanesAboveMe
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO, filename="telegrambot_logs/telegrambotPythonScriptLog.log", filemode='a')
+                    level=logging.INFO, filename="telegrambot_logs_out/telegrambotPythonScriptLog.log", filemode='a')
 
 logger = logging.getLogger(__name__)
 
