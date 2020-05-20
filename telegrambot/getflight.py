@@ -3,6 +3,8 @@ import datetime
 import time
 import oauth2 as oauth
 import re
+import logging
+logger = logging.getLogger(__name__)
 
 def getFlightStatus(flight, date):
     token = getToken()
@@ -28,24 +30,29 @@ def getFlight(token, flight, date):
     date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
     flight = re.search("^[A-z][A-z][0-9]{1,4}$", flight).group()
 
-
     url = (f"https://api.lufthansa.com/v1/operations/flightstatus/{flight}/{date}")
-    print(url)
+    #print(url)
     bearer = (f"Bearer {token}")
     headers = {"Authorization":bearer, "Accept":"application/json"}
-    print (bearer)
+    #print (bearer)
     i = 0
-    while i<10:
+    while i<5:
         try:
             request = requests.get(url = url, headers = headers)
-            print(request)
+            #print(request)
             data = request.json()
-            print(data)
-            i = 10
+            #print(data)
+            i = 5
+            logger.info("LH API response: %s", data)
         except:
-            time.sleep(5)
-            print("retry " + str(i))
+            time.sleep(2)
+            #print("retry " + str(i))
             i = i + 1
+            logger.info("LH API error, retry")
+            if (i==5):
+                logger.error("LH API error, ABORT")
+            else:
+                logger.info("LH API error, retry")
             pass
 
     try:
@@ -161,22 +168,26 @@ def getFlight(token, flight, date):
 
 def getAircraft(token, aircraftcode):
     url = (f"https://api.lufthansa.com/v1/mds-references/aircraft/{aircraftcode}")
-    print(url)
+    #print(url)
     bearer = (f"Bearer {token}")
     headers = {"Authorization":bearer, "Accept":"application/json"}
-    print (bearer)
+    #print (bearer)
     i = 0
     while i<3:
         try:
             request = requests.get(url = url, headers = headers)
-            print(request)
+            #print(request)
             data = request.json()
-            print(data)
+            #print(data)
             i = 3
         except:
-            time.sleep(5)
-            print("retry " + str(i))
+            time.sleep(2)
+            #print("retry " + str(i))
             i = i + 1
+            if (i==3):
+                logger.error("LH API error, ABORT")
+            else:
+                logger.info("LH API error, retry")
             pass
 
     try:
@@ -189,22 +200,26 @@ def getAircraft(token, aircraftcode):
 
 def getAirline(token, airlinecode):
     url = (f"https://api.lufthansa.com/v1/mds-references/airlines/{airlinecode}")
-    print(url)
+    #print(url)
     bearer = (f"Bearer {token}")
     headers = {"Authorization":bearer, "Accept":"application/json"}
-    print (bearer)
+    #print (bearer)
     i = 0
     while i<3:
         try:
             request = requests.get(url = url, headers = headers)
-            print(request)
+            #print(request)
             data = request.json()
-            print(data)
+            #print(data)
             i = 3
         except:
-            time.sleep(5)
-            print("retry " + str(i))
+            time.sleep(2)
+            #print("retry " + str(i))
             i = i + 1
+            if (i==3):
+                logger.error("LH API error, ABORT")
+            else:
+                logger.info("LH API error, retry")
             pass
 
     try:
@@ -218,22 +233,26 @@ def getAirline(token, airlinecode):
 
 def getAirport(token, airportname):
     url = (f"https://api.lufthansa.com/v1/mds-references/airports/{airportname}?lang=EN&LHoperated=0")
-    print(url)
+    #print(url)
     bearer = (f"Bearer {token}")
     headers = {"Authorization":bearer, "Accept":"application/json"}
-    print (bearer)
+    #print (bearer)
     i = 0
     while i<3:
         try:
             request = requests.get(url = url, headers = headers)
-            print(request)
+            #print(request)
             data = request.json()
-            print(data)
+            #print(data)
             i = 3
         except:
             time.sleep(5)
-            print("retry " + str(i))
+            #print("retry " + str(i))
             i = i + 1
+            if (i==3):
+                logger.error("LH API error, ABORT")
+            else:
+                logger.info("LH API error, retry")
             pass
     try:
         airportname = (data['AirportResource']['Airports']['Airport']['Names']['Name']['$'])
@@ -259,7 +278,7 @@ def getNewToken():
     client = oauth.Client(consumer)
     id, secret = readLHAccount()
     params = "client_id=" + id + "&" + "client_secret=" + secret + "&grant_type=client_credentials"
-    print(params)
+    #print(params)
     i = 0
     while i < 10:
         try:
@@ -275,7 +294,9 @@ def getNewToken():
             access_token = data["access_token"]
             expires_in = data["expires_in"]
             expires_date = datetime.datetime.now() + datetime.timedelta(0, (expires_in - 15))
-            print("New token, expires: ", expires_date)
+            #print("New token, expires: ", expires_date)
+            logger.info("LH API new token, expires: %s", expires_date)
+            pass
             i=10
         except:
             time.sleep(10)
@@ -283,8 +304,12 @@ def getNewToken():
                 time.sleep(180)
             if (i>5):
                 time.sleep(600)
-            print("Retry LH token " + str(i))
+            #print("Retry LH token " + str(i))
             i = i + 1
+            if (i == 10):
+                logger.error("LH API error, ABORT")
+            else:
+                logger.info("LH API error, retry")
             pass
 
     return access_token, expires_date

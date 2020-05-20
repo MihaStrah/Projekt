@@ -10,7 +10,7 @@ import logging
 
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO, filename="pythonScriptLog.log", filemode='a')
+                    level=logging.INFO, filename="lhgetdata_logs_out/lhgetdataPythonScriptLog.log", filemode='a')
 logger = logging.getLogger(__name__)
 
 
@@ -24,7 +24,7 @@ def job():
         dateFlight = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
         notification = "DATETIME: {} ::: Job in progress ... getting flights for date: {}".format(datetime.datetime.now(), dateFlight)
-        #print(notification)
+        print(notification)
         logger.info("Hour OK, started job, getting flights for date: %s", dateFlight)
         sendTG = telegram_bot_sendtext(notification)
         #print("TELEGRAM BOT: ", sendTG)
@@ -54,7 +54,7 @@ def job():
 
         notification = "DATETIME: {} ::: End of job - CODESHARE, all flights processed for date: {}".format(datetime.datetime.now(),
                                                                                                 dateFlight)
-        #print(notification)
+        print(notification)
         logger.info("Ended job, all codeshare flights processed for date: %s", dateFlight)
         sendTG = telegram_bot_sendtext(notification)
         #print("TELEGRAM BOT: ", sendTG)
@@ -67,9 +67,16 @@ def job():
 # schedule.every().day.at("21:01").do(job) NE DELA
 # workaround
 
-logger.info("Started Python script")
+logger.info("lhgetdata started")
+print("lghetdata started, logging in lhgetdataPythonScriptLog.log")
 schedule.every().hour.at(":30").do(job)
 
 while True:
     schedule.run_pending()
     time.sleep(1)  # wait one second
+
+
+
+
+
+

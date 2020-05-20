@@ -16,7 +16,6 @@ from openskyAPI import getAirplanesAboveMe
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO, filename="telegrambot_logs_out/telegrambotPythonScriptLog.log", filemode='a')
-
 logger = logging.getLogger(__name__)
 
 START, FLIGHT, FLIGHTDATE, STATUSMORE, REQLOCATION, LOCATION = range(6)
@@ -40,7 +39,7 @@ def flight(update, context):
 def flightdate(update, context):
     reply_keyboard = [[str(datetime.date.today() - datetime.timedelta(days=2)), str(datetime.date.today() - datetime.timedelta(days=1)), str(datetime.date.today()), str(datetime.date.today() + datetime.timedelta(days=1)), str(datetime.date.today() + datetime.timedelta(days=2))]]
     user = update.message.from_user
-    logger.info("FLight of %s: %s", user.first_name, update.message.text)
+    logger.info("%s: $Flight of$ %s", user.first_name, update.message.text)
     context.user_data['flight'] = re.search("^[A-z][A-z][0-9]{1,4}$", update.message.text).group()
     update.message.reply_text('Flight Date <i>(YYYY-MM-DD)</i>:',parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
@@ -51,7 +50,7 @@ def flightstatus(update, context):
     context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=ChatAction.TYPING)
     reply_keyboard = [['Departure', 'Arrival', 'Equipment', 'Done']]
     user = update.message.from_user
-    logger.info("Date of %s: %s", user.first_name, update.message.text)
+    logger.info("%s: $Date of$ %s", user.first_name, update.message.text)
     context.user_data['flightdate'] = update.message.text
     #delete previous flight data
     context.user_data['aircraftmodel'] = ""
@@ -65,10 +64,10 @@ def flightstatus(update, context):
     date = datetime.datetime.strptime(datestring, '%Y-%m-%d')
     if ((datetime.datetime.now() - datetime.timedelta(days=3)) < date):
         flightstatus = getFlightStatus(context.user_data["flight"], context.user_data["flightdate"])
-        logger.info("Getting flight from LH for %s: flight: %s, date: %s", user.first_name, context.user_data["flight"], context.user_data["flightdate"])
+        logger.info("%s: $Getting flight from LH API$ $flight: %s, date: %s$", user.first_name, context.user_data["flight"], context.user_data["flightdate"])
     else:
         flightstatus = getSQLFlightStatus(context.user_data["flight"], context.user_data["flightdate"])
-        logger.info("Getting flight from DB for %s: flight: %s, date: %s", user.first_name, context.user_data["flight"], context.user_data["flightdate"])
+        logger.info("%s: $Getting flight from DB$ $flight: %s, date: %s$", user.first_name, context.user_data["flight"], context.user_data["flightdate"])
 
     context.user_data['flightstatus'] = flightstatus
     if (flightstatus.depairport != ""):
@@ -92,7 +91,7 @@ def departure(update, context):
     context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=ChatAction.TYPING)
     reply_keyboard = [['Done', 'Arrival', 'Equipment']]
     user = update.message.from_user
-    logger.info("Option of %s: %s", user.first_name, update.message.text)
+    logger.info("%s: $Option: %s$", user.first_name, update.message.text)
     flightstatus = context.user_data['flightstatus']
 
 
@@ -120,7 +119,7 @@ def arrival(update, context):
     context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=ChatAction.TYPING)
     reply_keyboard = [['Departure', 'Done', 'Equipment']]
     user = update.message.from_user
-    logger.info("Option of %s: %s", user.first_name, update.message.text)
+    logger.info("%s: $Option: %s$", user.first_name, update.message.text)
     flightstatus = context.user_data['flightstatus']
     global timestatuscodes, timestatusdef
     if (flightstatus.arrtimestatusdef in timestatuscodes):
@@ -148,7 +147,7 @@ def equipment(update, context):
     context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=ChatAction.TYPING)
     reply_keyboard = [['Departure', 'Arrival', 'Done']]
     user = update.message.from_user
-    logger.info("Option of %s: %s", user.first_name, update.message.text)
+    logger.info("%s: $Option: %s$", user.first_name, update.message.text)
     flightstatus = context.user_data['flightstatus']
     if(context.user_data['operatingairlinename'] == ""):
         context.user_data['operatingairlinename'] = getAirlineName(flightstatus.airlineid)
@@ -159,13 +158,13 @@ def equipment(update, context):
     update.message.reply_text( 'Operating Carrier Flight: <b>{}{}</b>{}\n'
                                   'Aircraft: <b>{}</b>\n'
                                   'Aircraft Registration: <b>{}</b>\n'.format(flightstatus.airlineid,flightstatus.flightnumber,context.user_data['operatingairlinename'],context.user_data['aircraftmodel'],flightstatus.aircraftreg), parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
-    logger.info("Getting aircraft image for registration  %s for user %s", flightstatus.aircraftreg, user.first_name)
+    logger.info("%s: $Getting aircraft image for registration %s$",user.first_name, flightstatus.aircraftreg)
     context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=ChatAction.TYPING)
     if (context.user_data['aircraftimage'] == ""):
         context.user_data['aircraftimage'] = getAircraftImage(flightstatus.aircraftreg)
     if (context.user_data['aircraftimage'] != ""):
         update.message.reply_photo(photo=(f"{context.user_data['aircraftimage']}"))
-        logger.info("Sending aircraft image on link  %s for user %s", context.user_data['aircraftimage'], user.first_name)
+        logger.info("%s $Sending aircraft image on link %s$", user.first_name, context.user_data['aircraftimage'])
     return STATUSMORE
 
 
@@ -182,8 +181,8 @@ def location(update, context):
     user_location = update.message.location
     context.user_data['userlatitude'] = user_location.latitude
     context.user_data['userlongitude'] = user_location.longitude
-    print(update.message.location)
-    logger.info("Location of %s: %f / %f", user.first_name, user_location.latitude, user_location.longitude)
+    #print(update.message.location)
+    logger.info("%s: $Location of user is %f / %f$", user.first_name, user_location.latitude, user_location.longitude)
     update.message.reply_text('Location: <b>{} {}</b>\n'.format(user_location.latitude, user_location.longitude), parse_mode='HTML')
     context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=ChatAction.TYPING)
     range = 200
@@ -193,8 +192,8 @@ def location(update, context):
     for airplane in airplanesaboveme:
         txt = txt + '\nCall: {} Alt: {}m Vel: {}m/s'.format(airplane.callsign,airplane.baro_altitude,airplane.velocity)
         i = i + 1
-        print(i)
-        print(txt)
+        #print(i)
+        #print(txt)
         if (i>9):
             break
 
@@ -213,7 +212,7 @@ def location(update, context):
 
 def cancel(update, context):
     user = update.message.from_user
-    logger.info("User %s canceled the conversation.", user.first_name)
+    logger.info("%s: #User canceled the conversation.#", user.first_name)
     update.message.reply_text('Bye', reply_markup=ReplyKeyboardRemove())
     user_data.clear()
 
@@ -223,9 +222,12 @@ def cancel(update, context):
 def error(update, context):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, context.error)
+    print('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():
+    logger.info("telegrambot started")
+    print("telegrambot started, logging in telegrambotPythonScriptLog.log")
     bot_token = readTGAccount()
     updater = Updater(bot_token, use_context=True)
 

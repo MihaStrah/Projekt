@@ -21,7 +21,7 @@ def getAllFLights():
             if (i > 5):
                 time.sleep(600)
             i = i + 1
-            print("Retry DB " + str(i))
+            #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("Unsuccessful connection to SQL")
             else:
@@ -42,8 +42,8 @@ def getAllFLights():
             if (i > 5):
                 time.sleep(600)
             i = i + 1
-            print("Mariadb Error: {}".format(error))
-            print("Retry DB SELECT " + str(i))
+            #print("Mariadb Error: {}".format(error))
+            #print("Retry DB SELECT " + str(i))
             logger.error("MariaDB SQL error: %s", error)
             if (i == 10):
                 logger.error("Unsuccessful select from SQL")
@@ -64,8 +64,8 @@ def getAllFLights():
         allids.clear()
         logger.error("Unsuccessful parsing allids, allflights")
 
-    print(allflights)
-    print(allids)
+    #print(allflights)
+    #print(allids)
 
     return allflights, allids
 
@@ -86,7 +86,7 @@ def getAllFLightsForDay(date):
             if (i > 5):
                 time.sleep(600)
             i = i + 1
-            print("Retry DB " + str(i))
+            #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("Unsuccessful connection to SQL")
             else:
@@ -99,6 +99,7 @@ def getAllFLightsForDay(date):
             cursor.execute((f"SELECT id, airlineid, flightnumber, depscheduled FROM allflightsstatus where DATE(depscheduled)=DATE('{date}')"))
             mariadb_connection.close()
             i = 10
+            logger.info("Successfull select from SQL")
         except mariadb.Error as error:
             time.sleep(10)
             if (i > 3):
@@ -106,8 +107,8 @@ def getAllFLightsForDay(date):
             if (i > 5):
                 time.sleep(600)
             i = i + 1
-            print("Mariadb Error: {}".format(error))
-            print("Retry DB SELECT " + str(i))
+            #print("Mariadb Error: {}".format(error))
+            #print("Retry DB SELECT " + str(i))
             logger.error("MariaDB SQL error: %s", error)
             if (i == 10):
                 logger.error("Unsuccessful select from SQL")

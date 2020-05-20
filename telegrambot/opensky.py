@@ -2,6 +2,8 @@ import time
 import mysql.connector as mariadb
 import re
 import requests
+import logging
+logger = logging.getLogger(__name__)
 
 def getSQLicao24(registration):
     host, port, database, user, password = readDBAccount()
@@ -12,6 +14,7 @@ def getSQLicao24(registration):
             mariadb_connection = mariadb.connect(user=user, password=password, database=database, host=host, port=port)
             cursor = mariadb_connection.cursor()
             i = 10
+            logger.info("DB connection successful")
         except:
             i = i + 1
             time.sleep(1)
@@ -19,26 +22,36 @@ def getSQLicao24(registration):
                 time.sleep(2)
             if (i > 5):
                 time.sleep(3)
-            print("Retry DB " + str(i))
+            #print("Retry DB " + str(i))
+            if (i == 10):
+                logger.error("DB error, ABORT")
+            else:
+                logger.info("DB error, retry")
             pass
 
     i = 0
 
 
-    while i < 10:
+    while i < 3:
         try:
             cursor.execute("SELECT icao24 from aircraftDatabase where REPLACE(registration,'-','') LIKE %(registration)s limit 1;", {'registration': str(registration)})
             mariadb_connection.close()
-            i = 10
+            i = 3
         except mariadb.Error as error:
             i = i + 1
             time.sleep(1)
-            if (i > 3):
+            if (i > 0):
                 time.sleep(2)
-            if (i > 5):
+            if (i > 2):
                 time.sleep(3)
-            print("Mariadb Error: {}".format(error))
-            print("Retry DB SELECT " + str(i))
+            #print("Mariadb Error: {}".format(error))
+            #print("Retry DB SELECT " + str(i))
+            logger.error("DB error: %s", error)
+            if (i == 3):
+                logger.error("DB error, ABORT")
+            else:
+                logger.info("DB error, retry")
+            pass
 
         returnrow = cursor.fetchone()
         if returnrow is None:
@@ -59,14 +72,16 @@ def getAircraftImage(registration):
 
     try:
         URL = (f"https://www.airport-data.com/api/ac_thumb.json?m={icao24}&n=1")
-        print(URL)
+        #print(URL)
         r = requests.get(url=URL)
         data = r.json()
-        print(data)
+        #print(data)
         aircraftimage = data["data"][0]["image"]
         aircraftimage = aircraftimage.replace('/thumbnails', '')
+        logger.info("airport-data image API call successful")
     except:
         aircraftimage=""
+        logger.info("airport-data image API call unsuccessful, trying with '-'")
 
     if (aircraftimage == ""):
         try:
@@ -74,28 +89,31 @@ def getAircraftImage(registration):
             N=1
             registration = registration[ : N] + "-" + registration[N : ]
             URL = (f"https://www.airport-data.com/api/ac_thumb.json?r={registration}&n=1")
-            print(URL)
+            #print(URL)
             r = requests.get(url=URL)
             data = r.json()
-            print(data)
+            #print(data)
             aircraftimage = data["data"][0]["image"]
             aircraftimage = aircraftimage.replace('/thumbnails', '')
+            logger.info("airport-data image API call successful")
         except:
             aircraftimage = ""
+            logger.info("airport-data image API call unsuccessful, trying with '-' option 2")
         if (aircraftimage == ""):
             try:
                 # try with registration with "-"
                 N = 2
                 registration = registration[: N] + "-" + registration[N:]
                 URL = (f"https://www.airport-data.com/api/ac_thumb.json?r={registration}&n=1")
-                print(URL)
+                #print(URL)
                 r = requests.get(url=URL)
                 data = r.json()
-                print(data)
+                #print(data)
                 aircraftimage = data["data"][0]["image"]
                 aircraftimage = aircraftimage.replace('/thumbnails', '')
             except:
                 aircraftimage = ""
+                logger.info("airport-data image API call unsuccessful")
 
     return aircraftimage
 

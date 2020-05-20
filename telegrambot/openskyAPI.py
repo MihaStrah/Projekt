@@ -1,5 +1,7 @@
 import requests
 from aircraftlocations import boundingBox
+import logging
+logger = logging.getLogger(__name__)
 
 #https://opensky-network.org/apidoc/rest.html
 
@@ -12,19 +14,21 @@ def getAirplanesAboveMe(latitude, longtitude, range):
 
     try:
         URL = (f"https://opensky-network.org/api/states/all?lamin={lamin}&lomin={lomin}&lamax={lamax}&lomax={lomax}")
-        print(URL)
+        #print(URL)
         r = requests.get(url=URL, auth=(username, password))
-        print(r)
+        #print(r)
         data = r.json()
-        print(data)
+        #print(data)
+        logger.info("opensky API call successful: %s", data)
     except:
         states.clear()
+        logger.info("opensky API call unsuccessful")
 
     try:
         states.clear()
         statesdata = data["states"]
-        print(statesdata)
-        print(statesdata[0])
+        #print(statesdata)
+        #print(statesdata[0])
         for statedata in statesdata:
             icao24 = statedata[0]
             callsign = statedata[1]
@@ -46,11 +50,12 @@ def getAirplanesAboveMe(latitude, longtitude, range):
 
             new_airplane_status = airplane_status(icao24,callsign,origin_country,time_position,last_contact,longitude,latitude,baro_altitude,on_ground,velocity,true_track,vertical_rate,sensors,geo_altitude,squawk,spi,position_source)
             states.append(new_airplane_status)
-            print(new_airplane_status)
+            #print(new_airplane_status)
     except:
         states.clear()
-    print("STATES:")
-    print(states)
+        logger.error("opensky data not resolved")
+    #print("STATES:")
+    #print(states)
 
     return states
 

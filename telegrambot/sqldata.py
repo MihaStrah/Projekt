@@ -1,6 +1,8 @@
 import time
 import mysql.connector as mariadb
 import re
+import logging
+logger = logging.getLogger(__name__)
 
 def getSQLFlightStatus(flight,date):
     host, port, database, user, password = readDBAccount()
@@ -17,6 +19,7 @@ def getSQLFlightStatus(flight,date):
             mariadb_connection = mariadb.connect(user=user, password=password, database=database, host=host, port=port)
             cursor = mariadb_connection.cursor()
             i = 10
+            logger.info("DB connection successful")
         except:
             i = i + 1
             time.sleep(1)
@@ -24,27 +27,33 @@ def getSQLFlightStatus(flight,date):
                 time.sleep(2)
             if (i > 5):
                 time.sleep(3)
-            print("Retry DB " + str(i))
+            #print("Retry DB " + str(i))
+            if (i == 10):
+                logger.error("DB error, ABORT")
+            else:
+                logger.info("DB error, retry")
             pass
 
     i = 0
-    while i < 10:
+    while i < 3:
         try:
             #search in DB for operating and for codeshare (returns operating flight)
             cursor.execute("SELECT depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus,flightnumberkey from allflightsstatus where id in (select operating_id from codeshares where DATE(depscheduled)=DATE(%(date)s) and ((codeshare_airlineid=%(airlineid)s and codeshare_flightnumber=%(flightnumber)s) OR (operating_airlineid=%(airlineid)s and operating_flightnumber=%(flightnumber)s ))) limit 1;",{'airlineid': str(airlineid), 'flightnumber': str(flightnumber), 'date': str(date)})
             #search in DB only for operating flights
             #cursor.execute("SELECT depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus,flightnumberkey from allflightsstatus where airlineid=%(airlineid)s and flightnumber=%(flightnumber)s and DATE(depscheduled)=DATE(%(date)s) limit 1;", {'airlineid': str(airlineid), 'flightnumber': str(flightnumber),'date': str(date)})
             mariadb_connection.close()
-            i = 10
+            i = 3
         except mariadb.Error as error:
             i = i + 1
-            time.sleep(1)
-            if (i > 3):
-                time.sleep(2)
-            if (i > 5):
-                time.sleep(3)
-            print("Mariadb Error: {}".format(error))
-            print("Retry DB SELECT " + str(i))
+            time.sleep(2)
+            #print("Mariadb Error: {}".format(error))
+            #print("Retry DB SELECT " + str(i))
+            logger.error("DB error: %s", error)
+            if (i==3):
+                logger.error("DB error, ABORT")
+            else:
+                logger.info("DB error, retry")
+            pass
 
         returnrow = cursor.fetchone()
         if returnrow is None:

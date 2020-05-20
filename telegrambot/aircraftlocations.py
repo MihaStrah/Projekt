@@ -1,4 +1,6 @@
 import math
+import logging
+logger = logging.getLogger(__name__)
 
 #https://wiki.openstreetmap.org/wiki/API_v0.6
 #https://www.epochconverter.com
