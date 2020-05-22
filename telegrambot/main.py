@@ -63,11 +63,14 @@ def flightstatus(update, context):
     datestring = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", context.user_data['flightdate']).group()
     date = datetime.datetime.strptime(datestring, '%Y-%m-%d')
     if ((datetime.datetime.now() - datetime.timedelta(days=3)) < date):
+        logger.info("%s: $Getting flight from LH API$ $flight: %s, date: %s$", user.first_name,
+                    context.user_data["flight"], context.user_data["flightdate"])
         flightstatus = getFlightStatus(context.user_data["flight"], context.user_data["flightdate"])
-        logger.info("%s: $Getting flight from LH API$ $flight: %s, date: %s$", user.first_name, context.user_data["flight"], context.user_data["flightdate"])
     else:
+        logger.info("%s: $Getting flight from DB$ $flight: %s, date: %s$", user.first_name, context.user_data["flight"],
+                    context.user_data["flightdate"])
         flightstatus = getSQLFlightStatus(context.user_data["flight"], context.user_data["flightdate"])
-        logger.info("%s: $Getting flight from DB$ $flight: %s, date: %s$", user.first_name, context.user_data["flight"], context.user_data["flightdate"])
+
 
     context.user_data['flightstatus'] = flightstatus
     if (flightstatus.depairport != ""):

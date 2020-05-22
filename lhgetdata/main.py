@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def job():
     #print("DATETIME: ", datetime.datetime.now(), " checking hour")
     # workaround
-    if (datetime.datetime.now().strftime("%H") == "16"):
+    if (datetime.datetime.now().strftime("%H") == "21"):
         #print("DATETIME: ", datetime.datetime.now(), " Hour is 21")
 
 
@@ -32,7 +32,7 @@ def job():
 
         token = getNewToken()
         allflights, allids = getAllFLights()
-        getFlightStatusWriteSql(token,allflights,allids,dateFlight,3)
+        getFlightStatusWriteSql(token,allflights,allids,dateFlight,4)
 
         notification = "DATETIME: {} ::: End of job, all flights processed for date: {}".format(datetime.datetime.now(), dateFlight)
         logger.info("Ended job, all flights processed for date: %s", dateFlight)

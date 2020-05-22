@@ -180,6 +180,7 @@ def getAircraft(token, aircraftcode):
             data = request.json()
             #print(data)
             i = 3
+            logger.info("LH API response: %s", data)
         except:
             time.sleep(2)
             #print("retry " + str(i))
@@ -212,6 +213,8 @@ def getAirline(token, airlinecode):
             data = request.json()
             #print(data)
             i = 3
+            logger.info("LH API response: %s", data)
+
         except:
             time.sleep(2)
             #print("retry " + str(i))
@@ -245,6 +248,7 @@ def getAirport(token, airportname):
             data = request.json()
             #print(data)
             i = 3
+            logger.info("LH API response: %s", data)
         except:
             time.sleep(5)
             #print("retry " + str(i))
