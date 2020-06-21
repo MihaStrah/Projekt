@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 def job():
     #print("DATETIME: ", datetime.datetime.now(), " checking hour")
     # workaround
-    if (datetime.datetime.now().strftime("%H") == "21"):
-        #print("DATETIME: ", datetime.datetime.now(), " Hour is 21")
+    if (datetime.datetime.now().strftime("%H") == "20"):
+        #print("DATETIME: ", datetime.datetime.now(), " Hour is 20")
 
 
         dateFlight = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
@@ -60,11 +60,11 @@ def job():
         #print("TELEGRAM BOT: ", sendTG)
         logger.info("Sent telegram notification: %s", sendTG)
 
-    #print("DATETIME: ", datetime.datetime.now(), "Hour is not 21")
+    #print("DATETIME: ", datetime.datetime.now(), "Hour is not 20")
     logger.info("Hour NOT OK, sleeping")
     return
 
-# schedule.every().day.at("21:01").do(job) NE DELA
+# schedule.every().day.at("20:01").do(job) NE DELA
 # workaround
 
 logger.info("lhgetdata started")
@@ -74,8 +74,6 @@ schedule.every().hour.at(":30").do(job)
 while True:
     schedule.run_pending()
     time.sleep(1)  # wait one second
-
-
 
 
 

@@ -310,9 +310,9 @@ def getFlightCodeshares(token,flight,date,wait):
             #print("Retry LH " + str(i))
             i = i + 1
             if (i == 10):
-                logger.error("Error (abort) (operating retry) request to Lufthansa API for CODESHARE flight:  %s, date: %s", flight, date)
+                logger.error("Error (abort) request to Lufthansa API for CODESHARE flight:  %s, date: %s", flight, date)
             else:
-                logger.info("Retry (operating retry) request to Lufthansa API for CODESHARE flight:  %s, date: %s",
+                logger.info("Retry request to Lufthansa API for CODESHARE flight:  %s, date: %s",
                             flight, date)
             pass
 
@@ -321,12 +321,17 @@ def getFlightCodeshares(token,flight,date,wait):
     try:
         flightcodeshares = data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']
         #print("codeshares : ", flightcodeshares)
+        print(flightcodeshares)
         for flightcodeshare in flightcodeshares:
             codeshares.append([flightcodeshare['AirlineID'],flightcodeshare['FlightNumber']])
             #print(flightcodeshare['AirlineID'], flightcodeshare['FlightNumber'])
     except:
-        codeshares.clear()
-        logger.error("Unsuccessful parsing codeshares")
+        try:
+            codeshares.append([data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['AirlineID'], data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['FlightNumber']])
+            logger.info("Not array, only one marketing carrier, parsing OK")
+        except:
+            codeshares.clear()
+            logger.error("Unsuccessful parsing codeshares, no marketing carriers")
 
     return codeshares
 
