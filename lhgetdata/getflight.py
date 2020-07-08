@@ -321,7 +321,6 @@ def getFlightCodeshares(token,flight,date,wait):
     try:
         flightcodeshares = data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']
         #print("codeshares : ", flightcodeshares)
-        print(flightcodeshares)
         for flightcodeshare in flightcodeshares:
             codeshares.append([flightcodeshare['AirlineID'],flightcodeshare['FlightNumber']])
             #print(flightcodeshare['AirlineID'], flightcodeshare['FlightNumber'])

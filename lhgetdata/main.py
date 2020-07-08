@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def job():
     #print("DATETIME: ", datetime.datetime.now(), " checking hour")
     # workaround
-    if (datetime.datetime.now().strftime("%H") == "20"):
+    if (datetime.datetime.now().strftime("%H") == "18"):
         #print("DATETIME: ", datetime.datetime.now(), " Hour is 20")
 
 
