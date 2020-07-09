@@ -9,7 +9,7 @@ import os
 import logging
 from izbaze import getSQLFlightStatus, getSQLFlightStats
 
-app = Flask(__name__)
+server = Flask(__name__)
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO, filename="letAPI_logs_out/letAPIPythonScriptLog.log", filemode='a')
