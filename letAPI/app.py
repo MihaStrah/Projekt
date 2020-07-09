@@ -45,14 +45,6 @@ class Users(db.Model):
     admin = db.Column(db.Boolean)
 
 
-class Authors(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
-    book = db.Column(db.String(20), unique=True, nullable=False)
-    country = db.Column(db.String(50), nullable=False)
-    booker_prize = db.Column(db.Boolean)
-    user_id = db.Column(db.Integer)
-
 db.create_all()
 print('db created')
 
@@ -126,6 +118,8 @@ def get_letstat30day(current_user,stlet):
     letstat30dayinfo = getSQLFlightStats(stlet,30)
     print(letstat30dayinfo)
     return (letstat30dayinfo)
+
+
 
 
 #if __name__ == '__main__':
