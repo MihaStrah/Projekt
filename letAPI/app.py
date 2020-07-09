@@ -30,11 +30,11 @@ path = os.path.abspath(os.path.dirname(__file__))
 fullpath = 'sqlite:///' + os.path.join(path, 'apiusers/APIusersDB.db')
 print(fullpath)
 
-app.config['SECRET_KEY'] = readAPIKey()
-app.config['SQLALCHEMY_DATABASE_URI'] = (fullpath)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+server.config['SECRET_KEY'] = readAPIKey()
+server.config['SQLALCHEMY_DATABASE_URI'] = (fullpath)
+server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-db = SQLAlchemy(app)
+db = SQLAlchemy(server)
 
 
 class Users(db.Model):
