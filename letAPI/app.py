@@ -70,7 +70,7 @@ def token_required(f):
             return jsonify({'message': 'a valid token is missing'})
 
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'])
+            data = jwt.decode(token, server.config['SECRET_KEY'])
             current_user = Users.query.filter_by(public_id=data['public_id']).first()
         except:
             return jsonify({'message': 'token is invalid'})
@@ -80,7 +80,7 @@ def token_required(f):
     return decorator
 
 
-@app.route('/login', methods=['POST'])
+@server.route('/login', methods=['POST'])
 def login_user():
     auth = request.authorization
 
@@ -93,14 +93,14 @@ def login_user():
         exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
         token = jwt.encode(
             {'public_id': user.public_id, 'exp': exp},
-            app.config['SECRET_KEY'])
+            server.config['SECRET_KEY'])
         return jsonify({'token': token.decode('UTF-8'), 'expires': exp})
 
     return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
 
 
 #let
-@app.route('/let/<datum>/<stlet>', methods=['GET'])
+@server.route('/let/<datum>/<stlet>', methods=['GET'])
 @token_required
 def get_let(current_user,datum,stlet):
     print(datum)
@@ -110,7 +110,7 @@ def get_let(current_user,datum,stlet):
     return (letinfo)
 
 #letstat7day
-@app.route('/stat7/<stlet>', methods=['GET'])
+@server.route('/stat7/<stlet>', methods=['GET'])
 @token_required
 def get_letstat7day(current_user,stlet):
     print(stlet)
@@ -119,7 +119,7 @@ def get_letstat7day(current_user,stlet):
     return (letstat7dayinfo)
 
 #letstat7day
-@app.route('/stat30/<stlet>', methods=['GET'])
+@server.route('/stat30/<stlet>', methods=['GET'])
 @token_required
 def get_letstat30day(current_user,stlet):
     print(stlet)
@@ -129,6 +129,6 @@ def get_letstat30day(current_user,stlet):
 
 
 #if __name__ == '__main__':
-#    app.run(debug=True)
+#    server.run(debug=True)
 
 
