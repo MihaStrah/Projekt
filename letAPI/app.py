@@ -82,12 +82,14 @@ def login_user():
     user = Users.query.filter_by(name=auth.username).first()
 
     if check_password_hash(user.password, auth.password):
-        exp = (datetime.datetime.utcnow() + datetime.timedelta(minutes=30)).isoformat()
+        exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
         token = jwt.encode(
             {'public_id': user.public_id, 'exp': exp},
             server.config['SECRET_KEY'])
         print(exp)
-        return jsonify({'token': token.decode('UTF-8'), 'expires': exp})
+
+        #for json in iso
+        return jsonify({'token': token.decode('UTF-8'), 'expires': exp.isoformat()})
 
 
     return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
