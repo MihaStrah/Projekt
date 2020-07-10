@@ -7,7 +7,7 @@ import datetime
 from functools import wraps
 import os
 import logging
-from izbaze import getSQLFlightStatus, getSQLFlightStats
+from izbaze import getSQLFlightStatus, getSQLFlightStats, getSQLFlightCodeshares
 
 server = Flask(__name__)
 
@@ -46,7 +46,7 @@ class Users(db.Model):
 
 
 db.create_all()
-print('db created')
+print('db created or opened')
 
 
 def token_required(f):
@@ -95,34 +95,56 @@ def login_user():
 @server.route('/let/<datum>/<stlet>', methods=['GET'])
 @token_required
 def get_let(current_user,datum,stlet):
-    print(datum)
-    print(stlet)
+    #print(datum)
+    #print(stlet)
     letinfo = getSQLFlightStatus(stlet,datum)
-    print(letinfo)
+    #print(letinfo)
     return (letinfo)
 
 #letstat7day
 @server.route('/stat7/<stlet>', methods=['GET'])
 @token_required
 def get_letstat7day(current_user,stlet):
-    print(stlet)
+    #print(stlet)
     letstat7dayinfo = getSQLFlightStats(stlet,7)
-    print(letstat7dayinfo)
+    #print(letstat7dayinfo)
     return (letstat7dayinfo)
 
 #letstat7day
 @server.route('/stat30/<stlet>', methods=['GET'])
 @token_required
 def get_letstat30day(current_user,stlet):
-    print(stlet)
+    #print(stlet)
     letstat30dayinfo = getSQLFlightStats(stlet,30)
-    print(letstat30dayinfo)
+    #print(letstat30dayinfo)
     return (letstat30dayinfo)
 
 
+#letcodeshares
+@server.route('/codeshares/<datum>/<stlet>', methods=['GET'])
+@token_required
+def get_letcodeshares(current_user,datum,stlet):
+    #print(datum)
+    #print(stlet)
+    letcodeshares = getSQLFlightCodeshares(stlet,datum)
+    print(letcodeshares)
+    return (letcodeshares)
 
 
-#if __name__ == '__main__':
-#    server.run(debug=True)
+
+
+#letcodesharesOPEN!!!
+@server.route('/open/codeshares/<datum>/<stlet>', methods=['GET'])
+def get_letcodesharesopen(datum,stlet):
+    #print(datum)
+    #print(stlet)
+    letcodeshares = getSQLFlightCodeshares(stlet,datum)
+    print(letcodeshares)
+    return (letcodeshares)
+
+
+
+if __name__ == '__main__':
+    server.run(debug=True)
 
 
