@@ -28,7 +28,7 @@ def readAPIKey():
 
 path = os.path.abspath(os.path.dirname(__file__))
 fullpath = 'sqlite:///' + os.path.join(path, 'apiusers/APIusersDB.db')
-print(fullpath)
+#print(fullpath)
 
 server.config['SECRET_KEY'] = readAPIKey()
 server.config['SQLALCHEMY_DATABASE_URI'] = (fullpath)
@@ -46,7 +46,7 @@ class Users(db.Model):
 
 
 db.create_all()
-print('db created or opened')
+#print('db created or opened')
 
 
 def token_required(f):
@@ -133,18 +133,19 @@ def get_letcodeshares(current_user,datum,stlet):
 
 
 
+#testno
 #letcodesharesOPEN!!!
 @server.route('/open/codeshares/<datum>/<stlet>', methods=['GET'])
 def get_letcodesharesopen(datum,stlet):
     #print(datum)
     #print(stlet)
     letcodeshares = getSQLFlightCodeshares(stlet,datum)
-    print(letcodeshares)
+    #print(letcodeshares)
     return (letcodeshares)
 
 
 
-if __name__ == '__main__':
-    server.run(debug=True)
+#if __name__ == '__main__':
+#    server.run()
 
 

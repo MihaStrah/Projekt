@@ -212,6 +212,55 @@ def writeCodeshareToSql(codeshare_airlineid, codeshare_flightnumber, operating_a
     mariadb_connection.commit()
     mariadb_connection.close()
 
+
+
+def updateDuplicatesSql():
+    host, port, database, user, password = readDBAccount()
+    i = 0
+    while i < 10:
+        try:
+            mariadb_connection = mariadb.connect(user=user, password=password, database=database, host=host, port=port)
+            cursor = mariadb_connection.cursor()
+            i = 10
+            logger.info("Successfull connection to SQL")
+        except:
+            time.sleep(10)
+            if (i>3):
+                time.sleep(180)
+            if (i>5):
+                time.sleep(600)
+            i = i + 1
+            #print("Retry DB " + str(i))
+            if (i == 10):
+                logger.error("Unsuccessful connection to SQL")
+            else:
+                logger.info("Retry connection to SQL")
+            pass
+
+    i = 0
+    while i < 10:
+        try:
+            cursor.execute("update allflightsstatus set Duplicates='D' where id IN (select t.id from (select *, count(*) cnt from allflightsstatus where airlineid != '' and Duplicates is  null group by flightnumber, airlineid, depscheduled) t where t.cnt > 1);")
+            #print("successful write to database")
+            i = 10
+        except mariadb.Error as error:
+            time.sleep(10)
+            if (i > 3):
+                time.sleep(180)
+            if (i > 5):
+                time.sleep(600)
+            i = i + 1
+            #print("Mariadb Error: {}".format(error))
+            #print("Retry DB INSERT " + str(i))
+            logger.error("MariaDB SQL error: %s", error)
+            if (i == 10):
+                logger.error("Unsuccessful update to SQL")
+            else:
+                logger.info("Retry update to SQL")
+
+    mariadb_connection.commit()
+    mariadb_connection.close()
+
 def readDBAccount():
     import os
     path = os.path.abspath(os.path.dirname(__file__))

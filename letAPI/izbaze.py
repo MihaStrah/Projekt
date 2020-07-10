@@ -123,7 +123,7 @@ def getSQLFlightStats(flight,days):
 
         returnrow = cursor.fetchone()
 
-        print(returnrow)
+        #print(returnrow)
 
         if returnrow is None:
             letstats = jsonify({'info': 'statistika za ta let ne obstaja'})
@@ -174,8 +174,8 @@ def getSQLFlightCodeshares(flight,date):
         except mariadb.Error as error:
             i = i + 1
             time.sleep(2)
-            print("Mariadb Error: {}".format(error))
-            print("Retry DB SELECT " + str(i))
+            #print("Mariadb Error: {}".format(error))
+            #print("Retry DB SELECT " + str(i))
             logger.error("DB error: %s", error)
             if (i==3):
                 logger.error("DB error, ABORT")
@@ -186,8 +186,8 @@ def getSQLFlightCodeshares(flight,date):
 
         returnrows = cursor.fetchall()
 
-        print("returnrows")
-        print(returnrows)
+        #("returnrows")
+        #print(returnrows)
 
         if returnrows:
             codeshares = []
@@ -196,7 +196,7 @@ def getSQLFlightCodeshares(flight,date):
                 flightcodeshare = (flight_codeshare(row[2], row[3]))
                 codeshares.append(flightcodeshare.__dict__)
 
-            print(json.dumps(codeshares))
+            #print(json.dumps(codeshares))
             operatingcodeshares = operating_codeshares(flightoperating,codeshares)
             operatingcodeshares = operatingcodeshares.toJson()
         else:

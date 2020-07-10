@@ -40,7 +40,7 @@ def flightdate(update, context):
     reply_keyboard = [[str(datetime.date.today() - datetime.timedelta(days=2)), str(datetime.date.today() - datetime.timedelta(days=1)), str(datetime.date.today()), str(datetime.date.today() + datetime.timedelta(days=1)), str(datetime.date.today() + datetime.timedelta(days=2))]]
     user = update.message.from_user
     logger.info("%s: $Flight of$ %s", user.first_name, update.message.text)
-    context.user_data['flight'] = re.search("^[A-z][A-z][0-9]{1,4}$", update.message.text).group()
+    context.user_data['flight'] = re.search("^[A-z]{1,2}[0-9]{1,6}$", update.message.text).group()
     update.message.reply_text('Flight Date <i>(YYYY-MM-DD)</i>:',parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return FLIGHTDATE
@@ -243,7 +243,7 @@ def main():
 
             START: [MessageHandler(Filters.text, flight)],
 
-            FLIGHT: [MessageHandler(Filters.regex('^[A-z][A-z][0-9]{1,4}$'), flightdate),
+            FLIGHT: [MessageHandler(Filters.regex('^[A-z]{1,2}[0-9]{1,6}$'), flightdate),
                      MessageHandler(Filters.regex('^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'), flightstatus),
                      MessageHandler(Filters.regex('^location'), reqlocation)],
 
@@ -254,7 +254,7 @@ def main():
                          MessageHandler(Filters.regex('^Arrival$'), arrival),
                          MessageHandler(Filters.regex('^Equipment$'), equipment),
                          MessageHandler(Filters.regex('^Done$'), flight),
-                         MessageHandler(Filters.regex('^[A-z][A-z][0-9]{1,4}$'), flightdate),
+                         MessageHandler(Filters.regex('^[A-z]{1,2}[0-9]{1,6}$'), flightdate),
                          MessageHandler(Filters.regex('^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'), flightstatus)],
 
             REQLOCATION: [MessageHandler(Filters.regex('No'), flight),

@@ -1,7 +1,7 @@
 import requests, json
 import datetime
 import time
-from writetosql import writeOneFlightToSql
+from writetosql import writeOneFlightToSql, updateDuplicatesSql
 import logging
 
 logger = logging.getLogger(__name__)
@@ -144,6 +144,9 @@ def getFlightStatusWriteSql(token,flights,allids,date,wait):
             logger.info("Processed flight: %s, date: %s ; %s remaining", flight, date, (len(flights) - a))
             #wait because of API limitations
         time.sleep(wait)
+
+    updateDuplicatesSql()
+    logger.info("Updated duplicates in SQL")
 
     return
 

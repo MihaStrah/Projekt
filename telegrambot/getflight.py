@@ -28,7 +28,7 @@ def getAirportName(airportid):
 
 def getFlight(token, flight, date):
     date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
-    flight = re.search("^[A-z][A-z][0-9]{1,4}$", flight).group()
+    flight = re.search("^[A-z]{1,2}[0-9]{1,6}$", flight).group()
 
     url = (f"https://api.lufthansa.com/v1/operations/flightstatus/{flight}/{date}")
     #print(url)
