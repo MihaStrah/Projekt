@@ -82,11 +82,13 @@ def login_user():
     user = Users.query.filter_by(name=auth.username).first()
 
     if check_password_hash(user.password, auth.password):
-        exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+        exp = (datetime.datetime.utcnow() + datetime.timedelta(minutes=30)).isoformat()
         token = jwt.encode(
             {'public_id': user.public_id, 'exp': exp},
             server.config['SECRET_KEY'])
+        print(exp)
         return jsonify({'token': token.decode('UTF-8'), 'expires': exp})
+
 
     return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
 
@@ -146,6 +148,6 @@ def get_letcodesharesopen(datum,stlet):
 
 
 #if __name__ == '__main__':
-#    server.run()
+#   server.run()
 
 
