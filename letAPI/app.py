@@ -88,7 +88,7 @@ def login_user():
         token = jwt.encode(
             {'public_id': user.public_id, 'exp': exp},
             server.config['SECRET_KEY'])
-        print(exp)
+        #print(exp)
 
         #for json in iso
         return jsonify({'token': token.decode('UTF-8'), 'expires': exp.isoformat()})
@@ -133,48 +133,48 @@ def get_flightCodeshares(current_user,date,flightnumber):
     #print(date)
     #print(flightnumber)
     flightCodeshares = getSQLFlightCodeshares(flightnumber,date)
-    print(flightCodeshares)
+    #print(flightCodeshares)
     return (flightCodeshares)
 
 #AirplaneImageURL
 @server.route('/aircraftimage/<aircraftreg>', methods=['GET'])
 @token_required
 def get_aircraftImage(current_user,aircraftreg):
-    print("test")
+    #print("test")
     aircraftImageURL = getAircraftImageURL(aircraftreg)
-    print(aircraftImageURL)
+    #print(aircraftImageURL)
     return (aircraftImageURL)
 
 @server.route('/live/<date>/<flightnumber>', methods=['GET'])
 @token_required
 def get_flightstatusLive(current_user,flightnumber, date):
-    print("test")
+    #print("test")
     flightstatusLive = getFlightStatusLufthansa(flightnumber, date)
-    print(flightstatusLive)
+    #print(flightstatusLive)
     return (flightstatusLive)
 
 @server.route('/info/aircraftname/<aircraftmodelcode>', methods=['GET'])
 @token_required
 def get_aircraftmodelName(current_user,aircraftmodelcode):
-    print("test")
+    #print("test")
     aircraftmodelname = getAircraftModelLufthansa(aircraftmodelcode)
-    print(aircraftmodelname)
+    #print(aircraftmodelname)
     return (aircraftmodelname)
 
 @server.route('/info/airlinename/<airlinecode>', methods=['GET'])
 @token_required
 def get_airlineName(current_user,airlinecode):
-    print("test")
+    #print("test")
     airlinename = getAirlineNameLufthansa(airlinecode)
-    print(airlinename)
+    #print(airlinename)
     return (airlinename)
 
 @server.route('/info/airportname/<airportcode>', methods=['GET'])
 @token_required
 def get_airportName(current_user,airportcode):
-    print("test")
+    #print("test")
     airportname = getAirportNameLufthansa(airportcode)
-    print(airportname)
+    #print(airportname)
     return (airportname)
 
 
@@ -190,7 +190,7 @@ def get_flightCodesharesOpen(date,flightnumber):
 
 
 
-if __name__ == '__main__':
-   server.run(debug=True)
+#if __name__ == '__main__':
+#   server.run(debug=True)
 
 

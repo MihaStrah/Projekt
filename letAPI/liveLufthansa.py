@@ -165,9 +165,9 @@ def getAircraft(token, aircraftcode):
     while i<3:
         try:
             request = requests.get(url = url, headers = headers)
-            print(request)
+            #print(request)
             data = request.json()
-            print(data)
+            #print(data)
             i = 3
             logger.info("LH API response: %s", data)
         except:
