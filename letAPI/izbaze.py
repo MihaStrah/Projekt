@@ -60,7 +60,7 @@ def getSQLFlightStatus(flight,date):
 
         returnrow = cursor.fetchone()
         if returnrow is None:
-            newstatus = jsonify({'info': 'let ne obstaja'})
+            newstatus = jsonify({'info': 'flight does not exist'})
         else:
             newstatus = (flight_status(returnrow[0],returnrow[1],returnrow[2],returnrow[3],returnrow[4],returnrow[5],returnrow[6],returnrow[7],returnrow[8],returnrow[9],returnrow[10],returnrow[11],returnrow[12],returnrow[13],returnrow[14],returnrow[15],returnrow[16],returnrow[17],returnrow[18],returnrow[19],returnrow[20])).toJson()
 
@@ -126,11 +126,11 @@ def getSQLFlightStats(flight,days):
         #print(returnrow)
 
         if returnrow is None:
-            letstats = jsonify({'info': 'statistika za ta let ne obstaja'})
+            flightStats = jsonify({'info': 'flight statistics does not exist'})
         else:
-            letstats = (flight_stats(returnrow[0],returnrow[1],returnrow[2],returnrow[3],returnrow[4],returnrow[5],returnrow[6],returnrow[7],returnrow[8],returnrow[9],returnrow[10],returnrow[11],returnrow[12],returnrow[13],returnrow[14],returnrow[15])).toJson()
+            flightStats = (flight_stats(returnrow[0],returnrow[1],returnrow[2],returnrow[3],returnrow[4],returnrow[5],returnrow[6],returnrow[7],returnrow[8],returnrow[9],returnrow[10],returnrow[11],returnrow[12],returnrow[13],returnrow[14],returnrow[15])).toJson()
 
-    return letstats
+    return flightStats
 
 
 
@@ -200,7 +200,7 @@ def getSQLFlightCodeshares(flight,date):
             operatingcodeshares = operating_codeshares(flightoperating,codeshares)
             operatingcodeshares = operatingcodeshares.toJson()
         else:
-            operatingcodeshares = jsonify({'info': 'codeshare leti za ta let ne obstajajo'})
+            operatingcodeshares = jsonify({'info': 'no codeshare flights'})
 
     return operatingcodeshares
 

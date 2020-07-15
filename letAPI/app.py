@@ -8,6 +8,9 @@ from functools import wraps
 import os
 import logging
 from izbaze import getSQLFlightStatus, getSQLFlightStats, getSQLFlightCodeshares
+from aircraftImage import getAircraftImageURL
+
+from liveLufthansa import getFlightStatusLufthansa, getAircraftModelLufthansa, getAirlineNameLufthansa, getAirportNameLufthansa
 
 server = Flask(__name__)
 
@@ -59,13 +62,13 @@ def token_required(f):
             token = request.headers['x-access-tokens']
 
         if not token:
-            return jsonify({'message': 'a valid token is missing'})
+            return jsonify({'info': 'a valid token is missing'})
 
         try:
             data = jwt.decode(token, server.config['SECRET_KEY'])
             current_user = Users.query.filter_by(public_id=data['public_id']).first()
         except:
-            return jsonify({'message': 'token is invalid'})
+            return jsonify({'info': 'token is invalid'})
 
         return f(current_user, *args, **kwargs)
 
@@ -75,7 +78,6 @@ def token_required(f):
 @server.route('/login', methods=['POST'])
 def login_user():
     auth = request.authorization
-
     if not auth or not auth.username or not auth.password:
         return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
 
@@ -96,60 +98,99 @@ def login_user():
 
 
 #let
-@server.route('/let/<datum>/<stlet>', methods=['GET'])
+@server.route('/flight/<date>/<flightnumber>', methods=['GET'])
 @token_required
-def get_let(current_user,datum,stlet):
-    #print(datum)
-    #print(stlet)
-    letinfo = getSQLFlightStatus(stlet,datum)
-    #print(letinfo)
-    return (letinfo)
+def get_flight(current_user,date,flightnumber):
+    #print(date)
+    #print(flightnumber)
+    flightInfo = getSQLFlightStatus(flightnumber,date)
+    #print(flightInfo)
+    return (flightInfo)
 
 #letstat7day
-@server.route('/stat7/<stlet>', methods=['GET'])
+@server.route('/stat7/<flightnumber>', methods=['GET'])
 @token_required
-def get_letstat7day(current_user,stlet):
-    #print(stlet)
-    letstat7dayinfo = getSQLFlightStats(stlet,7)
+def get_flightStat7day(current_user,flightnumber):
+    #print(flightnumber)
+    letstat7dayinfo = getSQLFlightStats(flightnumber,7)
     #print(letstat7dayinfo)
     return (letstat7dayinfo)
 
 #letstat7day
-@server.route('/stat30/<stlet>', methods=['GET'])
+@server.route('/stat30/<flightnumber>', methods=['GET'])
 @token_required
-def get_letstat30day(current_user,stlet):
-    #print(stlet)
-    letstat30dayinfo = getSQLFlightStats(stlet,30)
+def get_flightStat30day(current_user,flightnumber):
+    #print(flightnumber)
+    letstat30dayinfo = getSQLFlightStats(flightnumber,30)
     #print(letstat30dayinfo)
     return (letstat30dayinfo)
 
 
-#letcodeshares
-@server.route('/codeshares/<datum>/<stlet>', methods=['GET'])
+#flightCodeshares
+@server.route('/codeshares/<date>/<flightnumber>', methods=['GET'])
 @token_required
-def get_letcodeshares(current_user,datum,stlet):
-    #print(datum)
-    #print(stlet)
-    letcodeshares = getSQLFlightCodeshares(stlet,datum)
-    print(letcodeshares)
-    return (letcodeshares)
+def get_flightCodeshares(current_user,date,flightnumber):
+    #print(date)
+    #print(flightnumber)
+    flightCodeshares = getSQLFlightCodeshares(flightnumber,date)
+    print(flightCodeshares)
+    return (flightCodeshares)
 
+#AirplaneImageURL
+@server.route('/aircraftimage/<aircraftreg>', methods=['GET'])
+@token_required
+def get_aircraftImage(current_user,aircraftreg):
+    print("test")
+    aircraftImageURL = getAircraftImageURL(aircraftreg)
+    print(aircraftImageURL)
+    return (aircraftImageURL)
 
+@server.route('/live/<date>/<flightnumber>', methods=['GET'])
+@token_required
+def get_flightstatusLive(current_user,flightnumber, date):
+    print("test")
+    flightstatusLive = getFlightStatusLufthansa(flightnumber, date)
+    print(flightstatusLive)
+    return (flightstatusLive)
+
+@server.route('/info/aircraftname/<aircraftmodelcode>', methods=['GET'])
+@token_required
+def get_aircraftmodelName(current_user,aircraftmodelcode):
+    print("test")
+    aircraftmodelname = getAircraftModelLufthansa(aircraftmodelcode)
+    print(aircraftmodelname)
+    return (aircraftmodelname)
+
+@server.route('/info/airlinename/<airlinecode>', methods=['GET'])
+@token_required
+def get_airlineName(current_user,airlinecode):
+    print("test")
+    airlinename = getAirlineNameLufthansa(airlinecode)
+    print(airlinename)
+    return (airlinename)
+
+@server.route('/info/airportname/<airportcode>', methods=['GET'])
+@token_required
+def get_airportName(current_user,airportcode):
+    print("test")
+    airportname = getAirportNameLufthansa(airportcode)
+    print(airportname)
+    return (airportname)
 
 
 #testno
-#letcodesharesOPEN!!!
-@server.route('/open/codeshares/<datum>/<stlet>', methods=['GET'])
-def get_letcodesharesopen(datum,stlet):
-    #print(datum)
-    #print(stlet)
-    letcodeshares = getSQLFlightCodeshares(stlet,datum)
-    #print(letcodeshares)
-    return (letcodeshares)
+#flightCodesharesOPEN!!!
+@server.route('/open/codeshares/<date>/<flightnumber>', methods=['GET'])
+def get_flightCodesharesOpen(date,flightnumber):
+    #print(date)
+    #print(flightnumber)
+    flightCodeshares = getSQLFlightCodeshares(flightnumber,date)
+    #print(flightCodeshares)
+    return (flightCodeshares)
 
 
 
-#if __name__ == '__main__':
-#   server.run()
+if __name__ == '__main__':
+   server.run(debug=True)
 
 
