@@ -10,7 +10,7 @@ import logging
 from izbaze import getSQLFlightStatus, getSQLFlightStats, getSQLFlightCodeshares
 from aircraftImage import getAircraftImageURL
 
-from liveLufthansa import getFlightStatusLufthansa, getAircraftModelLufthansa, getAirlineNameLufthansa, getAirportNameLufthansa
+from liveLufthansa import getFlightStatusLufthansa, getAircraftModelLufthansa, getAirlineNameLufthansa, getAirportNameLufthansa, getCodesharesLufthansa
 
 server = Flask(__name__)
 
@@ -177,6 +177,15 @@ def get_airportName(current_user,airportcode):
     #print(airportname)
     return (airportname)
 
+@server.route('/live/codeshares/<date>/<flightnumber>', methods=['GET'])
+@token_required
+def get_flightCodesharesOpen2(date,flightnumber):
+    #print(date)
+    #print(flightnumber)
+    flightCodeshares = getCodesharesLufthansa(flightnumber,date)
+    #print(flightCodeshares)
+    return (flightCodeshares)
+
 
 #testno
 #flightCodesharesOPEN!!!
@@ -187,6 +196,7 @@ def get_flightCodesharesOpen(date,flightnumber):
     flightCodeshares = getSQLFlightCodeshares(flightnumber,date)
     #print(flightCodeshares)
     return (flightCodeshares)
+
 
 
 

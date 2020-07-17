@@ -26,6 +26,11 @@ def getAirportNameLufthansa(airportid):
     airportname = getAirport(token, airportid)
     return airportname.toJson()
 
+def getCodesharesLufthansa(flight, date):
+    token = getToken()
+    codeshares = getCodeshares(token,  flight, date)
+    return codeshares
+
 
 def getFlight(token, flight, date):
     date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
@@ -260,6 +265,75 @@ def getAirport(token, airportname):
     return airportinfo
 
 
+def getCodeshares(token, flight, date):
+    url = 'https://api.lufthansa.com/v1/operations/customerflightinformation' + '/' + flight + '/' + date
+    #print(url)
+    bearer = "Bearer " + token
+    headers = {"Authorization":bearer, "Accept":"application/json"}
+    i = 0
+    while i<10:
+        try:
+            request = requests.get(url=url, headers=headers)
+            #print(request)
+            data = request.json()
+            #print(data)
+            i = 10
+            logger.info("Successfull request to Lufthansa API for CODESHARE flight:  %s, date: %s ; %s", flight, date, data)
+        except:
+            time.sleep(10)
+            if (i > 3):
+                time.sleep(180)
+            if (i > 5):
+                time.sleep(600)
+            #print("Retry LH " + str(i))
+            i = i + 1
+            if (i == 10):
+                logger.error("Error (abort) request to Lufthansa API for CODESHARE flight:  %s, date: %s", flight, date)
+            else:
+                logger.info("Retry request to Lufthansa API for CODESHARE flight:  %s, date: %s",
+                            flight, date)
+            pass
+
+    codeshares = []
+    codeshares.clear()
+
+    try:
+        flightcodeshares = data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']
+        #print("codeshares : ", flightcodeshares)
+        for flightcodeshare in flightcodeshares:
+            flightcodeshare = flight_codeshare([flightcodeshare['AirlineID'],flightcodeshare['FlightNumber']])
+            odeshares.append(flightcodeshare.__dict__)
+            #print(flightcodeshare['AirlineID'], flightcodeshare['FlightNumber'])
+        flightoperating = (flight_codeshare(row[0], row[1]))
+    except:
+        try:
+            flightcodeshare = flight_codeshare([data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['AirlineID'], data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['FlightNumber']])
+            codeshares.append(flightcodeshare.__dict__)
+            logger.info("Not array, only one marketing carrier, parsing OK")
+
+        except:
+            codeshares.clear()
+            logger.error("Unsuccessful parsing codeshares, no marketing carriers")
+    try:
+        flightoperating = flight_operating(
+        data['FlightInformation']['Flights']['Flight']['OperatingCarrier']['AirlineID'],
+        data['FlightInformation']['Flights']['Flight']['OperatingCarrier']['FlightNumber'])
+        operatingcodeshares = operating_codeshares(flightoperating, flightcodeshare)
+        codesharesInfo = operatingcodeshares.toJson()
+
+    except:
+        codesharesInfo = jsonify({'info': 'no codeshare flights'})
+
+    return codesharesInfo
+
+
+
+
+
+
+
+
+
 token = "null"
 expires_date = "2000-01-01 00:00:00.0"
 def getToken():
@@ -402,3 +476,39 @@ class airport_info:
 
     def __init__(self, airportName):
         self.airportName = airportName
+
+
+
+
+class flight_codeshare:
+    airlineid = ""
+    flightnumber = ""
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
+
+    def __init__(self, airlineid, flightnumber):
+        self.airlineid = airlineid
+        self.flightnumber = flightnumber
+
+class flight_operating:
+    airlineid = ""
+    flightnumber = ""
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
+
+    def __init__(self, airlineid, flightnumber):
+        self.airlineid = airlineid
+        self.flightnumber = flightnumber
+
+class operating_codeshares:
+    operating = flight_operating
+    codeshares = []
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
+
+    def __init__(self, operating, codeshares):
+        self.operating = operating
+        self.codeshares = codeshares
