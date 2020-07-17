@@ -145,7 +145,7 @@ def get_aircraftImage(current_user,aircraftreg):
     #print(aircraftImageURL)
     return (aircraftImageURL)
 
-@server.route('/live/<date>/<flightnumber>', methods=['GET'])
+@server.route('/live/flight/<date>/<flightnumber>', methods=['GET'])
 @token_required
 def get_flightstatusLive(current_user,flightnumber, date):
     #print("test")
@@ -179,7 +179,7 @@ def get_airportName(current_user,airportcode):
 
 @server.route('/live/codeshares/<date>/<flightnumber>', methods=['GET'])
 @token_required
-def get_flightCodesharesOpen2(date,flightnumber):
+def get_flightCodesharesLive(current_user,date,flightnumber):
     #print(date)
     #print(flightnumber)
     flightCodeshares = getCodesharesLufthansa(flightnumber,date)

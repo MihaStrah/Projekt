@@ -28,7 +28,8 @@ def getAirportNameLufthansa(airportid):
 
 def getCodesharesLufthansa(flight, date):
     token = getToken()
-    codeshares = getCodeshares(token,  flight, date)
+    codeshares = getCodeshares(token, flight, date)
+    print(codeshares)
     return codeshares
 
 
@@ -299,15 +300,12 @@ def getCodeshares(token, flight, date):
 
     try:
         flightcodeshares = data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']
-        #print("codeshares : ", flightcodeshares)
         for flightcodeshare in flightcodeshares:
-            flightcodeshare = flight_codeshare([flightcodeshare['AirlineID'],flightcodeshare['FlightNumber']])
-            odeshares.append(flightcodeshare.__dict__)
-            #print(flightcodeshare['AirlineID'], flightcodeshare['FlightNumber'])
-        flightoperating = (flight_codeshare(row[0], row[1]))
+            flightcodesharenew = flight_codeshare(flightcodeshare['AirlineID'],flightcodeshare['FlightNumber'])
+            codeshares.append(flightcodesharenew.__dict__)
     except:
         try:
-            flightcodeshare = flight_codeshare([data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['AirlineID'], data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['FlightNumber']])
+            flightcodeshare = flight_codeshare(data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['AirlineID'], data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['FlightNumber'])
             codeshares.append(flightcodeshare.__dict__)
             logger.info("Not array, only one marketing carrier, parsing OK")
 
@@ -318,7 +316,7 @@ def getCodeshares(token, flight, date):
         flightoperating = flight_operating(
         data['FlightInformation']['Flights']['Flight']['OperatingCarrier']['AirlineID'],
         data['FlightInformation']['Flights']['Flight']['OperatingCarrier']['FlightNumber'])
-        operatingcodeshares = operating_codeshares(flightoperating, flightcodeshare)
+        operatingcodeshares = operating_codeshares(flightoperating, codeshares)
         codesharesInfo = operatingcodeshares.toJson()
 
     except:
