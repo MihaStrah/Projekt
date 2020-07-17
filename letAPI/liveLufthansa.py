@@ -4,6 +4,8 @@ import time
 import oauth2 as oauth
 import re
 import logging
+from flask import jsonify
+
 logger = logging.getLogger(__name__)
 
 def getFlightStatusLufthansa(flight, date):
@@ -162,6 +164,7 @@ def getFlight(token, flight, date):
 
 
 def getAircraft(token, aircraftcode):
+    aircraftcode = re.search("[A-z,0-9]{1,10}", aircraftcode).group()
     url = (f"https://api.lufthansa.com/v1/mds-references/aircraft/{aircraftcode}")
     #print(url)
     bearer = (f"Bearer {token}")
@@ -197,6 +200,7 @@ def getAircraft(token, aircraftcode):
 
 
 def getAirline(token, airlinecode):
+    airlinecode = re.search("[A-z]{1,5}", airlinecode).group()
     url = (f"https://api.lufthansa.com/v1/mds-references/airlines/{airlinecode}")
     #print(url)
     bearer = (f"Bearer {token}")
@@ -233,6 +237,7 @@ def getAirline(token, airlinecode):
 
 
 def getAirport(token, airportname):
+    airportname = re.search("[A-z]{1,5}", airportname).group()
     url = (f"https://api.lufthansa.com/v1/mds-references/airports/{airportname}?lang=EN&LHoperated=0")
     #print(url)
     bearer = (f"Bearer {token}")
@@ -267,8 +272,13 @@ def getAirport(token, airportname):
 
 
 def getCodeshares(token, flight, date):
+    date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
+    airlineid = re.search("[A-z]{1,2}", flight).group()
+    flightnumber = re.search("[0-9]{1,5}", flight).group()
+    flight = airlineid + flightnumber
+
     url = 'https://api.lufthansa.com/v1/operations/customerflightinformation' + '/' + flight + '/' + date
-    #print(url)
+    print(url)
     bearer = "Bearer " + token
     headers = {"Authorization":bearer, "Accept":"application/json"}
     i = 0
