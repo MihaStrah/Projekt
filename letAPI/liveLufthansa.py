@@ -159,6 +159,9 @@ def getFlight(token, flight, date):
     if (operating != flight.upper() and operating != ""):
         newstatus = getFlight(token, operating, date)
 
+    if newstatus.depscheduledUTC == "":
+        newstatus = jsonify({'info': 'flight does not exist'})
+
     return newstatus
 
 
@@ -278,7 +281,7 @@ def getCodeshares(token, flight, date):
     flight = airlineid + flightnumber
 
     url = 'https://api.lufthansa.com/v1/operations/customerflightinformation' + '/' + flight + '/' + date
-    print(url)
+    #print(url)
     bearer = "Bearer " + token
     headers = {"Authorization":bearer, "Accept":"application/json"}
     i = 0
