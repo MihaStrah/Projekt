@@ -7,12 +7,15 @@ import datetime
 from functools import wraps
 import os
 import logging
+from flask_caching import Cache
 from izbaze import getSQLFlightStatus, getSQLFlightStats, getSQLFlightCodeshares
 from aircraftImage import getAircraftImageURL
-
 from liveLufthansa import getFlightStatusLufthansa, getAircraftModelLufthansa, getAirlineNameLufthansa, getAirportNameLufthansa, getCodesharesLufthansa
 
 server = Flask(__name__)
+
+#cache for API https://pythonhosted.org/Flask-Caching/
+cache = Cache(server, config={'CACHE_TYPE': 'simple'})
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO, filename="letAPI_logs_out/letAPIPythonScriptLog.log", filemode='a')
@@ -99,6 +102,7 @@ def login_user():
 
 #let
 @server.route('/flight/<date>/<flightnumber>', methods=['GET'])
+@cache.cached(timeout=432000) #cache requests for 1 day 864000s (this is historical data and should not change)
 @token_required
 def get_flight(current_user,date,flightnumber):
     #print(date)
@@ -109,6 +113,7 @@ def get_flight(current_user,date,flightnumber):
 
 #letstat7day
 @server.route('/stat7/<flightnumber>', methods=['GET'])
+@cache.cached(timeout=3600) #cache requests for 1 hour 3600s
 @token_required
 def get_flightStat7day(current_user,flightnumber):
     #print(flightnumber)
@@ -118,6 +123,7 @@ def get_flightStat7day(current_user,flightnumber):
 
 #letstat7day
 @server.route('/stat30/<flightnumber>', methods=['GET'])
+@cache.cached(timeout=3600) #cache requests for 1 hour 3600s
 @token_required
 def get_flightStat30day(current_user,flightnumber):
     #print(flightnumber)
@@ -128,6 +134,7 @@ def get_flightStat30day(current_user,flightnumber):
 
 #flightCodeshares
 @server.route('/codeshares/<date>/<flightnumber>', methods=['GET'])
+#cache requests for 1 day 864000s (this is historical data and should not change)
 @token_required
 def get_flightCodeshares(current_user,date,flightnumber):
     #print(date)
@@ -138,6 +145,7 @@ def get_flightCodeshares(current_user,date,flightnumber):
 
 #AirplaneImageURL
 @server.route('/aircraftimage/<aircraftreg>', methods=['GET'])
+@cache.cached(timeout=432000) #cache requests for 5 days 432000s
 @token_required
 def get_aircraftImage(current_user,aircraftreg):
     #print("test")
@@ -155,6 +163,7 @@ def get_flightstatusLive(current_user,flightnumber, date):
 
 @server.route('/info/aircraftname/<aircraftmodelcode>', methods=['GET'])
 @token_required
+@cache.cached(timeout=432000) #cache requests for 5 days 432000s
 def get_aircraftmodelName(current_user,aircraftmodelcode):
     #print("test")
     aircraftmodelname = getAircraftModelLufthansa(aircraftmodelcode)
@@ -162,6 +171,7 @@ def get_aircraftmodelName(current_user,aircraftmodelcode):
     return (aircraftmodelname)
 
 @server.route('/info/airlinename/<airlinecode>', methods=['GET'])
+@cache.cached(timeout=432000) #cache requests for 5 days 432000s
 @token_required
 def get_airlineName(current_user,airlinecode):
     #print("test")
@@ -170,6 +180,7 @@ def get_airlineName(current_user,airlinecode):
     return (airlinename)
 
 @server.route('/info/airportname/<airportcode>', methods=['GET'])
+@cache.cached(timeout=432000) #cache requests for 5 days 432000s
 @token_required
 def get_airportName(current_user,airportcode):
     #print("test")
@@ -189,13 +200,13 @@ def get_flightCodesharesLive(current_user,date,flightnumber):
 
 #testno
 #flightCodesharesOPEN!!!
-@server.route('/open/codeshares/<date>/<flightnumber>', methods=['GET'])
-def get_flightCodesharesOpen(date,flightnumber):
-    #print(date)
-    #print(flightnumber)
-    flightCodeshares = getSQLFlightCodeshares(flightnumber,date)
-    #print(flightCodeshares)
-    return (flightCodeshares)
+#@server.route('/open/codeshares/<date>/<flightnumber>', methods=['GET'])
+#def get_flightCodesharesOpen(date,flightnumber):
+#    #print(date)
+#    #print(flightnumber)
+#    flightCodeshares = getSQLFlightCodeshares(flightnumber,date)
+#    #print(flightCodeshares)
+#    return (flightCodeshares)
 
 
 

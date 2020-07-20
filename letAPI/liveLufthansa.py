@@ -4,14 +4,20 @@ import time
 import oauth2 as oauth
 import re
 import logging
-from flask import jsonify
+from flask import jsonify, request
+
+import requests_cache
+
+
+#cache for external API requests (1 minute)
+requests_cache.install_cache(cache_name='lufthansa_cache', backend='sqlite', expire_after=60)
 
 logger = logging.getLogger(__name__)
 
 def getFlightStatusLufthansa(flight, date):
     token = getToken()
     flightstatus = getFlight(token, flight, date)
-    return flightstatus.toJson()
+    return flightstatus
 
 def getAircraftModelLufthansa(aircraftcode):
     token = getToken()
@@ -31,7 +37,6 @@ def getAirportNameLufthansa(airportid):
 def getCodesharesLufthansa(flight, date):
     token = getToken()
     codeshares = getCodeshares(token, flight, date)
-    print(codeshares)
     return codeshares
 
 
@@ -52,7 +57,8 @@ def getFlight(token, flight, date):
             data = request.json()
             #print(data)
             i = 5
-            logger.info("LH API response: %s", data)
+            #print("Used Cache: %s" % request.from_cache)
+            logger.info("(Used cache: %s) LH API response: %s", str(request.from_cache), data)
         except:
             time.sleep(2)
             #print("retry " + str(i))
@@ -63,6 +69,9 @@ def getFlight(token, flight, date):
             else:
                 logger.info("LH API error, retry")
             pass
+
+
+
 
     try:
         depairport = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['AirportCode']
@@ -161,6 +170,8 @@ def getFlight(token, flight, date):
 
     if newstatus.depscheduledUTC == "":
         newstatus = jsonify({'info': 'flight does not exist'})
+    else:
+        newstatus = newstatus.toJson()
 
     return newstatus
 
