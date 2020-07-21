@@ -269,43 +269,43 @@ class flight_status:
 
 
 class flight_stats:
-    Allflights = ""
-    Cancelled = ""
-    Dep_OT = ""
-    Dep_FE = ""
-    Dep_DL = ""
-    AverageTimeDep = ""
-    AverageTimeDep_OT = ""
-    AverageTimeDep_FE = ""
-    AverageTimeDep_DL = ""
-    Arr_OT = ""
-    Arr_FE = ""
-    Arr_DL = ""
-    AverageTimeArr = ""
-    AverageTimeArr_OT = ""
-    AverageTimeArr_FE = ""
-    AverageTimeArr_DL = ""
+    allflights = ""
+    cancelled = ""
+    dep_OT = ""
+    dep_FE = ""
+    dep_DL = ""
+    averageTimeDep = ""
+    averageTimeDep_OT = ""
+    averageTimeDep_FE = ""
+    averageTimeDep_DL = ""
+    arr_OT = ""
+    arr_FE = ""
+    arr_DL = ""
+    averageTimeArr = ""
+    averageTimeArr_OT = ""
+    averageTimeArr_FE = ""
+    averageTimeArr_DL = ""
 
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__)
 
-    def __init__(self, Allflights, Cancelled, Dep_OT, Dep_FE, Dep_DL, AverageTimeDep, AverageTimeDep_OT, AverageTimeDep_FE, AverageTimeDep_DL, Arr_OT, Arr_FE, Arr_DL, AverageTimeArr, AverageTimeArr_OT, AverageTimeArr_FE, AverageTimeArr_DL):
-        self.Allflights = Allflights
-        self.Cancelled = Cancelled
-        self.Dep_OT = Dep_OT
-        self.Dep_FE = Dep_FE
-        self.Dep_DL = Dep_DL
-        self.AverageTimeDep = AverageTimeDep
-        self.AverageTimeDep_OT = AverageTimeDep_OT
-        self.AverageTimeDep_FE = AverageTimeDep_FE
-        self.AverageTimeDep_DL = AverageTimeDep_DL
-        self.Arr_OT = Arr_OT
-        self.Arr_FE = Arr_FE
-        self.Arr_DL = Arr_DL
-        self.AverageTimeArr = AverageTimeArr
-        self.AverageTimeArr_OT = AverageTimeArr_OT
-        self.AverageTimeArr_FE = AverageTimeArr_FE
-        self.AverageTimeArr_DL = AverageTimeArr_DL
+    def __init__(self, allflights, cancelled, dep_OT, dep_FE, dep_DL, averageTimeDep, averageTimeDep_OT, averageTimeDep_FE, averageTimeDep_DL, arr_OT, arr_FE, arr_DL, averageTimeArr, averageTimeArr_OT, averageTimeArr_FE, averageTimeArr_DL):
+        self.allflights = allflights
+        self.cancelled = cancelled
+        self.dep_OT = dep_OT
+        self.dep_FE = dep_FE
+        self.dep_DL = dep_DL
+        self.averageTimeDep = averageTimeDep
+        self.averageTimeDep_OT = averageTimeDep_OT
+        self.averageTimeDep_FE = averageTimeDep_FE
+        self.averageTimeDep_DL = averageTimeDep_DL
+        self.arr_OT = arr_OT
+        self.arr_FE = arr_FE
+        self.arr_DL = arr_DL
+        self.averageTimeArr = averageTimeArr
+        self.averageTimeArr_OT = averageTimeArr_OT
+        self.averageTimeArr_FE = averageTimeArr_FE
+        self.averageTimeArr_DL = averageTimeArr_DL
 
 
 
