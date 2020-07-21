@@ -102,8 +102,8 @@ def login_user():
 
 #let
 @server.route('/flight/<date>/<flightnumber>', methods=['GET'])
-@cache.cached(timeout=432000) #cache requests for 1 day 864000s (this is historical data and should not change)
 @token_required
+@cache.cached(timeout=432000) #cache requests for 1 day 864000s (this is historical data and should not change)
 def get_flight(current_user,date,flightnumber):
     #print(date)
     #print(flightnumber)
@@ -113,8 +113,8 @@ def get_flight(current_user,date,flightnumber):
 
 #letstat7day
 @server.route('/stat7/<flightnumber>', methods=['GET'])
-@cache.cached(timeout=3600) #cache requests for 1 hour 3600s
 @token_required
+@cache.cached(timeout=3600) #cache requests for 1 hour 3600s
 def get_flightStat7day(current_user,flightnumber):
     #print(flightnumber)
     letstat7dayinfo = getSQLFlightStats(flightnumber,7)
@@ -123,8 +123,8 @@ def get_flightStat7day(current_user,flightnumber):
 
 #letstat7day
 @server.route('/stat30/<flightnumber>', methods=['GET'])
-@cache.cached(timeout=3600) #cache requests for 1 hour 3600s
 @token_required
+@cache.cached(timeout=3600) #cache requests for 1 hour 3600s
 def get_flightStat30day(current_user,flightnumber):
     #print(flightnumber)
     letstat30dayinfo = getSQLFlightStats(flightnumber,30)
@@ -134,8 +134,8 @@ def get_flightStat30day(current_user,flightnumber):
 
 #flightCodeshares
 @server.route('/codeshares/<date>/<flightnumber>', methods=['GET'])
-#cache requests for 1 day 864000s (this is historical data and should not change)
 @token_required
+@cache.cached(timeout=864000) #cache requests for 1 day 864000s (this is historical data and should not change)
 def get_flightCodeshares(current_user,date,flightnumber):
     #print(date)
     #print(flightnumber)
@@ -145,8 +145,8 @@ def get_flightCodeshares(current_user,date,flightnumber):
 
 #AirplaneImageURL
 @server.route('/aircraftimage/<aircraftreg>', methods=['GET'])
-@cache.cached(timeout=432000) #cache requests for 5 days 432000s
 @token_required
+@cache.cached(timeout=432000) #cache requests for 5 days 432000s
 def get_aircraftImage(current_user,aircraftreg):
     #print("test")
     aircraftImageURL = getAircraftImageURL(aircraftreg)
@@ -171,8 +171,8 @@ def get_aircraftmodelName(current_user,aircraftmodelcode):
     return (aircraftmodelname)
 
 @server.route('/info/airlinename/<airlinecode>', methods=['GET'])
-@cache.cached(timeout=432000) #cache requests for 5 days 432000s
 @token_required
+@cache.cached(timeout=432000) #cache requests for 5 days 432000s
 def get_airlineName(current_user,airlinecode):
     #print("test")
     airlinename = getAirlineNameLufthansa(airlinecode)
@@ -180,8 +180,8 @@ def get_airlineName(current_user,airlinecode):
     return (airlinename)
 
 @server.route('/info/airportname/<airportcode>', methods=['GET'])
-@cache.cached(timeout=432000) #cache requests for 5 days 432000s
 @token_required
+@cache.cached(timeout=432000) #cache requests for 5 days 432000s
 def get_airportName(current_user,airportcode):
     #print("test")
     airportname = getAirportNameLufthansa(airportcode)
