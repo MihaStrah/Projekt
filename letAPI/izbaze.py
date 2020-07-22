@@ -1,9 +1,11 @@
 import time
+import datetime
 import mysql.connector as mariadb
 import re
 import logging
 import json
 from flask import jsonify
+from liveLufthansa import getFlightStatusLufthansa
 
 logger = logging.getLogger(__name__)
 
@@ -131,6 +133,85 @@ def getSQLFlightStats(flight,days):
             flightStats = (flight_stats(returnrow[0],returnrow[1],returnrow[2],returnrow[3],returnrow[4],returnrow[5],returnrow[6],returnrow[7],returnrow[8],returnrow[9],returnrow[10],returnrow[11],returnrow[12],returnrow[13],returnrow[14],returnrow[15])).toJson()
 
     return flightStats
+
+
+#this one also gets data from lufthansa for last day
+def getSQLFlightPastStats(flight):
+    host, port, database, user, password = readDBAccount()
+    airlineid = re.search("[A-z]{1,2}", flight).group()
+    flightnumber = re.search("[0-9]{1,5}", flight).group()
+    #padding to min length 3
+    flightnumber = str(flightnumber).zfill(3)
+
+    flightString = airlineid + flightnumber
+
+    yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    startdate = (datetime.date.today() - datetime.timedelta(days=90)).strftime("%Y-%m-%d")
+    enddate = (datetime.date.today() - datetime.timedelta(days=2)).strftime("%Y-%m-%d")
+
+    i=0
+    while i < 10:
+        try:
+            mariadb_connection = mariadb.connect(user=user, password=password, database=database, host=host, port=port)
+            cursor = mariadb_connection.cursor()
+            i = 10
+            logger.info("DB connection successful")
+        except:
+            i = i + 1
+            time.sleep(1)
+            if (i > 3):
+                time.sleep(2)
+            if (i > 5):
+                time.sleep(3)
+            #print("Retry DB " + str(i))
+            if (i == 10):
+                logger.error("DB error, ABORT")
+            else:
+                logger.info("DB error, retry")
+            pass
+
+    i = 0
+    while i < 3:
+        try:
+            #search in DB for operating and for codeshare (returns operating flight)
+            cursor.execute("select depscheduled, deptimestatus, arrtimestatus, flightstatus from allflightsstatus where (DATE(depscheduled) between DATE(%(startdate)s) and DATE(%(enddate)s)) and airlineid=%(airlineid)s and flightnumber=%(flightnumber)s;", {'startdate': str(startdate), 'enddate': str(enddate), 'airlineid': str(airlineid), 'flightnumber': str(flightnumber)})
+            mariadb_connection.close()
+            i = 3
+        except mariadb.Error as error:
+            i = i + 1
+            time.sleep(2)
+            #print("Mariadb Error: {}".format(error))
+            #print("Retry DB SELECT " + str(i))
+            logger.error("DB error: %s", error)
+            if (i==3):
+                logger.error("DB error, ABORT")
+            else:
+                logger.info("DB error, retry")
+            pass
+
+        flightPastStatArray = []
+
+        try:
+            for depscheduled, deptimestatus, arrtimestatus, flightstatus in cursor:
+                flightPastStat = flight_paststat(depscheduled, deptimestatus, arrtimestatus, flightstatus)
+                flightPastStatArray.append(flightPastStat)
+
+            try:
+                yesterdayStatus = json.loads(getFlightStatusLufthansa(flightString, yesterday))
+                flightPastStat = flight_paststat(yesterdayStatus["depscheduled"], yesterdayStatus["deptimestatus"], yesterdayStatus["arrtimestatus"], yesterdayStatus["flightstatus"])
+
+                flightPastStatArray.append(flightPastStat)
+            except:
+                logger.info("No flight yesterday for past stat")
+
+            flightPastStats = flight_paststats(flightPastStatArray)
+            flightPastStatsJson = flightPastStats.toJson()
+
+        except:
+            flightPastStatArray.clear()
+            flightPastStatsJson = jsonify({'info': 'flight statistics does not exist'})
+
+    return flightPastStatsJson
 
 
 
@@ -307,6 +388,31 @@ class flight_stats:
         self.averageTimeArr_FE = averageTimeArr_FE
         self.averageTimeArr_DL = averageTimeArr_DL
 
+
+
+class flight_paststat:
+    depscheduled = ""
+    deptimestatus = ""
+    arrtimestatus = ""
+    flightstatus = ""
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
+
+    def __init__(self, depscheduled, deptimestatus, arrtimestatus, flightstatus):
+        self.depscheduled = depscheduled
+        self.deptimestatus = deptimestatus
+        self.arrtimestatus = arrtimestatus
+        self.flightstatus = flightstatus
+
+class flight_paststats:
+    flightDayArray = [flight_paststat]
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
+
+    def __init__(self, flightDayArray):
+        self.flightDayArray = flightDayArray
 
 
 class flight_codeshare:

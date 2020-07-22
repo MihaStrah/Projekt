@@ -8,7 +8,7 @@ from functools import wraps
 import os
 import logging
 from flask_caching import Cache
-from izbaze import getSQLFlightStatus, getSQLFlightStats, getSQLFlightCodeshares
+from izbaze import getSQLFlightStatus, getSQLFlightStats, getSQLFlightCodeshares, getSQLFlightPastStats
 from aircraftImage import getAircraftImageURL
 from liveLufthansa import getFlightStatusLufthansa, getAircraftModelLufthansa, getAirlineNameLufthansa, getAirportNameLufthansa, getCodesharesLufthansa
 
@@ -196,6 +196,18 @@ def get_flightCodesharesLive(current_user,date,flightnumber):
     flightCodeshares = getCodesharesLufthansa(flightnumber,date)
     #print(flightCodeshares)
     return (flightCodeshares)
+
+
+@server.route('/statday/<flightnumber>', methods=['GET'])
+@token_required
+def get_flightStatDay(current_user,flightnumber):
+    #print(date)
+    #print(flightnumber)
+    flightStatDay = getSQLFlightPastStats(flightnumber)
+    #print(flightCodeshares)
+    return (flightStatDay)
+
+
 
 
 #testno

@@ -40,6 +40,7 @@ def getCodesharesLufthansa(flight, date):
     return codeshares
 
 
+
 def getFlight(token, flight, date):
     date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
     flight = re.search("^[A-z]{1,2}[0-9]{1,6}$", flight).group()

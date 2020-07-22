@@ -139,7 +139,7 @@ def getFlightStatusWriteSql(token,flights,allids,date,wait):
             logger.info("Processed flight: %s, date: %s ; %s remaining ; !THIS WAS INSERTED WITH OPERATING RETRY BEACUSE OF OPERATING FLIGHT MISMATCH!", flight, date, (len(flights) - a))
 
         else:
-            writeOneFlightToSql(newstatus, id)
+            writeOneFlightToSql(newstatus, id, date)
             #print(str(a) + " done. Processed flight " + str(flight) + " with ID " + id + ", " + str(len(flights) - a) + " remaining")
             logger.info("Processed flight: %s, date: %s ; %s remaining", flight, date, (len(flights) - a))
             #wait because of API limitations
@@ -280,7 +280,7 @@ def getFlightStatusWriteSqlOperatingRetry(token, flight, id, date, wait):
         logger.error("Operating is not the same, but should be (operating retry), writing anyway ; flight:  %s, date: %s", flight, date)
 
 
-    writeOneFlightToSql(newstatus, id)
+    writeOneFlightToSql(newstatus, id, date)
 
     # wait because of API limitations
     time.sleep(wait)
