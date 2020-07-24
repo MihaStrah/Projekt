@@ -71,7 +71,7 @@ def job():
 logger.info("lhgetdata started")
 print("lghetdata started, logging in lhgetdataPythonScriptLog.log")
 #change to 30
-schedule.every().hour.at(":05").do(job)
+schedule.every().hour.at(":15").do(job)
 
 while True:
     schedule.run_pending()
