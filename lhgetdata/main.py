@@ -8,7 +8,6 @@ import time
 import datetime
 import logging
 
-
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO, filename="lhgetdata_logs_out/lhgetdataPythonScriptLog.log", filemode='a')
 logger = logging.getLogger(__name__)
