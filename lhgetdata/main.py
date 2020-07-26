@@ -18,7 +18,7 @@ def job():
     # workaround
 
     #change to 18 (this timezone 20:30)
-    if (datetime.datetime.now().strftime("%H") == "11"):
+    if (datetime.datetime.now().strftime("%H") == "05"):
         #print("DATETIME: ", datetime.datetime.now(), " Hour is 20")
 
 
@@ -72,7 +72,7 @@ def job():
 logger.info("lhgetdata started")
 print("lghetdata started, logging in lhgetdataPythonScriptLog.log")
 #change to 30
-schedule.every().hour.at(":01").do(job)
+schedule.every().hour.at(":40").do(job)
 
 while True:
     schedule.run_pending()
