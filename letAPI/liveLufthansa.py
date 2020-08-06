@@ -32,7 +32,7 @@ def getAirlineNameLufthansa(airlineid):
 def getAirportNameLufthansa(airportid):
     token = getToken()
     airportname = getAirport(token, airportid)
-    return airportname.toJson()
+    return airportname
 
 def getCodesharesLufthansa(flight, date):
     token = getToken()
@@ -278,10 +278,11 @@ def getAirport(token, airportname):
             pass
     try:
         airportname = (data['AirportResource']['Airports']['Airport']['Names']['Name']['$'])
-        airportinfo = airport_info(airportname)
+        latitude = (data['AirportResource']['Airports']['Airport']['Position']['Coordinate']['Latitude'])
+        longitude = (data['AirportResource']['Airports']['Airport']['Position']['Coordinate']['Longitude'])
+        airportinfo = airport_info(airportname, latitude, longitude).toJson()
     except:
-        airportname = ""
-        airportinfo = airport_info(airportname)
+        airportinfo = jsonify({'info': 'airport does not exist'})
 
     return airportinfo
 
@@ -492,13 +493,17 @@ class airline_info:
         self.airlineName = airlineName
 
 class airport_info:
-    airportName= ""
+    airportName = ""
+    latitude = 0
+    longitude = 0
 
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__)
 
-    def __init__(self, airportName):
+    def __init__(self, airportName, latitude, longitude):
         self.airportName = airportName
+        self.latitude = latitude
+        self.longitude = longitude
 
 
 
