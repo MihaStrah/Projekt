@@ -35,9 +35,7 @@ def check(data):
     tokens = []
 
     for row in rows:
-        print(row[0])
         tokens.append(row[0])
-        print(len(tokens))
 
     if len(tokens) > 0:
         print(tokens.count())
