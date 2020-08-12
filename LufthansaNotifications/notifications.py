@@ -38,7 +38,6 @@ def check(data):
         tokens.append(row[0])
 
     if len(tokens) > 0:
-        print(tokens.count())
         #sendMultipleNotifications(tokens, title, body, flightString, dateString)
         print(tokens, title, body, flightString, dateString)
 
