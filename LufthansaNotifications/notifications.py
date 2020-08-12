@@ -23,7 +23,7 @@ def check(data):
     flightString = re.search("^([A-z]{1,2}[0-9]{1,5})$", update["Update"]["FlightNumber"]).group()
     print(flightString)
 
-    conn = sqlite3.connect('notificationUsers.db')
+    conn = sqlite3.connect('notificationsDB/notificationUsers.db')
     c = conn.cursor()
     print("connection ok")
     #c.execute('SELECT token FROM notifications WHERE flight == ? AND date == ?', (flightString, dateString))
