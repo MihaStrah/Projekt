@@ -16,7 +16,7 @@ def main():
     #checkt()
     # Enable logging
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                        level=logging.INFO, filename="LufthansaNotification_logs_out/LufthansaNotificationPythonScriptLog.log", filemode='a')
+                        level=logging.INFO, filename="LufthansaNotifications_logs_out/LufthansaNotificationsPythonScriptLog.log", filemode='a')
     logger = logging.getLogger(__name__)
 
     client = mqtt.Client(client_id="lufthansanotificationinstance1", clean_session=True, userdata=None, transport="tcp")
