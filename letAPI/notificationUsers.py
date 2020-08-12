@@ -24,14 +24,14 @@ def registerFlight(token, airline, flightnumber, date):
         flightnumberString = re.search("[0-9]{1,5}", flightnumber).group()
         flightnumberString = str(flightnumberString).zfill(3)
         flightString = (airlineString + flightnumberString).upper()
-
+        print("here")
         tokenString = re.search("[0-9]{1,50}", token).group()
         dateString = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
-
+        print("here2")
         logger.info("registerFlight: %s, %s, %s, %s", token, airline, flightnumber, date)
         logger.info("registerFlight String: %s, %s, %s, %s", tokenString, airlineString, flightnumberString, dateString)
-
-        conn = sqlite3.connect('notificationUsers.db')
+        print("here3")
+        conn = sqlite3.connect('notificationsDB/notificationUsers.db')
         c = conn.cursor()
         c.execute('INSERT INTO notifications VALUES (?,?,?)', (idString, flightString, dateString))
         conn.commit()
@@ -55,7 +55,7 @@ def unregisterFlight(id, airline, flightnumber, date):
         logger.info("unregisterFlight: %s, %s, %s, %s", token, airline, flightnumber, date)
         logger.info("unregisterFlight String: %s, %s, %s, %s", tokenString, airlineString, flightnumberString, dateString)
 
-        conn = sqlite3.connect('notificationUsers.db')
+        conn = sqlite3.connect('notificationsDB/notificationUsers.db')
         c = conn.cursor()
         c.execute('DELETE from notifications WHERE token == ? AND flight == ? AND date == ?', (tokenString, flightString, dateString))
         conn.commit()
