@@ -42,7 +42,7 @@ def registerFlight(token, airline, flightnumber, date):
 
 def unregisterFlight(token, airline, flightnumber, date):
     try:
-        airlineString = re.search("[A-z]{1,2}", airline).group()
+        airlineString = re.search("[A-z]{1,3}", airline).group()
         flightnumberString = re.search("[0-9]{1,5}", flightnumber).group()
         flightnumberString = str(flightnumberString).zfill(3)
         flightString = (airlineString + flightnumberString).upper()
@@ -50,15 +50,39 @@ def unregisterFlight(token, airline, flightnumber, date):
         tokenString = re.search("[0-9]{1,50}", token).group()
         dateString = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
 
-        logger.info("unregisterFlight: %s, %s, %s, %s", token, airline, flightnumber, date)
-        logger.info("unregisterFlight String: %s, %s, %s, %s", tokenString, airlineString, flightnumberString, dateString)
 
-        conn = sqlite3.connect('notificationsDB/notificationUsers.db')
-        c = conn.cursor()
-        c.execute('DELETE from notifications WHERE token == ? AND flight == ? AND date == ?', (tokenString, flightString, dateString))
-        conn.commit()
-        conn.close()
-        logger.info("unregisterFlight OK: %s, %s, %s, %s", tokenString, airlineString, flightnumberString, dateString)
-        return jsonify({'info': 'OK'})
+        if ((airlineString.upper() == "ALL") and (flightnumberString == "000")):
+            logger.info("unregisterALLFlights: %s, %s, %s, %s", token, airline, flightnumber, date)
+            logger.info("unregisterALLFlights String: %s, %s, %s, %s", tokenString, airlineString, flightnumberString,
+                        dateString)
+
+            conn = sqlite3.connect('notificationsDB/notificationUsers.db')
+            c = conn.cursor()
+            print(tokenString)
+            c.execute('DELETE from notifications WHERE token == ?', (tokenString,))
+            print("1")
+            conn.commit()
+            print("2")
+            conn.close()
+            print("3")
+            logger.info("unregisterALLFlight OK: %s, %s, %s, %s", tokenString, airlineString, flightnumberString,
+                        dateString)
+            return jsonify({'info': 'OK'})
+
+        else:
+            logger.info("unregisterFlight: %s, %s, %s, %s", token, airline, flightnumber, date)
+            logger.info("unregisterFlight String: %s, %s, %s, %s", tokenString, airlineString, flightnumberString,
+                        dateString)
+
+            conn = sqlite3.connect('notificationsDB/notificationUsers.db')
+            c = conn.cursor()
+            c.execute('DELETE from notifications WHERE token == ? AND flight == ? AND date == ?',
+                      (tokenString, flightString, dateString))
+            conn.commit()
+            conn.close()
+            logger.info("unregisterFlight OK: %s, %s, %s, %s", tokenString, airlineString, flightnumberString,
+                        dateString)
+            return jsonify({'info': 'OK'})
+
     except:
         return jsonify({'info': 'ERROR'})

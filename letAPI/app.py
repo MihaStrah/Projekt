@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 #set notificationUsers database
 setDatabase()
 
+
 def readAPIKey():
     import os
     path = os.path.abspath(os.path.dirname(__file__))
@@ -236,6 +237,9 @@ def notificationsUnregister(current_user):
 
 
 
+
+
+
 #testno
 #flightCodesharesOPEN!!!
 #@server.route('/open/codeshares/<date>/<flightnumber>', methods=['GET'])
@@ -245,7 +249,6 @@ def notificationsUnregister(current_user):
 #    flightCodeshares = getSQLFlightCodeshares(flightnumber,date)
 #    #print(flightCodeshares)
 #    return (flightCodeshares)
-
 
 
 
