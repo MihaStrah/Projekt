@@ -213,7 +213,7 @@ def get_flightStatDay(current_user,flightnumber):
 @token_required
 def notificationsRegister(current_user):
     if request.method == 'POST':
-        id = request.form.get('id')
+        id = request.form.get('token')
         airline = request.form.get('airline')
         flightnumber = request.form.get('flightnumber')
         date = request.form.get('date')

@@ -24,25 +24,23 @@ def registerFlight(token, airline, flightnumber, date):
         flightnumberString = re.search("[0-9]{1,5}", flightnumber).group()
         flightnumberString = str(flightnumberString).zfill(3)
         flightString = (airlineString + flightnumberString).upper()
-        print("here")
         tokenString = re.search("[0-9]{1,50}", token).group()
         dateString = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
-        print("here2")
         logger.info("registerFlight: %s, %s, %s, %s", token, airline, flightnumber, date)
         logger.info("registerFlight String: %s, %s, %s, %s", tokenString, airlineString, flightnumberString, dateString)
-        print("here3")
         conn = sqlite3.connect('notificationsDB/notificationUsers.db')
         c = conn.cursor()
-        c.execute('INSERT INTO notifications VALUES (?,?,?)', (idString, flightString, dateString))
+        c.execute('INSERT INTO notifications VALUES (?,?,?)', (tokenString, flightString, dateString))
         conn.commit()
         conn.close()
         logger.info("registerFlight OK: %s, %s, %s, %s", tokenString, airlineString, flightnumberString, dateString)
+
 
         return jsonify({'info': 'OK'})
     except:
         return jsonify({'info': 'ERROR'})
 
-def unregisterFlight(id, airline, flightnumber, date):
+def unregisterFlight(token, airline, flightnumber, date):
     try:
         airlineString = re.search("[A-z]{1,2}", airline).group()
         flightnumberString = re.search("[0-9]{1,5}", flightnumber).group()
