@@ -11,6 +11,7 @@ from flask_caching import Cache
 from izbaze import getSQLFlightStatus, getSQLFlightStats, getSQLFlightCodeshares, getSQLFlightPastStats
 from aircraftImage import getAircraftImageURL
 from liveLufthansa import getFlightStatusLufthansa, getAircraftModelLufthansa, getAirlineNameLufthansa, getAirportNameLufthansa, getCodesharesLufthansa
+from notificationUsers import setDatabase, registerFlight, unregisterFlight
 
 server = Flask(__name__)
 
@@ -20,6 +21,10 @@ cache = Cache(server, config={'CACHE_TYPE': 'simple'})
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO, filename="letAPI_logs_out/letAPIPythonScriptLog.log", filemode='a')
 logger = logging.getLogger(__name__)
+
+
+#set notificationUsers database
+setDatabase()
 
 def readAPIKey():
     import os
@@ -49,7 +54,6 @@ class Users(db.Model):
     name = db.Column(db.String(50))
     password = db.Column(db.String(50))
     admin = db.Column(db.Boolean)
-
 
 db.create_all()
 #print('db created or opened')
@@ -91,11 +95,8 @@ def login_user():
         token = jwt.encode(
             {'public_id': user.public_id, 'exp': exp},
             server.config['SECRET_KEY'])
-        #print(exp)
-
         #for json in iso
         return jsonify({'token': token.decode('UTF-8'), 'expires': exp.isoformat()})
-
 
     return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
 
@@ -206,6 +207,31 @@ def get_flightStatDay(current_user,flightnumber):
     flightStatDay = getSQLFlightPastStats(flightnumber)
     #print(flightCodeshares)
     return (flightStatDay)
+
+
+@server.route('/notifications/register', methods=['POST'])
+@token_required
+def notificationsRegister(current_user):
+    if request.method == 'POST':
+        id = request.form.get('id')
+        airline = request.form.get('airline')
+        flightnumber = request.form.get('flightnumber')
+        date = request.form.get('date')
+        info = registerFlight(id, airline, flightnumber, date)
+        return info
+    return (jsonify({'info': 'REQUEST ERROR'}))
+
+@server.route('/notifications/unregister', methods=['POST'])
+@token_required
+def notificationsUnregister(current_user):
+    if request.method == 'POST':
+        token = request.form.get('token')
+        airline = request.form.get('airline')
+        flightnumber = request.form.get('flightnumber')
+        date = request.form.get('date')
+        info = unregisterFlight(token, airline, flightnumber, date)
+        return info
+    return (jsonify({'info': 'REQUEST ERROR'}))
 
 
 
