@@ -13,7 +13,8 @@ from notifications import check
 
 
 def main():
-    #checkt()
+    #set database
+
     # Enable logging
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         level=logging.INFO, filename="LufthansaNotifications_logs_out/LufthansaNotificationsPythonScriptLog.log", filemode='a')
@@ -52,18 +53,6 @@ def on_disconnect(client, userdata, rc):
     if rc != 0:
         print("Unexpected disconnection.")
 
-
-
-
-def setDatabase():
-    try:
-        conn = sqlite3.connect('notificationUsers.db')
-        c = conn.cursor()
-        c.execute("CREATE TABLE notifications (id text, flight text, date text)")
-        conn.commit()
-        conn.close()
-    except:
-        print("notificationUsers DB already exists")
 
 
 if __name__ == '__main__':

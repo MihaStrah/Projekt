@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def setDatabase():
     try:
-        conn = sqlite3.connect('notificationUsers.db')
+        conn = sqlite3.connect('notificationsDB/notificationUsers.db')
         c = conn.cursor()
         c.execute("CREATE TABLE notifications (token text, flight text, date text)")
         conn.commit()
