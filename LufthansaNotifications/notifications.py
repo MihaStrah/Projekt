@@ -31,11 +31,13 @@ def check(data):
     for row in rows:
         tokens.append(row[0])
 
+    #tokens.append("435a901c94d133a2a2a8c7325973563c9a6aee76227f24f888e41e6300ce1047")
+
     if len(tokens) > 0:
         #sendMultipleNotifications(tokens, title, body, flightString, dateString)
         logger.info("subscribed: : %s, %s, %s, %s, %s", tokens, title, body, flightString, dateString)
-
-    sendMultipleNotifications(tokens, title, body, update["Update"]["FlightNumber"], update["Update"]["ScheduledFlightDate"])
+        sendMultipleNotifications(tokens, title, body, update["Update"]["FlightNumber"],
+                                  update["Update"]["ScheduledFlightDate"])
 
     return
 
