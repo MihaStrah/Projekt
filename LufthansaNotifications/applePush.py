@@ -1,5 +1,6 @@
-from apns2.client import APNsClient, TokenCredentials
+from apns2.client import APNsClient
 from apns2.payload import Payload, PayloadAlert
+from apns2.credentials import TokenCredentials
 import logging
 import collections
 
