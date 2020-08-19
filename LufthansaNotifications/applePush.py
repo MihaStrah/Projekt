@@ -15,9 +15,9 @@ def sendMultipleNotifications(tokens, title, body, flightString, dateString):
     }
     payload = Payload(alert=PayloadAlert(title=title, body=body), custom=costumDict, sound="default", badge=0)
     topic = 'com.MihaStrah.FlightTracker'
-    #client = APNsClient('AppleAuthentication/pushcertdev.pem', use_sandbox=True, use_alternative_port=False)
-    token_credentials = TokenCredentials(auth_key_path="AppleAuthentication/AuthKey_85KZTANBJ8.p8", auth_key_id="85KZTANBJ8", team_id="7YNLV7443U")
-    client = APNsClient(credentials=token_credentials, use_sandbox=False)
+    client = APNsClient('AppleAuthentication/pushcertdev.pem', use_sandbox=True, use_alternative_port=False)
+    #token_credentials = TokenCredentials(auth_key_path="AppleAuthentication/AuthKey_85KZTANBJ8.p8", auth_key_id="85KZTANBJ8", team_id="7YNLV7443U")
+    #client = APNsClient(credentials=token_credentials, use_sandbox=True)
     Notification = collections.namedtuple('Notification', ['token', 'payload'])
     notifications = []
 
