@@ -305,7 +305,7 @@ def getCodeshares(token, flight, date):
             data = request.json()
             #print(data)
             i = 10
-            logger.info("Successfull request to Lufthansa API for CODESHARE flight:  %s, date: %s ; %s", flight, date, data)
+            logger.info("(Used cache: %s) Successfull request to Lufthansa API for CODESHARE flight:  %s, date: %s ; %s", str(request.from_cache), date, data)
         except:
             time.sleep(10)
             if (i > 3):

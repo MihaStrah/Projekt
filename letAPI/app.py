@@ -157,6 +157,7 @@ def get_aircraftImage(current_user,aircraftreg):
 
 @server.route('/live/flight/<date>/<flightnumber>', methods=['GET'])
 @token_required
+@cache.cached(timeout=60) #cache requests for 1 minute 60s
 def get_flightstatusLive(current_user,flightnumber, date):
     #print("test")
     flightstatusLive = getFlightStatusLufthansa(flightnumber, date)
@@ -192,6 +193,7 @@ def get_airportName(current_user,airportcode):
 
 @server.route('/live/codeshares/<date>/<flightnumber>', methods=['GET'])
 @token_required
+@cache.cached(timeout=60) #cache requests for 1 minute 60s
 def get_flightCodesharesLive(current_user,date,flightnumber):
     #print(date)
     #print(flightnumber)
@@ -202,6 +204,7 @@ def get_flightCodesharesLive(current_user,date,flightnumber):
 
 @server.route('/statday/<flightnumber>', methods=['GET'])
 @token_required
+@cache.cached(timeout=60) #cache requests for 1 minute 60s
 def get_flightStatDay(current_user,flightnumber):
     #print(date)
     #print(flightnumber)
@@ -214,11 +217,11 @@ def get_flightStatDay(current_user,flightnumber):
 @token_required
 def notificationsRegister(current_user):
     if request.method == 'POST':
-        id = request.form.get('token')
+        token = request.form.get('token')
         airline = request.form.get('airline')
         flightnumber = request.form.get('flightnumber')
         date = request.form.get('date')
-        info = registerFlight(id, airline, flightnumber, date)
+        info = registerFlight(token, airline, flightnumber, date)
         return info
     return (jsonify({'info': 'REQUEST ERROR'}))
 
