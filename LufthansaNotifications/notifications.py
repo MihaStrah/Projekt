@@ -33,8 +33,7 @@ def check(data):
 
     if len(tokens) > 0:
         #sendMultipleNotifications(tokens, title, body, flightString, dateString)
-        print("subscribed:")
-        print(tokens, title, body, flightString, dateString)
+        logger.info("subscribed: : %s, %s, %s, %s, %s", tokens, title, body, flightString, dateString)
 
     sendMultipleNotifications(tokens, title, body, update["Update"]["FlightNumber"], update["Update"]["ScheduledFlightDate"])
 

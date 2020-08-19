@@ -15,15 +15,16 @@ def sendMultipleNotifications(tokens, title, body, flightString, dateString):
     }
     payload = Payload(alert=PayloadAlert(title=title, body=body), custom=costumDict, sound="default", badge=0)
     topic = 'com.MihaStrah.FlightTracker'
-    client = APNsClient('AppleAuthentication/pushcertdev.pem', use_sandbox=True, use_alternative_port=False)
-    #token_credentials = TokenCredentials(auth_key_path="AppleAuthentication/AuthKey_85KZTANBJ8.p8", auth_key_id="85KZTANBJ8", team_id="7YNLV7443U")
-    #client = APNsClient(credentials=token_credentials, use_sandbox=True)
+    #client = APNsClient('AppleAuthentication/pushcertdev.pem', use_sandbox=True, use_alternative_port=False)
+    token_credentials = TokenCredentials(auth_key_path="AppleAuthentication/AuthKey_85KZTANBJ8.p8", auth_key_id="85KZTANBJ8", team_id="7YNLV7443U")
+    client = APNsClient(credentials=token_credentials, use_sandbox=True)
     Notification = collections.namedtuple('Notification', ['token', 'payload'])
     notifications = []
 
     for token in tokens:
-        print("sending notification")
+        logger.info("notifications")
         #make token_hex out of token
         #token_hex = 'b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b87'
         notifications.append(Notification(payload=payload, token=token))
+
     client.send_notification_batch(notifications=notifications, topic=topic)
