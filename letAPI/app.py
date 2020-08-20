@@ -16,7 +16,8 @@ from notificationUsers import setDatabase, registerFlight, unregisterFlight
 server = Flask(__name__)
 
 #cache for API https://pythonhosted.org/Flask-Caching/
-cache = Cache(server, config={'CACHE_TYPE': 'simple'})
+#cache = Cache(server, config={'CACHE_TYPE': 'simple'})
+cache = Cache(server, config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': '/tmp'})
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO, filename="letAPI_logs_out/letAPIPythonScriptLog.log", filemode='a')
@@ -256,7 +257,7 @@ def notificationsUnregister(current_user):
 
 
 
-if __name__ == '__main__':
-   server.run(debug=True)
+#if __name__ == '__main__':
+#   server.run(debug=True)
 
 
