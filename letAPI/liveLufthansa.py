@@ -167,7 +167,7 @@ def getFlight(token, flight, date):
     #check status for operating carrier flight if not operating carrier
     operating = (f"{newstatus.airlineid}{newstatus.flightnumber}")
     if (operating != flight.upper() and operating != ""):
-        newstatus = getFlight(token, operating, date)
+        getFlight(token, operating, date)
 
     if newstatus.depscheduledUTC == "":
         newstatus = jsonify({'info': 'flight does not exist'})

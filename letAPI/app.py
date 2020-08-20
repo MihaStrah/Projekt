@@ -83,6 +83,7 @@ def token_required(f):
     return decorator
 
 
+
 @server.route('/login', methods=['POST'])
 def login_user():
     auth = request.authorization
@@ -158,7 +159,7 @@ def get_aircraftImage(current_user,aircraftreg):
 @server.route('/live/flight/<date>/<flightnumber>', methods=['GET'])
 @token_required
 @cache.cached(timeout=60) #cache requests for 1 minute 60s
-def get_flightstatusLive(current_user,flightnumber, date):
+def get_flightstatusLive(flightnumber, date):
     #print("test")
     flightstatusLive = getFlightStatusLufthansa(flightnumber, date)
     #print(flightstatusLive)
