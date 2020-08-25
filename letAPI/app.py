@@ -160,7 +160,7 @@ def get_aircraftImage(current_user,aircraftreg):
 @server.route('/live/flight/<date>/<flightnumber>', methods=['GET'])
 @token_required
 @cache.cached(timeout=60) #cache requests for 1 minute 60s
-def get_flightstatusLive(current_user, flightnumber, date):
+def get_flightstatusLive(current_user,flightnumber, date):
     #print("test")
     flightstatusLive = getFlightStatusLufthansa(flightnumber, date)
     #print(flightstatusLive)

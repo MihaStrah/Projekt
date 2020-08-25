@@ -87,6 +87,14 @@ def getFlight(token, flight, date):
     except:
         depscheduledUTC = ""
     try:
+        depestimated = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['EstimatedTimeLocal']['DateTime']
+    except:
+        depestimated = ""
+    try:
+        depestimatedUTC = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['EstimatedTimeUTC']['DateTime']
+    except:
+        depestimatedUTC = ""
+    try:
         depactual = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['ActualTimeLocal']['DateTime']
     except:
         depactual = ""
@@ -118,6 +126,14 @@ def getFlight(token, flight, date):
         arrscheduledUTC = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['ScheduledTimeUTC']['DateTime']
     except:
         arrscheduledUTC = ""
+    try:
+        arrestimated = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['EstimatedTimeLocal']['DateTime']
+    except:
+        arrestimated = ""
+    try:
+        arrestimatedUTC = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['EstimatedTimeUTC']['DateTime']
+    except:
+        arrestimatedUTC = ""
     try:
         arractual = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['ActualTimeLocal']['DateTime']
     except:
@@ -159,8 +175,8 @@ def getFlight(token, flight, date):
     except:
         flightstatus = ""
 
-    newstatus = flight_status(depairport, depscheduled, depscheduledUTC, depactual, depactualUTC, depterminal, depgate,
-                              deptimestatus, arrairport, arrscheduled, arrscheduledUTC, arractual,
+    newstatus = flight_status(depairport, depscheduled, depscheduledUTC, depestimated, depestimatedUTC, depactual, depactualUTC, depterminal, depgate,
+                              deptimestatus, arrairport, arrscheduled, arrscheduledUTC, arrestimated, arrestimatedUTC, arractual,
                               arractualUTC, arrterminal, arrgate, arrtimestatus, aircraftcode,
                               aircraftreg, airlineid, flightnumber, flightstatus)
 
@@ -427,6 +443,8 @@ class flight_status:
     depairport = ""
     depscheduled = ""
     depscheduledUTC = ""
+    depestimated = ""
+    depestimatedUTC = ""
     depactual = ""
     depactualUTC = ""
     depterminal = ""
@@ -435,6 +453,8 @@ class flight_status:
     arrairport = ""
     arrscheduled = ""
     arrscheduledUTC = ""
+    arrestimated = ""
+    arrestimatedUTC = ""
     arractual = ""
     arractualUTC = ""
     arrterminal = ""
@@ -449,10 +469,12 @@ class flight_status:
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__)
 
-    def __init__(self, depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus):
+    def __init__(self, depairport,depscheduled,depscheduledUTC, depestimated, depestimatedUTC, depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC, arrestimated, arrestimatedUTC, arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus):
         self.depairport = depairport
         self.depscheduled = depscheduled
         self.depscheduledUTC = depscheduledUTC
+        self.depestimated = depestimated
+        self.depestimatedUTC = depestimatedUTC
         self.depactual = depactual
         self.depactualUTC = depactualUTC
         self.depterminal = depterminal
@@ -461,6 +483,8 @@ class flight_status:
         self.arrairport = arrairport
         self.arrscheduled = arrscheduled
         self.arrscheduledUTC = arrscheduledUTC
+        self.arrestimated = arrestimated
+        self.arrestimatedUTC = arrestimatedUTC
         self.arractual = arractual
         self.arractualUTC = arractualUTC
         self.arrterminal = arrterminal
