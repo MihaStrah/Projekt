@@ -1,8 +1,9 @@
 from getflight import getFlightCodeshares
-from tryall import getAllFLightsForDay
+from allflights import getAllFLightsForDay
 from writetosql import writeCodeshareToSql
 from gettoken import getNewToken
 
+#iz baze pridobimo vse načrtovane lete za dan in kličemo funkcijo za vpis v bazo
 def getandwriteCodeshares(date):
     allids = getAllFLightsForDay(date)
     token = getNewToken()

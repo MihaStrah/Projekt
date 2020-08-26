@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+#pridobimo status leta iz Lufthansa API in kličemo funkcijo za vpis v bazo
 def getFlightStatusWriteSql(token,flights,allids,date,wait):
     a=0
     idn=0
@@ -14,16 +15,13 @@ def getFlightStatusWriteSql(token,flights,allids,date,wait):
         idn=idn+1
         a=a+1
         url = 'https://api.lufthansa.com/v1/operations/flightstatus' + '/' + flight + '/' + date
-        #print(url)
         bearer = "Bearer " + token
         headers = {"Authorization":bearer, "Accept":"application/json"}
         i = 0
         while i<10:
             try:
                 request = requests.get(url=url, headers=headers)
-                #print(request)
                 data = request.json()
-                #print(data)
                 i = 10
                 logger.info("Successfull request to Lufthansa API for flight:  %s, date: %s ; %s", flight, date, data)
             except:
@@ -32,7 +30,6 @@ def getFlightStatusWriteSql(token,flights,allids,date,wait):
                     time.sleep(180)
                 if (i > 5):
                     time.sleep(600)
-                #print("Retry LH " + str(i))
                 i = i + 1
                 if (i == 10):
                     logger.error("Error (abort) request to Lufthansa API for flight:  %s, date: %s", flight, date)
@@ -133,36 +130,36 @@ def getFlightStatusWriteSql(token,flights,allids,date,wait):
         newstatus = flight_status(depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus)
 
         operating = (f"{newstatus.airlineid}{newstatus.flightnumber}")
+
+        #preverimo če se pridobljen let ne ujema z iskanim letom
         if (operating != flight.upper() and operating != ""):
             getFlightStatusWriteSqlOperatingRetry(token, operating, id, date, wait)
-            #print(str(a) + " done. Processed flight " + str(flight) + " with ID " + id + ", " + str(len(flights) - a) + " remaining !THIS WAS INSERTED WITH OPERATING RETRY BEACUSE OF OPERATING FLIGHT MISMATCH!")
             logger.info("Processed flight: %s, date: %s ; %s remaining ; !THIS WAS INSERTED WITH OPERATING RETRY BEACUSE OF OPERATING FLIGHT MISMATCH!", flight, date, (len(flights) - a))
 
         else:
+            #kličemo funkcijo za vpis v bazo
             writeOneFlightToSql(newstatus, id, date)
-            #print(str(a) + " done. Processed flight " + str(flight) + " with ID " + id + ", " + str(len(flights) - a) + " remaining")
+
             logger.info("Processed flight: %s, date: %s ; %s remaining", flight, date, (len(flights) - a))
-            #wait because of API limitations
         time.sleep(wait)
 
+    #kličemo funkcijo za preverjanje duplikatov
     updateDuplicatesSql()
+
     logger.info("Updated duplicates in SQL")
 
     return
 
-
+#pridobimo status leta iz Lufthansa API in kličemo funkcijo za vpis v bazo (ko iskani let ni enak dobljenemu, v primeru deljenega leta)
 def getFlightStatusWriteSqlOperatingRetry(token, flight, id, date, wait):
     url = 'https://api.lufthansa.com/v1/operations/flightstatus' + '/' + flight + '/' + date
-    #print(url)
     bearer = "Bearer " + token
     headers = {"Authorization": bearer, "Accept": "application/json"}
     i = 0
     while i < 10:
         try:
             request = requests.get(url=url, headers=headers)
-            #print(request)
             data = request.json()
-            #print(data)
             i = 10
             logger.info("Successfull (operating retry) request to Lufthansa API for flight:  %s, date: %s ; %s", flight, date, data)
         except:
@@ -171,7 +168,6 @@ def getFlightStatusWriteSqlOperatingRetry(token, flight, id, date, wait):
                 time.sleep(180)
             if (i > 5):
                 time.sleep(600)
-            #print("Retry LH " + str(i))
             i = i + 1
             if (i == 10):
                 logger.error("Error (abort) (operating retry) request to Lufthansa API for flight:  %s, date: %s", flight, date)
@@ -276,32 +272,27 @@ def getFlightStatusWriteSqlOperatingRetry(token, flight, id, date, wait):
 
     operating = (f"{newstatus.airlineid}{newstatus.flightnumber}")
     if (operating != flight.upper() and operating != ""):
-        #print("!!!! ERROR !!!! operating is not the same, but should be (operating retry), writing anyway")
         logger.error("Operating is not the same, but should be (operating retry), writing anyway ; flight:  %s, date: %s", flight, date)
 
-
+    #kličemo funkcijo za vpis v bazo
     writeOneFlightToSql(newstatus, id, date)
 
-    # wait because of API limitations
     time.sleep(wait)
 
     return newstatus
 
 
-
+#pridobimo deljene lete iz Lufthansa API
 def getFlightCodeshares(token,flight,date,wait):
     time.sleep(wait)
     url = 'https://api.lufthansa.com/v1/operations/customerflightinformation' + '/' + flight + '/' + date
-    #print(url)
     bearer = "Bearer " + token
     headers = {"Authorization":bearer, "Accept":"application/json"}
     i = 0
     while i<10:
         try:
             request = requests.get(url=url, headers=headers)
-            #print(request)
             data = request.json()
-            #print(data)
             i = 10
             logger.info("Successfull request to Lufthansa API for CODESHARE flight:  %s, date: %s ; %s", flight, date, data)
         except:
@@ -310,7 +301,6 @@ def getFlightCodeshares(token,flight,date,wait):
                 time.sleep(180)
             if (i > 5):
                 time.sleep(600)
-            #print("Retry LH " + str(i))
             i = i + 1
             if (i == 10):
                 logger.error("Error (abort) request to Lufthansa API for CODESHARE flight:  %s, date: %s", flight, date)
@@ -323,10 +313,8 @@ def getFlightCodeshares(token,flight,date,wait):
     codeshares.clear()
     try:
         flightcodeshares = data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']
-        #print("codeshares : ", flightcodeshares)
         for flightcodeshare in flightcodeshares:
             codeshares.append([flightcodeshare['AirlineID'],flightcodeshare['FlightNumber']])
-            #print(flightcodeshare['AirlineID'], flightcodeshare['FlightNumber'])
     except:
         try:
             codeshares.append([data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['AirlineID'], data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['FlightNumber']])
@@ -339,7 +327,7 @@ def getFlightCodeshares(token,flight,date,wait):
 
 
 
-
+#definicija razreda pridobljenega statusa leta
 class flight_status:
     depairport = ""
     depscheduled = ""

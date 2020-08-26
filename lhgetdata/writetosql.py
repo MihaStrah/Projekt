@@ -4,6 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+#vpišemo en let v bazo
 def writeOneFlightToSql(flight, id, date):
     host, port, database, user, password = readDBAccount()
     i = 0
@@ -20,8 +21,6 @@ def writeOneFlightToSql(flight, id, date):
             if (i>5):
                 time.sleep(600)
             i = i + 1
-            #print("Retry DB " + str(i))
-
             if (i == 10):
                 logger.error("Unsuccessful connection to SQL")
             else:
@@ -32,7 +31,6 @@ def writeOneFlightToSql(flight, id, date):
     while i < 10:
         try:
             cursor.execute("INSERT INTO allflightsstatus (depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus,flightnumberkey) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (flight.depairport,flight.depscheduled,flight.depscheduledUTC,flight.depactual,flight.depactualUTC,flight.depterminal,flight.depgate,flight.deptimestatus,flight.arrairport,flight.arrscheduled,flight.arrscheduledUTC,flight.arractual,flight.arractualUTC,flight.arrterminal,flight.arrgate,flight.arrtimestatus,flight.aircraftcode,flight.aircraftreg,flight.airlineid,flight.flightnumber,flight.flightstatus,id))
-            #print("successful write to database")
             i = 10
             logger.info("Successfull write to SQL")
         except mariadb.Error as error:
@@ -42,8 +40,6 @@ def writeOneFlightToSql(flight, id, date):
             if (i > 5):
                 time.sleep(600)
             i = i + 1
-            #print("Mariadb Error: {}".format(error))
-            #print("Retry DB INSERT " + str(i))
             logger.error("MariaDB SQL error: %s", error)
             if (i == 10):
                 logger.error("Unsuccessful write to SQL")
@@ -58,7 +54,6 @@ def writeOneFlightToSql(flight, id, date):
             cursor.execute("INSERT IGNORE INTO flightstats_7day (allflights_id, Allflights, Cancelled, Dep_OT, Dep_FE, Dep_DL, AverageTimeDep, AverageTimeDep_OT, AverageTimeDep_FE, AverageTimeDep_DL, Arr_OT, Arr_FE, Arr_DL, AverageTimeArr, AverageTimeArr_OT, AverageTimeArr_FE, AverageTimeArr_DL) SELECT new_update.allflights_id, new_update.Allflights, new_update.Cancelled, new_update.Dep_OT, new_update.Dep_FE, new_update.Dep_DL, new_update.AverageTimeDep, new_update.AverageTimeDep_OT, new_update.AverageTimeDep_FE, new_update.AverageTimeDep_DL, new_update.Arr_OT, new_update.Arr_FE, new_update.Arr_DL, new_update.AverageTimeArr, new_update.AverageTimeArr_OT, new_update.AverageTimeArr_FE, new_update.AverageTimeArr_DL FROM (SELECT %s as allflights_id, COUNT(CASE WHEN flightstatus is not null and flightstatus <> '' THEN 1 END) as Allflights, COUNT(CASE WHEN flightstatus='CD' THEN 1 END) as Cancelled, COUNT(CASE WHEN deptimestatus = 'OT' THEN 1 END) as Dep_OT, COUNT(CASE WHEN deptimestatus = 'FE' THEN 1 END) as Dep_FE, COUNT(CASE WHEN deptimestatus = 'DL' THEN 1 END) as Dep_DL, CAST(AVG(CASE WHEN depactualUTC is not null and depactualUTC <> '' THEN (timestampdiff(minute,depscheduledUTC, depactualUTC)) END) as int) as AverageTimeDep, CAST(AVG(CASE WHEN deptimestatus = 'OT' and depactualUTC is not null and depactualUTC <> '' THEN (timestampdiff(minute,depscheduledUTC, depactualUTC)) END) as int) as AverageTimeDep_OT, CAST(AVG(CASE WHEN deptimestatus = 'FE' and depactualUTC is not null and depactualUTC <> '' THEN (timestampdiff(minute,depscheduledUTC, depactualUTC)) END) as int) as AverageTimeDep_FE, CAST(AVG(CASE WHEN deptimestatus = 'DL' and depactualUTC is not null and depactualUTC <> '' THEN (timestampdiff(minute,depscheduledUTC, depactualUTC)) END) as int) as AverageTimeDep_DL, COUNT(CASE WHEN arrtimestatus = 'OT' THEN 1 END) as Arr_OT, COUNT(CASE WHEN arrtimestatus = 'FE' THEN 1 END) as Arr_FE, COUNT(CASE WHEN arrtimestatus = 'DL' THEN 1 END) as Arr_DL, CAST(AVG(CASE WHEN arractualUTC is not null and arractualUTC <> '' THEN (timestampdiff(minute,arrscheduledUTC, arractualUTC)) END) as int) as AverageTimeArr, CAST(AVG(CASE WHEN arrtimestatus = 'OT' and arractualUTC is not null and arractualUTC <> '' THEN (timestampdiff(minute,arrscheduledUTC, arractualUTC)) END) as int) as AverageTimeArr_OT, CAST(AVG(CASE WHEN arrtimestatus = 'FE' and arractualUTC is not null and arractualUTC <> '' THEN (timestampdiff(minute,arrscheduledUTC, arractualUTC)) END) as int) as AverageTimeArr_FE, CAST(AVG(CASE WHEN arrtimestatus = 'DL' and arractualUTC is not null and arractualUTC <> '' THEN (timestampdiff(minute,arrscheduledUTC, arractualUTC)) END) as int) as AverageTimeArr_DL from allflightsstatus where (DATE(depscheduled) between DATE_ADD(DATE(%s), INTERVAL %s DAY) and DATE(%s)) and flightnumberkey = %s) as new_update where Allflights <> 0 ON DUPLICATE KEY UPDATE Allflights = new_update.Allflights, Cancelled = new_update.Cancelled, Dep_OT = new_update.Dep_OT, Dep_DL = new_update.Dep_DL, Dep_FE = new_update.Dep_FE, AverageTimeDep = new_update.AverageTimeDep, AverageTimeDep_OT = new_update.AverageTimeDep_OT, AverageTimeDep_FE = new_update.AverageTimeDep_FE, AverageTimeDep_DL = new_update.AverageTimeDep_DL, Arr_OT = new_update.Arr_OT, Arr_FE = new_update.Arr_FE, Arr_DL = new_update.Arr_DL, AverageTimeArr = new_update.AverageTimeArr, AverageTimeArr_OT = new_update.AverageTimeArr_OT, AverageTimeArr_FE = new_update.AverageTimeArr_FE, AverageTimeArr_DL = new_update.AverageTimeArr_DL;", (id, date, interval, date, id))
             interval = -30+1
             cursor.execute("INSERT IGNORE INTO flightstats_30day (allflights_id, Allflights, Cancelled, Dep_OT, Dep_FE, Dep_DL, AverageTimeDep, AverageTimeDep_OT, AverageTimeDep_FE, AverageTimeDep_DL, Arr_OT, Arr_FE, Arr_DL, AverageTimeArr, AverageTimeArr_OT, AverageTimeArr_FE, AverageTimeArr_DL) SELECT new_update.allflights_id, new_update.Allflights, new_update.Cancelled, new_update.Dep_OT, new_update.Dep_FE, new_update.Dep_DL, new_update.AverageTimeDep, new_update.AverageTimeDep_OT, new_update.AverageTimeDep_FE, new_update.AverageTimeDep_DL, new_update.Arr_OT, new_update.Arr_FE, new_update.Arr_DL, new_update.AverageTimeArr, new_update.AverageTimeArr_OT, new_update.AverageTimeArr_FE, new_update.AverageTimeArr_DL FROM (SELECT %s as allflights_id, COUNT(CASE WHEN flightstatus is not null and flightstatus <> '' THEN 1 END) as Allflights, COUNT(CASE WHEN flightstatus='CD' THEN 1 END) as Cancelled, COUNT(CASE WHEN deptimestatus = 'OT' THEN 1 END) as Dep_OT, COUNT(CASE WHEN deptimestatus = 'FE' THEN 1 END) as Dep_FE, COUNT(CASE WHEN deptimestatus = 'DL' THEN 1 END) as Dep_DL, CAST(AVG(CASE WHEN depactualUTC is not null and depactualUTC <> '' THEN (timestampdiff(minute,depscheduledUTC, depactualUTC)) END) as int) as AverageTimeDep, CAST(AVG(CASE WHEN deptimestatus = 'OT' and depactualUTC is not null and depactualUTC <> '' THEN (timestampdiff(minute,depscheduledUTC, depactualUTC)) END) as int) as AverageTimeDep_OT, CAST(AVG(CASE WHEN deptimestatus = 'FE' and depactualUTC is not null and depactualUTC <> '' THEN (timestampdiff(minute,depscheduledUTC, depactualUTC)) END) as int) as AverageTimeDep_FE, CAST(AVG(CASE WHEN deptimestatus = 'DL' and depactualUTC is not null and depactualUTC <> '' THEN (timestampdiff(minute,depscheduledUTC, depactualUTC)) END) as int) as AverageTimeDep_DL, COUNT(CASE WHEN arrtimestatus = 'OT' THEN 1 END) as Arr_OT, COUNT(CASE WHEN arrtimestatus = 'FE' THEN 1 END) as Arr_FE, COUNT(CASE WHEN arrtimestatus = 'DL' THEN 1 END) as Arr_DL, CAST(AVG(CASE WHEN arractualUTC is not null and arractualUTC <> '' THEN (timestampdiff(minute,arrscheduledUTC, arractualUTC)) END) as int) as AverageTimeArr, CAST(AVG(CASE WHEN arrtimestatus = 'OT' and arractualUTC is not null and arractualUTC <> '' THEN (timestampdiff(minute,arrscheduledUTC, arractualUTC)) END) as int) as AverageTimeArr_OT, CAST(AVG(CASE WHEN arrtimestatus = 'FE' and arractualUTC is not null and arractualUTC <> '' THEN (timestampdiff(minute,arrscheduledUTC, arractualUTC)) END) as int) as AverageTimeArr_FE, CAST(AVG(CASE WHEN arrtimestatus = 'DL' and arractualUTC is not null and arractualUTC <> '' THEN (timestampdiff(minute,arrscheduledUTC, arractualUTC)) END) as int) as AverageTimeArr_DL from allflightsstatus where (DATE(depscheduled) between DATE_ADD(DATE(%s), INTERVAL %s DAY) and DATE(%s)) and flightnumberkey = %s) as new_update where Allflights <> 0 ON DUPLICATE KEY UPDATE Allflights = new_update.Allflights, Cancelled = new_update.Cancelled, Dep_OT = new_update.Dep_OT, Dep_DL = new_update.Dep_DL, Dep_FE = new_update.Dep_FE, AverageTimeDep = new_update.AverageTimeDep, AverageTimeDep_OT = new_update.AverageTimeDep_OT, AverageTimeDep_FE = new_update.AverageTimeDep_FE, AverageTimeDep_DL = new_update.AverageTimeDep_DL, Arr_OT = new_update.Arr_OT, Arr_FE = new_update.Arr_FE, Arr_DL = new_update.Arr_DL, AverageTimeArr = new_update.AverageTimeArr, AverageTimeArr_OT = new_update.AverageTimeArr_OT, AverageTimeArr_FE = new_update.AverageTimeArr_FE, AverageTimeArr_DL = new_update.AverageTimeArr_DL;", (id, date, interval, date, id))
-            #print("successful write to database")
             i = 10
             if (flight.depscheduledUTC == ''):
                 logger.info("Flight null, updating alltimeflightstats")
@@ -71,8 +66,6 @@ def writeOneFlightToSql(flight, id, date):
             if (i > 5):
                 time.sleep(600)
             i = i + 1
-            #print("Mariadb Error: {}".format(error))
-            #print("Retry DB INSERT " + str(i))
             logger.error("MariaDB SQL flightstats error: %s", error)
             if (i == 10):
                 logger.error("Unsuccessful write flightstats to SQL")
@@ -85,7 +78,7 @@ def writeOneFlightToSql(flight, id, date):
     mariadb_connection.close()
 
 
-
+#vpišemo deljen let v bazo
 def writeCodeshareToSql(codeshare_airlineid, codeshare_flightnumber, operating_airlineid, operating_flightnumber, operating_id, depscheduled):
     host, port, database, user, password = readDBAccount()
     i = 0
@@ -102,7 +95,6 @@ def writeCodeshareToSql(codeshare_airlineid, codeshare_flightnumber, operating_a
             if (i>5):
                 time.sleep(600)
             i = i + 1
-            #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("Unsuccessful connection to SQL")
             else:
@@ -113,7 +105,6 @@ def writeCodeshareToSql(codeshare_airlineid, codeshare_flightnumber, operating_a
     while i < 10:
         try:
             cursor.execute("INSERT INTO codeshares (codeshare_airlineid, codeshare_flightnumber, operating_airlineid, operating_flightnumber, operating_id, depscheduled) values (%s,%s,%s,%s,%s,%s);", (codeshare_airlineid, codeshare_flightnumber, operating_airlineid, operating_flightnumber, operating_id, depscheduled))
-            #print("successful write to database")
             i = 10
         except mariadb.Error as error:
             time.sleep(10)
@@ -122,8 +113,6 @@ def writeCodeshareToSql(codeshare_airlineid, codeshare_flightnumber, operating_a
             if (i > 5):
                 time.sleep(600)
             i = i + 1
-            #print("Mariadb Error: {}".format(error))
-            #print("Retry DB INSERT " + str(i))
             logger.error("MariaDB SQL error: %s", error)
             if (i == 10):
                 logger.error("Unsuccessful write to SQL")
@@ -134,7 +123,7 @@ def writeCodeshareToSql(codeshare_airlineid, codeshare_flightnumber, operating_a
     mariadb_connection.close()
 
 
-
+#preverimo in označimo možne duplikate
 def updateDuplicatesSql():
     host, port, database, user, password = readDBAccount()
     i = 0
@@ -151,7 +140,6 @@ def updateDuplicatesSql():
             if (i>5):
                 time.sleep(600)
             i = i + 1
-            #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("Unsuccessful connection to SQL")
             else:
@@ -162,7 +150,6 @@ def updateDuplicatesSql():
     while i < 10:
         try:
             cursor.execute("update allflightsstatus set Duplicates='D' where id IN (select t.id from (select *, count(*) cnt from allflightsstatus where airlineid != '' and Duplicates is  null group by flightnumber, airlineid, depscheduled) t where t.cnt > 1);")
-            #print("successful write to database")
             i = 10
         except mariadb.Error as error:
             time.sleep(10)
@@ -171,8 +158,6 @@ def updateDuplicatesSql():
             if (i > 5):
                 time.sleep(600)
             i = i + 1
-            #print("Mariadb Error: {}".format(error))
-            #print("Retry DB INSERT " + str(i))
             logger.error("MariaDB SQL error: %s", error)
             if (i == 10):
                 logger.error("Unsuccessful update to SQL")
@@ -183,6 +168,7 @@ def updateDuplicatesSql():
     mariadb_connection.close()
 
 
+#preberemo podatke in račun za bazo
 def readDBAccount():
     import os
     path = os.path.abspath(os.path.dirname(__file__))

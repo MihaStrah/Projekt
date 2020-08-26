@@ -5,6 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+#pridobimo vse možne lete iz baze shranjenih letov (katalog letov - Lufthansa)
 def getAllFLights():
     host, port, database, user, password = readDBAccount()
     i=0
@@ -21,7 +22,6 @@ def getAllFLights():
             if (i > 5):
                 time.sleep(600)
             i = i + 1
-            #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("Unsuccessful connection to SQL")
             else:
@@ -31,7 +31,7 @@ def getAllFLights():
     i = 0
     while i < 10:
         try:
-            cursor.execute("SELECT OperatingCarrier, FlightNumber, max(id) FROM allflightsnewver group by OperatingCarrier, FlightNumber order by FlightNumber;")
+            cursor.execute("SELECT OperatingCarrier, FlightNumber, max(id) FROM allflights group by OperatingCarrier, FlightNumber order by FlightNumber;")
             mariadb_connection.close()
             logger.info("Successfull select from SQL")
             i = 10
@@ -42,8 +42,6 @@ def getAllFLights():
             if (i > 5):
                 time.sleep(600)
             i = i + 1
-            #print("Mariadb Error: {}".format(error))
-            #print("Retry DB SELECT " + str(i))
             logger.error("MariaDB SQL error: %s", error)
             if (i == 10):
                 logger.error("Unsuccessful select from SQL")
@@ -64,12 +62,10 @@ def getAllFLights():
         allids.clear()
         logger.error("Unsuccessful parsing allids, allflights")
 
-    #print(allflights)
-    #print(allids)
-
     return allflights, allids
 
 
+#pridobimo vse načrtovane lete za dan
 def getAllFLightsForDay(date):
     host, port, database, user, password = readDBAccount()
     i=0
@@ -86,7 +82,6 @@ def getAllFLightsForDay(date):
             if (i > 5):
                 time.sleep(600)
             i = i + 1
-            #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("Unsuccessful connection to SQL")
             else:
@@ -107,8 +102,6 @@ def getAllFLightsForDay(date):
             if (i > 5):
                 time.sleep(600)
             i = i + 1
-            #print("Mariadb Error: {}".format(error))
-            #print("Retry DB SELECT " + str(i))
             logger.error("MariaDB SQL error: %s", error)
             if (i == 10):
                 logger.error("Unsuccessful select from SQL")
