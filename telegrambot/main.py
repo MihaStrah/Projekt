@@ -10,9 +10,6 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
 import time
 from openskyAPI import getAirplanesAboveMe
 
-
-from openskyAPI import getAirplaneLocation
-
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO, filename="telegrambot_logs_out/telegrambotPythonScriptLog.log", filemode='a')
@@ -229,14 +226,7 @@ def error(update, context):
 
 
 def main():
-
-    while True:
-        getAirplaneLocation("3c656f")
-        #print(((datetime.datetime.now().astimezone() - datetime.timedelta(minutes=3)) - epoch).total_seconds())
-        time.sleep(2)
-
-
-
+    
     logger.info("telegrambot started")
     print("telegrambot started, logging in telegrambotPythonScriptLog.log")
     bot_token = readTGAccount()
