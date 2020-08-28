@@ -1,4 +1,4 @@
-mysql-connector-python
+mysql-connector
 Flask
 Flask-SQLAlchemy
 Flask-Caching

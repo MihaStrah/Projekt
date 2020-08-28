@@ -24,7 +24,7 @@ def registerFlight(token, airline, flightnumber, date):
         flightnumberString = re.search("[0-9]{1,5}", flightnumber).group()
         flightnumberString = str(flightnumberString).zfill(3)
         flightString = (airlineString + flightnumberString).upper()
-        tokenString = re.search("[0-9, A-z]{1,64}", token).group()
+        tokenString = re.search("[0-9A-z]{1,64}", token).group()
         dateString = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
         logger.info("registerFlight: %s, %s, %s, %s", token, airline, flightnumber, date)
         logger.info("registerFlight String: %s, %s, %s, %s", tokenString, airlineString, flightnumberString, dateString)
@@ -47,7 +47,7 @@ def unregisterFlight(token, airline, flightnumber, date):
         flightnumberString = str(flightnumberString).zfill(3)
         flightString = (airlineString + flightnumberString).upper()
 
-        tokenString = re.search("[0-9, A-z]{1,64}", token).group()
+        tokenString = re.search("[0-9A-z]{1,64}", token).group()
         dateString = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
 
 

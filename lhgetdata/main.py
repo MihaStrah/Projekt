@@ -10,7 +10,7 @@ import logging
 
 def job():
     #preverimo uro, in ob 18 uri po strežniškem času (UTC) nadaljujemo
-    if (datetime.datetime.now().strftime("%H") == "18"):
+    if (datetime.datetime.now().strftime("%H") == "20"):
 
         #določimo dan, za katerega bomo pridobivali lete
         dateFlight = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")

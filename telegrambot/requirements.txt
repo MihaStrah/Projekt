@@ -1,5 +1,5 @@
 schedule
 requests
 oauth2==1.9.0.post1
-mysql-connector-python
+mysql-connector
 python-telegram-bot

@@ -12,9 +12,15 @@ logger = logging.getLogger(__name__)
 # API https://www.airport-data.com
 
 def getAircraftImageURL(aircraftreg):
-    icao24 = getSQLicao24(aircraftreg)
 
-    if (aircraftreg == ""):
+    aircraftregstring = re.search("[a-zA-Z0-9]{5,6}", aircraftreg).group().lower()
+
+    if (aircraftregstring == ""):
+        return jsonify({'info': 'no image found'})
+
+    icao24 = getSQLicao24(aircraftregstring)
+
+    if (icao24 == ""):
         return jsonify({'info': 'no image found'})
 
     try:
@@ -32,10 +38,10 @@ def getAircraftImageURL(aircraftreg):
 
     if (aircraftimage == ""):
         try:
-            # try with aircraftreg with "-" on second character
+            # try with aircraftregstring with "-" on second character
             N = 1
-            aircraftreg = aircraftreg[: N] + "-" + aircraftreg[N:]
-            URL = (f"https://www.airport-data.com/api/ac_thumb.json?r={aircraftreg}&n=1")
+            aircraftregstring = aircraftregstring[: N] + "-" + aircraftregstring[N:]
+            URL = (f"https://www.airport-data.com/api/ac_thumb.json?r={aircraftregstring}&n=1")
             r = requests.get(url=URL)
             data = r.json()
             # print(data)
@@ -49,10 +55,10 @@ def getAircraftImageURL(aircraftreg):
             logger.info("airport-data image API call unsuccessful, trying with '-' option 2")
         if (aircraftimage == ""):
             try:
-                # try with aircraftreg with "-" on third character
+                # try with aircraftregstring with "-" on third character
                 N = 2
-                aircraftreg = aircraftreg[: N] + "-" + aircraftreg[N:]
-                URL = (f"https://www.airport-data.com/api/ac_thumb.json?r={aircraftreg}&n=1")
+                aircraftregstring = aircraftregstring[: N] + "-" + aircraftregstring[N:]
+                URL = (f"https://www.airport-data.com/api/ac_thumb.json?r={aircraftregstring}&n=1")
                 # print(URL)
                 r = requests.get(url=URL)
                 data = r.json()
@@ -69,6 +75,9 @@ def getAircraftImageURL(aircraftreg):
 
 
 def getSQLicao24(aircraftreg):
+
+    aircraftregstring = re.search("[a-zA-Z0-9]{5,6}", aircraftreg).group().lower()
+
     host, port, database, user, password = readDBAccount()
     i = 0
     while i < 10:
@@ -81,12 +90,14 @@ def getSQLicao24(aircraftreg):
             i = i + 1
             time.sleep(1)
             if (i > 3):
-                time.sleep(2)
+                time.sleep(1)
             if (i > 5):
-                time.sleep(3)
+                time.sleep(1)
             # print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("DB error, ABORT")
+                icao24 = ""
+                return icao24
             else:
                 logger.info("DB error, retry")
             pass
@@ -95,21 +106,23 @@ def getSQLicao24(aircraftreg):
         try:
             cursor.execute(
                 "SELECT icao24 from aircraftDatabase where REPLACE(registration,'-','') LIKE %(registration)s limit 1;",
-                {'registration': str(aircraftreg)})
+                {'registration': str(aircraftregstring)})
             mariadb_connection.close()
             i = 3
         except mariadb.Error as error:
             i = i + 1
             time.sleep(1)
             if (i > 0):
-                time.sleep(2)
+                time.sleep(1)
             if (i > 2):
-                time.sleep(3)
+                time.sleep(1)
             # print("Mariadb Error: {}".format(error))
             # print("Retry DB SELECT " + str(i))
             logger.error("DB error: %s", error)
             if (i == 3):
                 logger.error("DB error, ABORT")
+                icao24 = ""
+                return icao24
             else:
                 logger.info("DB error, retry")
             pass

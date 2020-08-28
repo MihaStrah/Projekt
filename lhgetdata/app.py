@@ -12,14 +12,12 @@ from izbaze import getSQLFlightStatus, getSQLFlightStats, getSQLFlightCodeshares
 from aircraftImage import getAircraftImageURL
 from liveLufthansa import getFlightStatusLufthansa, getAircraftModelLufthansa, getAirlineNameLufthansa, getAirportNameLufthansa, getCodesharesLufthansa
 from notificationUsers import setDatabase, registerFlight, unregisterFlight
-from opensky import getAircraftLocation
 
 server = Flask(__name__)
 
 #cache for API https://pythonhosted.org/Flask-Caching/
 #cache = Cache(server, config={'CACHE_TYPE': 'simple'})
 cache = Cache(server, config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': '/tmp'})
-cache.clear()
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO, filename="letAPI_logs_out/letAPIPythonScriptLog.log", filemode='a')
@@ -161,16 +159,6 @@ def get_aircraftImage(current_user,aircraftreg):
     aircraftImageURL = getAircraftImageURL(aircraftreg)
     #print(aircraftImageURL)
     return (aircraftImageURL)
-
-#AircraftLocation
-@server.route('/aircraftlocation/<aircraftreg>', methods=['GET'])
-@token_required
-@cache.cached(timeout=10) #cache requests for 10 seconds 10s
-def get_aircraftLocation(current_user,aircraftreg):
-    aircraftlocation = getAircraftLocation(aircraftreg)
-    #print(aircraftlocation)
-    return (aircraftlocation)
-
 
 @server.route('/live/flight/<date>/<flightnumber>', methods=['GET'])
 @token_required

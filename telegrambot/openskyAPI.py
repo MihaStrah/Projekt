@@ -1,5 +1,6 @@
 import requests
 from aircraftlocations import boundingBox
+import datetime
 import logging
 logger = logging.getLogger(__name__)
 
@@ -9,6 +10,7 @@ def getAirplanesAboveMe(latitude, longtitude, range):
     lamin,lomin,lamax,lomax = boundingBox(latitude, longtitude, range)
 
     username, password = readOSAccount()
+
 
     states = []
 
@@ -60,7 +62,6 @@ def getAirplanesAboveMe(latitude, longtitude, range):
     return states
 
 
-#user with select priviledges
 def readOSAccount():
     import os
     path = os.path.abspath(os.path.dirname(__file__))

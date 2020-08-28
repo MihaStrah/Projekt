@@ -195,7 +195,7 @@ def getFlight(token, flight, date):
 
 
 def getAircraft(token, aircraftcode):
-    aircraftcode = re.search("[A-z,0-9]{1,10}", aircraftcode).group()
+    aircraftcode = re.search("[A-z0-9]{1,10}", aircraftcode).group()
     url = (f"https://api.lufthansa.com/v1/mds-references/aircraft/{aircraftcode}")
     #print(url)
     bearer = (f"Bearer {token}")
@@ -307,6 +307,7 @@ def getCodeshares(token, flight, date):
     date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
     airlineid = re.search("[A-z]{1,2}", flight).group()
     flightnumber = re.search("[0-9]{1,5}", flight).group()
+    flightnumber = str(flightnumber).zfill(3)
     flight = airlineid + flightnumber
 
     url = 'https://api.lufthansa.com/v1/operations/customerflightinformation' + '/' + flight + '/' + date

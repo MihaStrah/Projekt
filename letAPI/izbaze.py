@@ -31,9 +31,9 @@ def getSQLFlightStatus(flight,date):
                 time.sleep(2)
             if (i > 5):
                 time.sleep(3)
-            #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("DB error, ABORT")
+                return jsonify({'info': 'database error'})
             else:
                 logger.info("DB error, retry")
             pass
@@ -46,21 +46,22 @@ def getSQLFlightStatus(flight,date):
             cursor.execute("SELECT depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus,flightnumberkey from allflightsstatus where DATE(depscheduled)=DATE( %(date)s) and airlineid= %(airlineid)s and flightnumber= %(flightnumber)s UNION SELECT depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus,flightnumberkey from allflightsstatus as a join ( select operating_id from codeshares where DATE(depscheduled)=DATE( %(date)s) and codeshare_airlineid= %(airlineid)s and codeshare_flightnumber= %(flightnumber)s) as c on a.id = c.operating_id limit 1;",{'airlineid': str(airlineid), 'flightnumber': str(flightnumber), 'date': str(date)})
             #search in DB only for operating flights
             #cursor.execute("SELECT depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus,flightnumberkey from allflightsstatus where airlineid=%(airlineid)s and flightnumber=%(flightnumber)s and DATE(depscheduled)=DATE(%(date)s) limit 1;", {'airlineid': str(airlineid), 'flightnumber': str(flightnumber),'date': str(date)})
-            mariadb_connection.close()
             i = 3
         except mariadb.Error as error:
             i = i + 1
             time.sleep(2)
-            #print("Mariadb Error: {}".format(error))
-            #print("Retry DB SELECT " + str(i))
             logger.error("DB error: %s", error)
             if (i==3):
                 logger.error("DB error, ABORT")
+                return jsonify({'info': 'database error'})
             else:
                 logger.info("DB error, retry")
             pass
 
+
         returnrow = cursor.fetchone()
+        mariadb_connection.close()
+
         if returnrow is None:
             newstatus = jsonify({'info': 'flight does not exist'})
         else:
@@ -93,6 +94,7 @@ def getSQLFlightStats(flight,days):
             #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("DB error, ABORT")
+                return jsonify({'info': 'database error'})
             else:
                 logger.info("DB error, retry")
             pass
@@ -109,7 +111,7 @@ def getSQLFlightStats(flight,days):
                 cursor.execute("select Allflights, Cancelled, Dep_OT, Dep_FE, Dep_DL, AverageTimeDep, AverageTimeDep_OT, AverageTimeDep_FE, AverageTimeDep_DL, Arr_OT, Arr_FE, Arr_DL, AverageTimeArr, AverageTimeArr_OT, AverageTimeArr_FE, AverageTimeArr_DL from flightstats_30day as f30 join ( select max(flightnumberkey) as flightnumberkey from allflightsstatus as a join ( select max(operating_id) as operating_id from codeshares where codeshare_airlineid=%(airlineid)s and codeshare_flightnumber=%(flightnumber)s ) as c on a.id = c.operating_id ) as fn on f30.allflights_id = fn.flightnumberkey UNION select Allflights, Cancelled, Dep_OT, Dep_FE, Dep_DL, AverageTimeDep, AverageTimeDep_OT, AverageTimeDep_FE, AverageTimeDep_DL, Arr_OT, Arr_FE, Arr_DL, AverageTimeArr, AverageTimeArr_OT, AverageTimeArr_FE, AverageTimeArr_DL from flightstats_30day as f30 join (select max(flightnumberkey) as flightnumberkey from allflightsstatus as a where airlineid=%(airlineid)s and flightnumber=%(flightnumber)s ) as fn on f30.allflights_id = fn.flightnumberkey limit 1;", {'airlineid': str(airlineid), 'flightnumber': str(flightnumber)})
             #search in DB only for operating flights
             #cursor.execute("SELECT depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus,flightnumberkey from allflightsstatus where airlineid=%(airlineid)s and flightnumber=%(flightnumber)s and DATE(depscheduled)=DATE(%(date)s) limit 1;", {'airlineid': str(airlineid), 'flightnumber': str(flightnumber),'date': str(date)})
-            mariadb_connection.close()
+
             i = 3
         except mariadb.Error as error:
             i = i + 1
@@ -119,18 +121,19 @@ def getSQLFlightStats(flight,days):
             logger.error("DB error: %s", error)
             if (i==3):
                 logger.error("DB error, ABORT")
+                return jsonify({'info': 'database error'})
             else:
                 logger.info("DB error, retry")
             pass
 
         returnrow = cursor.fetchone()
 
-        #print(returnrow)
 
         if returnrow is None:
             flightStats = jsonify({'info': 'flight statistics does not exist'})
         else:
             flightStats = (flight_stats(returnrow[0],returnrow[1],returnrow[2],returnrow[3],returnrow[4],returnrow[5],returnrow[6],returnrow[7],returnrow[8],returnrow[9],returnrow[10],returnrow[11],returnrow[12],returnrow[13],returnrow[14],returnrow[15])).toJson()
+
 
     return flightStats
 
@@ -166,6 +169,7 @@ def getSQLFlightPastStats(flight):
             #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("DB error, ABORT")
+                return jsonify({'info': 'database error'})
             else:
                 logger.info("DB error, retry")
             pass
@@ -175,7 +179,6 @@ def getSQLFlightPastStats(flight):
         try:
             #search in DB for operating and for codeshare (returns operating flight)
             cursor.execute("select depscheduled, deptimestatus, arrtimestatus, flightstatus from allflightsstatus where (DATE(depscheduled) between DATE(%(startdate)s) and DATE(%(enddate)s)) and airlineid=%(airlineid)s and flightnumber=%(flightnumber)s;", {'startdate': str(startdate), 'enddate': str(enddate), 'airlineid': str(airlineid), 'flightnumber': str(flightnumber)})
-            mariadb_connection.close()
             i = 3
         except mariadb.Error as error:
             i = i + 1
@@ -185,6 +188,7 @@ def getSQLFlightPastStats(flight):
             logger.error("DB error: %s", error)
             if (i==3):
                 logger.error("DB error, ABORT")
+                return jsonify({'info': 'database error'})
             else:
                 logger.info("DB error, retry")
             pass
@@ -210,6 +214,9 @@ def getSQLFlightPastStats(flight):
         except:
             flightPastStatArray.clear()
             flightPastStatsJson = jsonify({'info': 'flight statistics does not exist'})
+
+    cursor.close()
+    mariadb_connection.close()
 
     return flightPastStatsJson
 
@@ -240,6 +247,7 @@ def getSQLFlightCodeshares(flight,date):
             #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("DB error, ABORT")
+                return jsonify({'info': 'database error'})
             else:
                 logger.info("DB error, retry")
             pass
@@ -250,7 +258,6 @@ def getSQLFlightCodeshares(flight,date):
             #search in DB for operating and for codeshare (returns operating flight)
             #cursor.execute("select Allflights, Cancelled, Dep_OT, Dep_FE, Dep_DL, AverageTimeDep, AverageTimeDep_OT, AverageTimeDep_FE, AverageTimeDep_DL, Arr_OT, Arr_FE, Arr_DL, AverageTimeArr, AverageTimeArr_OT, AverageTimeArr_FE, AverageTimeArr_DL from flightstats_7day where allflights_id in (select max(flightnumberkey) from allflightsstatus where (id in (select max(operating_id) from codeshares where codeshare_airlineid=%(airlineid)s and codeshare_flightnumber=%(flightnumber)s)) or (airlineid=%(airlineid)s and flightnumber=%(flightnumber)s));",{'airlineid': str(airlineid), 'flightnumber': str(flightnumber)})
             cursor.execute("select c.operating_airlineid, c.operating_flightnumber,  c.codeshare_airlineid, c.codeshare_flightnumber from codeshares as c join (select operating_airlineid, operating_flightnumber, depscheduled from codeshares as c2 where ((c2.operating_airlineid=%(airlineid)s and c2.operating_flightnumber=%(flightnumber)s) or (c2.codeshare_airlineid=%(airlineid)s and c2.codeshare_flightnumber=%(flightnumber)s)) and DATE(c2.depscheduled)=DATE(%(date)s) limit 1) as o on c.operating_flightnumber = o.operating_flightnumber and c.operating_airlineid = o.operating_airlineid and DATE(c.depscheduled)=DATE(o.depscheduled);", {'airlineid': str(airlineid), 'flightnumber': str(flightnumber), 'date': str(date)})
-            mariadb_connection.close()
             i = 3
         except mariadb.Error as error:
             i = i + 1
@@ -260,6 +267,7 @@ def getSQLFlightCodeshares(flight,date):
             logger.error("DB error: %s", error)
             if (i==3):
                 logger.error("DB error, ABORT")
+                return jsonify({'info': 'database error'})
             else:
                 logger.info("DB error, retry")
             pass
@@ -282,6 +290,9 @@ def getSQLFlightCodeshares(flight,date):
             operatingcodeshares = operatingcodeshares.toJson()
         else:
             operatingcodeshares = jsonify({'info': 'no codeshare flights'})
+
+    cursor.close()
+    mariadb_connection.close()
 
     return operatingcodeshares
 
