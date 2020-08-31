@@ -5,7 +5,7 @@ import re
 import logging
 import json
 from flask import jsonify
-from liveLufthansa import getFlightStatusLufthansa
+from liveLufthansa import getFlightStatusObjectLufthansa
 
 from flask_restful import Resource, Api, abort
 
@@ -161,6 +161,7 @@ def getSQLFlightPastStats(flight):
 
     flightString = airlineid + flightnumber
 
+    daybeforeyesterday = (datetime.date.today() - datetime.timedelta(days=2)).strftime("%Y-%m-%d")
     yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
     startdate = (datetime.date.today() - datetime.timedelta(days=90)).strftime("%Y-%m-%d")
     enddate = (datetime.date.today() - datetime.timedelta(days=3)).strftime("%Y-%m-%d")
@@ -217,12 +218,24 @@ def getSQLFlightPastStats(flight):
             if i == 0:
                 return abort(404, message="Flight Not Found")
             try:
-                yesterdayStatus = json.loads(getFlightStatusLufthansa(flightString, yesterday))
+                yesterdayStatus = getFlightStatusObjectLufthansa(flightString, yesterday)
                 flightPastStat = FlightPastStat(yesterdayStatus["depscheduled"], yesterdayStatus["deptimestatus"], yesterdayStatus["arrtimestatus"], yesterdayStatus["flightstatus"])
-
                 flightPastStatArray.append(flightPastStat.toJson())
             except:
                 logger.info("No flight yesterday for past stat")
+
+            #check if lhgetdata is in progress
+            start = '22:00:00'
+            end = '09:00:00'
+            current_time = datetime.datetime.today().strftime("%H:%M:%S")
+            if ((current_time > start) | (current_time < end)):
+                try:
+                    yesterdayStatus = getFlightStatusObjectLufthansa(flightString, daybeforeyesterday)
+                    flightPastStat = FlightPastStat(yesterdayStatus["depscheduled"], yesterdayStatus["deptimestatus"],
+                                                    yesterdayStatus["arrtimestatus"], yesterdayStatus["flightstatus"])
+                    flightPastStatArray.append(flightPastStat.toJson())
+                except:
+                    logger.info("No flight yesterday for past stat (lhgetdata in progress)")
 
             cursor.close()
             mariadb_connection.close()

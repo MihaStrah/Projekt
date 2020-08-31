@@ -15,6 +15,13 @@ requests_cache.install_cache(cache_name='lufthansa_cache', backend='sqlite', exp
 
 logger = logging.getLogger(__name__)
 
+def getFlightStatusObjectLufthansa(flight, date):
+    try:
+        token = getToken()
+    except:
+        return
+    return getFlightObject(token, flight, date)
+
 def getFlightStatusLufthansa(flight, date):
     try:
         token = getToken()
@@ -397,6 +404,153 @@ def getCodeshares(token, flight, date):
         return abort(404, message="Flight Not Found")
 
 
+
+def getFlightObject(token, flight, date):
+    date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
+    flight = re.search("^[A-z]{1,2}[0-9]{1,6}$", flight).group()
+
+    url = (f"https://api.lufthansa.com/v1/operations/flightstatus/{flight}/{date}")
+    #print(url)
+    bearer = (f"Bearer {token}")
+    headers = {"Authorization":bearer, "Accept":"application/json"}
+    #print (bearer)
+    i = 0
+    while i<5:
+        try:
+            request = requests.get(url = url, headers = headers)
+            #print(request)
+            data = request.json()
+            #print(data)
+            i = 5
+            #print("Used Cache: %s" % request.from_cache)
+            logger.info("(Used cache: %s) LH API response: %s", str(request.from_cache), data)
+        except:
+            time.sleep(2)
+            #print("retry " + str(i))
+            i = i + 1
+            logger.info("LH API error, retry")
+            if (i==5):
+                logger.error("LH API error, ABORT")
+                return
+            else:
+                logger.info("LH API error, retry")
+            pass
+
+    try:
+        depairport = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['AirportCode']
+    except:
+        depairport = ""
+    try:
+        depscheduled = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['ScheduledTimeLocal']['DateTime']
+    except:
+        depscheduled = ""
+    try:
+        depscheduledUTC = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['ScheduledTimeUTC']['DateTime']
+    except:
+        depscheduledUTC = ""
+    try:
+        depestimated = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['EstimatedTimeLocal']['DateTime']
+    except:
+        depestimated = ""
+    try:
+        depestimatedUTC = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['EstimatedTimeUTC']['DateTime']
+    except:
+        depestimatedUTC = ""
+    try:
+        depactual = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['ActualTimeLocal']['DateTime']
+    except:
+        depactual = ""
+    try:
+        depactualUTC = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['ActualTimeUTC']['DateTime']
+    except:
+        depactualUTC = ""
+    try:
+        depterminal = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['Terminal']['Name']
+    except:
+        depterminal = ""
+    try:
+        depgate = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['Terminal']['Gate']
+    except:
+        depgate = ""
+    try:
+        deptimestatus = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['TimeStatus']['Code']
+    except:
+        deptimestatus = ""
+    try:
+        arrairport = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['AirportCode']
+    except:
+        arrairport = ""
+    try:
+        arrscheduled = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['ScheduledTimeLocal']['DateTime']
+    except:
+        arrscheduled = ""
+    try:
+        arrscheduledUTC = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['ScheduledTimeUTC']['DateTime']
+    except:
+        arrscheduledUTC = ""
+    try:
+        arrestimated = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['EstimatedTimeLocal']['DateTime']
+    except:
+        arrestimated = ""
+    try:
+        arrestimatedUTC = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['EstimatedTimeUTC']['DateTime']
+    except:
+        arrestimatedUTC = ""
+    try:
+        arractual = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['ActualTimeLocal']['DateTime']
+    except:
+        arractual = ""
+    try:
+        arractualUTC = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['ActualTimeUTC']['DateTime']
+    except:
+        arractualUTC = ""
+    try:
+        arrterminal = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['Terminal']['Name']
+    except:
+        arrterminal = ""
+    try:
+        arrgate = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['Terminal']['Gate']
+    except:
+        arrgate = ""
+    try:
+        arrtimestatus = data['FlightStatusResource']['Flights']['Flight'][0]['Arrival']['TimeStatus']['Code']
+    except:
+        arrtimestatus = ""
+    try:
+        aircraftcode = data['FlightStatusResource']['Flights']['Flight'][0]['Equipment']['AircraftCode']
+    except:
+        aircraftcode = ""
+    try:
+        aircraftreg = data['FlightStatusResource']['Flights']['Flight'][0]['Equipment']['AircraftRegistration']
+    except:
+        aircraftreg = ""
+    try:
+        airlineid = data['FlightStatusResource']['Flights']['Flight'][0]['OperatingCarrier']['AirlineID']
+    except:
+        airlineid = ""
+    try:
+        flightnumber = data['FlightStatusResource']['Flights']['Flight'][0]['OperatingCarrier']['FlightNumber']
+    except:
+        flightnumber = ""
+    try:
+        flightstatus = data['FlightStatusResource']['Flights']['Flight'][0]['FlightStatus']['Code']
+    except:
+        flightstatus = ""
+
+    newstatus = flight_status(depairport, depscheduled, depscheduledUTC, depestimated, depestimatedUTC, depactual, depactualUTC, depterminal, depgate,
+                              deptimestatus, arrairport, arrscheduled, arrscheduledUTC, arrestimated, arrestimatedUTC, arractual,
+                              arractualUTC, arrterminal, arrgate, arrtimestatus, aircraftcode,
+                              aircraftreg, airlineid, flightnumber, flightstatus)
+
+    #check status for operating carrier flight if not operating carrier
+    operating = (f"{newstatus.airlineid}{newstatus.flightnumber}")
+    if (operating != flight.upper() and operating != ""):
+        getFlight(token, operating, date)
+
+    if newstatus.depscheduledUTC == "":
+        return
+    else:
+        return newstatus.toJson()
 
 
 
