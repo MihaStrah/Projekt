@@ -22,12 +22,17 @@ def getAircraftLocation(aircraftreg):
     except:
         return abort(500, message="API Error")
 
+    if not icao24:
+        return abort(404, message="Aircraft Not Found")
+
     username, password = readOSAccount()
 
     try:
         URL = (f"https://opensky-network.org/api/states/all?icao24={icao24}")
+        print(URL)
         r = requests.get(url=URL, auth=(username, password))
         data = r.json()
+        print(data)
         logger.info("opensky API call successful: %s", data)
     except:
         logger.info("opensky API call unsuccessful")
@@ -44,7 +49,7 @@ def getAircraftLocation(aircraftreg):
         currentlocation = location(longitude,latitude,baro_altitude,velocity,true_track)
         return currentlocation.toJson(), 200
     except:
-        logger.error("opensky data not resolved")
+        logger.info("opensky data not resolved, aircraft not found")
         return abort(404, message="Aircraft Not Found")
 
 

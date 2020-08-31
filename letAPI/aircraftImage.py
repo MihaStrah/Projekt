@@ -130,7 +130,6 @@ def getSQLicao24(aircraftreg):
             else:
                 logger.info("DB error, retry")
             pass
-
         returnrow = cursor.fetchone()
         if returnrow is None:
             icao24 = ""
