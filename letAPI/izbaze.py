@@ -105,7 +105,7 @@ def getSQLFlightStats(flight,days):
             #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("DB error, ABORT")
-                return jsonify({'info': 'database error'})
+                return {'info': 'database error'}
             else:
                 return abort(500, message="Database Error")
             pass
@@ -226,7 +226,7 @@ def getSQLFlightPastStats(flight):
 
             cursor.close()
             mariadb_connection.close()
-            return flightPastStatArray, 200
+            return {'flightDayArray':flightPastStatArray}, 200
 
         except:
             cursor.close()

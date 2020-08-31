@@ -28,7 +28,6 @@ def getAircraftLocation(aircraftreg):
         URL = (f"https://opensky-network.org/api/states/all?icao24={icao24}")
         r = requests.get(url=URL, auth=(username, password))
         data = r.json()
-        print(data)
         logger.info("opensky API call successful: %s", data)
     except:
         logger.info("opensky API call unsuccessful")

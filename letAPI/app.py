@@ -226,10 +226,10 @@ api.add_resource(AirportName, '/info/airportname/<airportcode>', endpoint='info/
 class NotificationRegister(Resource):
     @token_required
     def post(self, current_user):
-        token = post.form.get('token')
-        airline = post.form.get('airline')
-        flightnumber = post.form.get('flightnumber')
-        date = post.form.get('date')
+        token = request.form.get('token')
+        airline = request.form.get('airline')
+        flightnumber = request.form.get('flightnumber')
+        date = request.form.get('date')
         return registerFlight(token, airline, flightnumber, date)
 
 api.add_resource(NotificationRegister, '/notifications/register', endpoint='/notifications/register')

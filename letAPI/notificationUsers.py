@@ -38,7 +38,7 @@ def registerFlight(token, airline, flightnumber, date):
         conn.commit()
         conn.close()
         logger.info("registerFlight OK: %s, %s, %s, %s", tokenString, airlineString, flightnumberString, dateString)
-        return jsonify({"info":"OK"}), 200
+        return {"info":"OK"}, 200
     except:
         return abort(500, message="API Error")
 
@@ -70,7 +70,7 @@ def unregisterFlight(token, airline, flightnumber, date):
             conn.close()
             logger.info("unregisterALLFlight OK: %s, %s, %s, %s", tokenString, airlineString, flightnumberString,
                         dateString)
-            return jsonify({'info': 'OK'}), 200
+            return {'info': 'OK'}, 200
 
         else:
             logger.info("unregisterFlight: %s, %s, %s, %s", token, airline, flightnumber, date)
@@ -85,7 +85,7 @@ def unregisterFlight(token, airline, flightnumber, date):
             conn.close()
             logger.info("unregisterFlight OK: %s, %s, %s, %s", tokenString, airlineString, flightnumberString,
                         dateString)
-            return jsonify({'info': 'OK'}), 200
+            return {'info':'OK'}, 200
 
     except:
         return abort(500, message="API Error")
