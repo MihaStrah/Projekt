@@ -118,7 +118,7 @@ api.add_resource(Login, '/login', endpoint='login')
 class OldFlight(Resource):
     @token_required
     @cache.cached(timeout=432000)
-    def get(self, flightnumber, date):
+    def get(self, current_user, flightnumber, date):
         return getSQLFlightStatus(flightnumber, date)
 
 api.add_resource(OldFlight, '/flight/<string:date>/<string:flightnumber>', endpoint='flight')
@@ -127,7 +127,7 @@ api.add_resource(OldFlight, '/flight/<string:date>/<string:flightnumber>', endpo
 class OldCodeshares(Resource):
     @token_required
     @cache.cached(timeout=432000)
-    def get(self, flightnumber, date):
+    def get(self, current_user, flightnumber, date):
         return getSQLFlightCodeshares(flightnumber, date)
 
 api.add_resource(OldCodeshares, '/codeshares/<string:date>/<string:flightnumber>', endpoint='codeshares')
@@ -136,7 +136,7 @@ api.add_resource(OldCodeshares, '/codeshares/<string:date>/<string:flightnumber>
 class Stat7Day(Resource):
     @token_required
     @cache.cached(timeout=3600)
-    def get(self, flightnumber):
+    def get(self, current_user, flightnumber):
         return getSQLFlightStats(flightnumber,7)
 
 api.add_resource(Stat7Day, '/stat7/<string:flightnumber>', endpoint='stat7')
@@ -145,7 +145,7 @@ api.add_resource(Stat7Day, '/stat7/<string:flightnumber>', endpoint='stat7')
 class Stat30Day(Resource):
     @token_required
     @cache.cached(timeout=3600)
-    def get(self, flightnumber):
+    def get(self, current_user, flightnumber):
         return getSQLFlightStats(flightnumber,30)
 
 api.add_resource(Stat30Day, '/stat30/<string:flightnumber>', endpoint='stat30')
@@ -154,7 +154,7 @@ api.add_resource(Stat30Day, '/stat30/<string:flightnumber>', endpoint='stat30')
 class StatDay(Resource):
     @token_required
     @cache.cached(timeout=3600)
-    def get(self, flightnumber):
+    def get(self, current_user, flightnumber):
         return getSQLFlightPastStats(flightnumber)
 
 api.add_resource(StatDay, '/statday/<string:flightnumber>', endpoint='statday')
@@ -163,7 +163,7 @@ api.add_resource(StatDay, '/statday/<string:flightnumber>', endpoint='statday')
 class LiveFlight(Resource):
     @token_required
     @cache.cached(timeout=60)
-    def get(self, flightnumber, date):
+    def get(self, current_user, flightnumber, date):
         return getFlightStatusLufthansa(flightnumber, date)
 
 api.add_resource(LiveFlight, '/live/flight/<string:date>/<string:flightnumber>', endpoint='live/flight')
@@ -172,7 +172,7 @@ api.add_resource(LiveFlight, '/live/flight/<string:date>/<string:flightnumber>',
 class LiveCodeshares(Resource):
     @token_required
     @cache.cached(timeout=60)
-    def get(self, flightnumber, date):
+    def get(self, current_user, flightnumber, date):
         return getCodesharesLufthansa(flightnumber, date)
 
 api.add_resource(LiveCodeshares, '/live/codeshares/<string:date>/<string:flightnumber>', endpoint='live/codeshares')
@@ -181,7 +181,7 @@ api.add_resource(LiveCodeshares, '/live/codeshares/<string:date>/<string:flightn
 class AircraftImage(Resource):
     @token_required
     @cache.cached(timeout=432000)
-    def get(self, aircraftreg):
+    def get(self, current_user, aircraftreg):
         return getAircraftImageURL(aircraftreg)
 
 api.add_resource(AircraftImage, '/aircraftimage/<aircraftreg>', endpoint='aircraftimage')
@@ -190,7 +190,7 @@ api.add_resource(AircraftImage, '/aircraftimage/<aircraftreg>', endpoint='aircra
 class AircraftLocation(Resource):
     @token_required
     @cache.cached(timeout=10)
-    def get(self, aircraftreg):
+    def get(self, current_user, aircraftreg):
         return getAircraftLocation(aircraftreg)
 
 api.add_resource(AircraftLocation, '/aircraftlocation/<aircraftreg>', endpoint='aircraftlocation')
@@ -199,7 +199,7 @@ api.add_resource(AircraftLocation, '/aircraftlocation/<aircraftreg>', endpoint='
 class AircraftName(Resource):
     @token_required
     @cache.cached(timeout=432000)
-    def get(self, aircraftmodelcode):
+    def get(self, current_user, aircraftmodelcode):
         return getAircraftModelLufthansa(aircraftmodelcode)
 
 api.add_resource(AircraftName, '/info/aircraftname/<aircraftmodelcode>', endpoint='info/aircraftname')
@@ -208,7 +208,7 @@ api.add_resource(AircraftName, '/info/aircraftname/<aircraftmodelcode>', endpoin
 class AirlineName(Resource):
     @token_required
     @cache.cached(timeout=432000)
-    def get(self, airlinecode):
+    def get(self, current_user, airlinecode):
         return getAirlineNameLufthansa(airlinecode)
 
 api.add_resource(AirlineName, '/info/airlinename/<airlinecode>', endpoint='info/airlinename')
@@ -217,7 +217,7 @@ api.add_resource(AirlineName, '/info/airlinename/<airlinecode>', endpoint='info/
 class AirportName(Resource):
     @token_required
     @cache.cached(timeout=432000)
-    def get(self, airportcode):
+    def get(self, current_user, airportcode):
         return getAirportNameLufthansa(airportcode)
 
 api.add_resource(AirportName, '/info/airportname/<airportcode>', endpoint='info/airportname')
@@ -225,7 +225,7 @@ api.add_resource(AirportName, '/info/airportname/<airportcode>', endpoint='info/
 
 class NotificationRegister(Resource):
     @token_required
-    def post(self):
+    def post(self, current_user):
         token = post.form.get('token')
         airline = post.form.get('airline')
         flightnumber = post.form.get('flightnumber')
@@ -237,7 +237,7 @@ api.add_resource(NotificationRegister, '/notifications/register', endpoint='/not
 
 class NotificationUnRegister(Resource):
     @token_required
-    def post(self):
+    def post(self, current_user):
         token = request.form.get('token')
         airline = request.form.get('airline')
         flightnumber = request.form.get('flightnumber')
