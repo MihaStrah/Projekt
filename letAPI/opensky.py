@@ -4,21 +4,23 @@ from flask import jsonify
 import json
 import re
 from aircraftImage import getSQLicao24
+from flask_restful import Resource, Api, abort
 
 import logging
 logger = logging.getLogger(__name__)
 
+
 def getAircraftLocation(aircraftreg):
 
-    aircraftregstring = re.search("[a-zA-Z0-9]{5,6}", aircraftreg).group().upper()
+    try:
+        aircraftregstring = re.search("[a-zA-Z0-9]{5,6}", aircraftreg).group().upper()
+    except:
+        return abort(400, message="Invalid Request")
 
-    if (aircraftregstring == ""):
-        return jsonify({'info': 'no location found'})
-
-    icao24 = getSQLicao24(aircraftregstring)
-
-    if (icao24 == ""):
-        return jsonify({'info': 'no location found'})
+    try:
+        icao24 = getSQLicao24(aircraftregstring)
+    except:
+        return abort(500, message="API Error")
 
     username, password = readOSAccount()
 
@@ -26,10 +28,12 @@ def getAircraftLocation(aircraftreg):
         URL = (f"https://opensky-network.org/api/states/all?icao24={icao24}")
         r = requests.get(url=URL, auth=(username, password))
         data = r.json()
+        print(data)
         logger.info("opensky API call successful: %s", data)
     except:
         logger.info("opensky API call unsuccessful")
-        return jsonify({'info': 'no location found'})
+        return abort(500, message="API Error")
+
 
     try:
         state = data["states"][0]
@@ -38,11 +42,11 @@ def getAircraftLocation(aircraftreg):
         baro_altitude = state[7]
         velocity = state[9]
         true_track = state[10]
-        currentlocation = location(longitude,latitude,baro_altitude,velocity,true_track).toJson()
-        return currentlocation
+        currentlocation = location(longitude,latitude,baro_altitude,velocity,true_track)
+        return currentlocation.toJson(), 200
     except:
         logger.error("opensky data not resolved")
-        return jsonify({'info': 'no location found'})
+        return abort(404, message="Aircraft Not Found")
 
 
 class location:
@@ -60,7 +64,8 @@ class location:
         self.true_track = true_track
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
+        #return json.dumps(self, default=lambda o: o.__dict__)
 
 
 

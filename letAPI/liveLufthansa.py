@@ -5,6 +5,7 @@ import oauth2 as oauth
 import re
 import logging
 from flask import jsonify, request
+from flask_restful import Resource, Api, abort
 
 import requests_cache
 
@@ -15,35 +16,51 @@ requests_cache.install_cache(cache_name='lufthansa_cache', backend='sqlite', exp
 logger = logging.getLogger(__name__)
 
 def getFlightStatusLufthansa(flight, date):
-    token = getToken()
-    flightstatus = getFlight(token, flight, date)
-    return flightstatus
-
-def getAircraftModelLufthansa(aircraftcode):
-    token = getToken()
-    aircraftmodel = getAircraft(token, aircraftcode)
-    return aircraftmodel.toJson()
-
-def getAirlineNameLufthansa(airlineid):
-    token = getToken()
-    airlinename = getAirline(token, airlineid)
-    return airlinename.toJson()
-
-def getAirportNameLufthansa(airportid):
-    token = getToken()
-    airportname = getAirport(token, airportid)
-    return airportname
+    try:
+        token = getToken()
+    except:
+        return abort(500, message="API Error")
+    return getFlight(token, flight, date)
 
 def getCodesharesLufthansa(flight, date):
-    token = getToken()
-    codeshares = getCodeshares(token, flight, date)
-    return codeshares
+    try:
+        token = getToken()
+    except:
+        return abort(500, message="API Error")
+    return getCodeshares(token, flight, date)
+
+def getAircraftModelLufthansa(aircraftcode):
+    try:
+        token = getToken()
+    except:
+        return abort(500, message="API Error")
+    return getAircraft(token, aircraftcode)
+
+def getAirlineNameLufthansa(airlineid):
+    try:
+        token = getToken()
+    except:
+        return abort(500, message="API Error")
+    return getAirline(token, airlineid)
+
+def getAirportNameLufthansa(airportid):
+    try:
+        token = getToken()
+    except:
+        return abort(500, message="API Error")
+    return getAirport(token, airportid)
+
+
 
 
 
 def getFlight(token, flight, date):
-    date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
-    flight = re.search("^[A-z]{1,2}[0-9]{1,6}$", flight).group()
+
+    try:
+        date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
+        flight = re.search("^[A-z]{1,2}[0-9]{1,6}$", flight).group()
+    except:
+        return abort(400, message="Invalid Request")
 
     url = (f"https://api.lufthansa.com/v1/operations/flightstatus/{flight}/{date}")
     #print(url)
@@ -67,12 +84,10 @@ def getFlight(token, flight, date):
             logger.info("LH API error, retry")
             if (i==5):
                 logger.error("LH API error, ABORT")
+                return abort(500, message="API Error")
             else:
                 logger.info("LH API error, retry")
             pass
-
-
-
 
     try:
         depairport = data['FlightStatusResource']['Flights']['Flight'][0]['Departure']['AirportCode']
@@ -186,16 +201,17 @@ def getFlight(token, flight, date):
         getFlight(token, operating, date)
 
     if newstatus.depscheduledUTC == "":
-        newstatus = jsonify({'info': 'flight does not exist'})
+        return abort(404, message="Flight Not Found")
     else:
-        newstatus = newstatus.toJson()
-
-    return newstatus
-
+        return newstatus.toJson(), 200
 
 
 def getAircraft(token, aircraftcode):
-    aircraftcode = re.search("[A-z0-9]{1,10}", aircraftcode).group()
+    try:
+        aircraftcode = re.search("[A-z0-9]{1,10}", aircraftcode).group()
+    except:
+        return abort(400, message="Invalid Request")
+
     url = (f"https://api.lufthansa.com/v1/mds-references/aircraft/{aircraftcode}")
     #print(url)
     bearer = (f"Bearer {token}")
@@ -216,22 +232,26 @@ def getAircraft(token, aircraftcode):
             i = i + 1
             if (i==3):
                 logger.error("LH API error, ABORT")
+                return abort(500, message="API Error")
             else:
                 logger.info("LH API error, retry")
             pass
 
     try:
         aircraftmodel = data['AircraftResource']['AircraftSummaries']['AircraftSummary']['Names']['Name']['$']
-        aircraftinfo = aircraft_info(aircraftmodel)
+        aircraftinfo = AircraftInfo(aircraftmodel)
     except:
-        aircraftmodel = aircraftcode
-        aircraftinfo = aircraft_info(aircraftmodel)
+        return abort(404, message="Aircraft Not Found")
 
-    return aircraftinfo
+    return aircraftinfo.toJson(), 200
 
 
 def getAirline(token, airlinecode):
-    airlinecode = re.search("[A-z]{1,5}", airlinecode).group()
+    try:
+        airlinecode = re.search("[A-z]{1,5}", airlinecode).group()
+    except:
+        return abort(400, message="Invalid Request")
+
     url = (f"https://api.lufthansa.com/v1/mds-references/airlines/{airlinecode}")
     #print(url)
     bearer = (f"Bearer {token}")
@@ -253,22 +273,26 @@ def getAirline(token, airlinecode):
             i = i + 1
             if (i==3):
                 logger.error("LH API error, ABORT")
+                return abort(500, message="API Error")
             else:
                 logger.info("LH API error, retry")
             pass
 
     try:
         airlinename = (data['AirlineResource']['Airlines']['Airline']['Names']['Name']['$'])
-        airlineinfo = airline_info(airlinename)
+        airlineinfo = AirlineInfo(airlinename)
     except:
-        airlinename = ""
-        airlineinfo = airline_info(airlinename)
+        return abort(404, message="Airline Not Found")
 
-    return airlineinfo
+    return airlineinfo.toJson(), 200
 
 
 def getAirport(token, airportname):
-    airportname = re.search("[A-z]{1,5}", airportname).group()
+    try:
+        airportname = re.search("[A-z]{1,5}", airportname).group()
+    except:
+        return abort(400, message="Invalid Request")
+
     url = (f"https://api.lufthansa.com/v1/mds-references/airports/{airportname}?lang=EN&LHoperated=0")
     #print(url)
     bearer = (f"Bearer {token}")
@@ -289,6 +313,7 @@ def getAirport(token, airportname):
             i = i + 1
             if (i==3):
                 logger.error("LH API error, ABORT")
+                return abort(500, message="API Error")
             else:
                 logger.info("LH API error, retry")
             pass
@@ -296,18 +321,22 @@ def getAirport(token, airportname):
         airportname = (data['AirportResource']['Airports']['Airport']['Names']['Name']['$'])
         latitude = (data['AirportResource']['Airports']['Airport']['Position']['Coordinate']['Latitude'])
         longitude = (data['AirportResource']['Airports']['Airport']['Position']['Coordinate']['Longitude'])
-        airportinfo = airport_info(airportname, latitude, longitude).toJson()
+        airportinfo = AirportInfo(airportname, latitude, longitude)
     except:
-        airportinfo = jsonify({'info': 'airport does not exist'})
+        return abort(404, message="Airport Not Found")
 
-    return airportinfo
+    return airportinfo.toJson(), 200
 
 
 def getCodeshares(token, flight, date):
-    date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
-    airlineid = re.search("[A-z]{1,2}", flight).group()
-    flightnumber = re.search("[0-9]{1,5}", flight).group()
-    flightnumber = str(flightnumber).zfill(3)
+    try:
+        date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
+        airlineid = re.search("[A-z]{1,2}", flight).group()
+        flightnumber = re.search("[0-9]{1,5}", flight).group()
+        flightnumber = str(flightnumber).zfill(3)
+    except:
+        return abort(400, message="Invalid Request")
+
     flight = airlineid + flightnumber
 
     url = 'https://api.lufthansa.com/v1/operations/customerflightinformation' + '/' + flight + '/' + date
@@ -322,7 +351,7 @@ def getCodeshares(token, flight, date):
             data = request.json()
             #print(data)
             i = 10
-            logger.info("(Used cache: %s) Successfull request to Lufthansa API for CODESHARE flight:  %s, date: %s ; %s", str(request.from_cache), date, data)
+            logger.info("(Used cache: %s) Successfull request to Lufthansa API for CODESHARE flight:  %s, date: %s ; %s", str(request.from_cache), flight, date, data)
         except:
             time.sleep(10)
             if (i > 3):
@@ -333,6 +362,8 @@ def getCodeshares(token, flight, date):
             i = i + 1
             if (i == 10):
                 logger.error("Error (abort) request to Lufthansa API for CODESHARE flight:  %s, date: %s", flight, date)
+                return abort(500, message="API Error")
+
             else:
                 logger.info("Retry request to Lufthansa API for CODESHARE flight:  %s, date: %s",
                             flight, date)
@@ -344,28 +375,26 @@ def getCodeshares(token, flight, date):
     try:
         flightcodeshares = data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']
         for flightcodeshare in flightcodeshares:
-            flightcodesharenew = flight_codeshare(flightcodeshare['AirlineID'],flightcodeshare['FlightNumber'])
-            codeshares.append(flightcodesharenew.__dict__)
+            flightcodesharenew = FlightCodeshare(flightcodeshare['AirlineID'],flightcodeshare['FlightNumber'])
+            codeshares.append(flightcodesharenew.toJson())
     except:
         try:
-            flightcodeshare = flight_codeshare(data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['AirlineID'], data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['FlightNumber'])
-            codeshares.append(flightcodeshare.__dict__)
+            flightcodeshare = FlightCodeshare(data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['AirlineID'], data['FlightInformation']['Flights']['Flight']['MarketingCarrierList']['MarketingCarrier']['FlightNumber'])
+            codeshares.append(flightcodeshare.toJson())
             logger.info("Not array, only one marketing carrier, parsing OK")
 
         except:
             codeshares.clear()
             logger.error("Unsuccessful parsing codeshares, no marketing carriers")
     try:
-        flightoperating = flight_operating(
+        flightoperating = FlightOperating(
         data['FlightInformation']['Flights']['Flight']['OperatingCarrier']['AirlineID'],
         data['FlightInformation']['Flights']['Flight']['OperatingCarrier']['FlightNumber'])
-        operatingcodeshares = operating_codeshares(flightoperating, codeshares)
-        codesharesInfo = operatingcodeshares.toJson()
+        operatingcodeshares = OperatingCodeshares(flightoperating.toJson(), codeshares)
+        return operatingcodeshares.toJson(), 200
 
     except:
-        codesharesInfo = jsonify({'info': 'no codeshare flights'})
-
-    return codesharesInfo
+        return abort(404, message="Flight Not Found")
 
 
 
@@ -468,7 +497,8 @@ class flight_status:
     flightstatus = ""
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        #return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
 
     def __init__(self, depairport,depscheduled,depscheduledUTC, depestimated, depestimatedUTC, depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC, arrestimated, arrestimatedUTC, arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus):
         self.depairport = depairport
@@ -498,32 +528,35 @@ class flight_status:
         self.flightstatus = flightstatus
 
 
-class aircraft_info:
+class AircraftInfo:
     aircraftName= ""
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        #return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
 
     def __init__(self, aircraftName):
         self.aircraftName = aircraftName
 
 
-class airline_info:
+class AirlineInfo:
     airlineName = ""
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        #return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
 
     def __init__(self, airlineName):
         self.airlineName = airlineName
 
-class airport_info:
+class AirportInfo:
     airportName = ""
     latitude = 0
     longitude = 0
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        #return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
 
     def __init__(self, airportName, latitude, longitude):
         self.airportName = airportName
@@ -533,34 +566,37 @@ class airport_info:
 
 
 
-class flight_codeshare:
+class FlightCodeshare:
     airlineid = ""
     flightnumber = ""
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        #return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
 
     def __init__(self, airlineid, flightnumber):
         self.airlineid = airlineid
         self.flightnumber = flightnumber
 
-class flight_operating:
+class FlightOperating:
     airlineid = ""
     flightnumber = ""
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        #return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
 
     def __init__(self, airlineid, flightnumber):
         self.airlineid = airlineid
         self.flightnumber = flightnumber
 
-class operating_codeshares:
-    operating = flight_operating
+class OperatingCodeshares:
+    operating = FlightOperating
     codeshares = []
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        #return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
 
     def __init__(self, operating, codeshares):
         self.operating = operating

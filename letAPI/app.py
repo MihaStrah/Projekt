@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, make_response
+from flask_restful import Resource, Api, abort
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
@@ -15,6 +16,7 @@ from notificationUsers import setDatabase, registerFlight, unregisterFlight
 from opensky import getAircraftLocation
 
 server = Flask(__name__)
+api = Api(server)
 
 #cache for API https://pythonhosted.org/Flask-Caching/
 #cache = Cache(server, config={'CACHE_TYPE': 'simple'})
@@ -73,13 +75,13 @@ def token_required(f):
             token = request.headers['x-access-tokens']
 
         if not token:
-            return jsonify({'info': 'a valid token is missing'})
+            return abort(401, message="Missing Token")
 
         try:
             data = jwt.decode(token, server.config['SECRET_KEY'])
             current_user = Users.query.filter_by(public_id=data['public_id']).first()
         except:
-            return jsonify({'info': 'token is invalid'})
+            return abort(401, message="Invalid Token")
 
         return f(current_user, *args, **kwargs)
 
@@ -87,192 +89,168 @@ def token_required(f):
 
 
 
-@server.route('/login', methods=['POST'])
-def login_user():
-    auth = request.authorization
-    if not auth or not auth.username or not auth.password:
+class Login(Resource):
+    def post(self):
+        auth = request.authorization
+        if not auth or not auth.username or not auth.password:
+            return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
+
+        user = Users.query.filter_by(name=auth.username).first()
+
+        if (user is None):
+            return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
+
+        if check_password_hash(user.password, auth.password):
+            exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+            token = jwt.encode(
+                {'public_id': user.public_id, 'exp': exp},
+                server.config['SECRET_KEY'])
+            # for json in iso
+            return make_response(jsonify({'token': token.decode('UTF-8'), 'expires': exp.isoformat()}), 200)
+
         return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
 
-    user = Users.query.filter_by(name=auth.username).first()
-
-    if (user is None):
-        return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
-
-    if check_password_hash(user.password, auth.password):
-        exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
-        token = jwt.encode(
-            {'public_id': user.public_id, 'exp': exp},
-            server.config['SECRET_KEY'])
-        #for json in iso
-        return jsonify({'token': token.decode('UTF-8'), 'expires': exp.isoformat()})
-
-    return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
+api.add_resource(Login, '/login', endpoint='login')
 
 
-#let
-@server.route('/flight/<date>/<flightnumber>', methods=['GET'])
-@token_required
-@cache.cached(timeout=432000) #cache requests for 1 day 864000s (this is historical data and should not change)
-def get_flight(current_user,date,flightnumber):
-    #print(date)
-    #print(flightnumber)
-    flightInfo = getSQLFlightStatus(flightnumber,date)
-    #print(flightInfo)
-    return (flightInfo)
-
-#letstat7day
-@server.route('/stat7/<flightnumber>', methods=['GET'])
-@token_required
-@cache.cached(timeout=3600) #cache requests for 1 hour 3600s
-def get_flightStat7day(current_user,flightnumber):
-    #print(flightnumber)
-    letstat7dayinfo = getSQLFlightStats(flightnumber,7)
-    #print(letstat7dayinfo)
-    return (letstat7dayinfo)
-
-#letstat7day
-@server.route('/stat30/<flightnumber>', methods=['GET'])
-@token_required
-@cache.cached(timeout=3600) #cache requests for 1 hour 3600s
-def get_flightStat30day(current_user,flightnumber):
-    #print(flightnumber)
-    letstat30dayinfo = getSQLFlightStats(flightnumber,30)
-    #print(letstat30dayinfo)
-    return (letstat30dayinfo)
 
 
-#flightCodeshares
-@server.route('/codeshares/<date>/<flightnumber>', methods=['GET'])
-@token_required
-@cache.cached(timeout=864000) #cache requests for 1 day 864000s (this is historical data and should not change)
-def get_flightCodeshares(current_user,date,flightnumber):
-    #print(date)
-    #print(flightnumber)
-    flightCodeshares = getSQLFlightCodeshares(flightnumber,date)
-    #print(flightCodeshares)
-    return (flightCodeshares)
+class OldFlight(Resource):
+    @token_required
+    @cache.cached(timeout=432000)
+    def get(self, flightnumber, date):
+        return getSQLFlightStatus(flightnumber, date)
 
-#AirplaneImageURL
-@server.route('/aircraftimage/<aircraftreg>', methods=['GET'])
-@token_required
-@cache.cached(timeout=432000) #cache requests for 5 days 432000s
-def get_aircraftImage(current_user,aircraftreg):
-    #print("test")
-    aircraftImageURL = getAircraftImageURL(aircraftreg)
-    #print(aircraftImageURL)
-    return (aircraftImageURL)
-
-#AircraftLocation
-@server.route('/aircraftlocation/<aircraftreg>', methods=['GET'])
-@token_required
-@cache.cached(timeout=10) #cache requests for 10 seconds 10s
-def get_aircraftLocation(current_user,aircraftreg):
-    aircraftlocation = getAircraftLocation(aircraftreg)
-    #print(aircraftlocation)
-    return (aircraftlocation)
+api.add_resource(OldFlight, '/flight/<string:date>/<string:flightnumber>', endpoint='flight')
 
 
-@server.route('/live/flight/<date>/<flightnumber>', methods=['GET'])
-@token_required
-@cache.cached(timeout=60) #cache requests for 1 minute 60s
-def get_flightstatusLive(current_user,flightnumber, date):
-    #print("test")
-    flightstatusLive = getFlightStatusLufthansa(flightnumber, date)
-    #print(flightstatusLive)
-    return (flightstatusLive)
+class OldCodeshares(Resource):
+    @token_required
+    @cache.cached(timeout=432000)
+    def get(self, flightnumber, date):
+        return getSQLFlightCodeshares(flightnumber, date)
 
-@server.route('/info/aircraftname/<aircraftmodelcode>', methods=['GET'])
-@token_required
-@cache.cached(timeout=432000) #cache requests for 5 days 432000s
-def get_aircraftmodelName(current_user,aircraftmodelcode):
-    #print("test")
-    aircraftmodelname = getAircraftModelLufthansa(aircraftmodelcode)
-    #print(aircraftmodelname)
-    return (aircraftmodelname)
-
-@server.route('/info/airlinename/<airlinecode>', methods=['GET'])
-@token_required
-@cache.cached(timeout=432000) #cache requests for 5 days 432000s
-def get_airlineName(current_user,airlinecode):
-    #print("test")
-    airlinename = getAirlineNameLufthansa(airlinecode)
-    #print(airlinename)
-    return (airlinename)
-
-@server.route('/info/airportname/<airportcode>', methods=['GET'])
-@token_required
-@cache.cached(timeout=432000) #cache requests for 5 days 432000s
-def get_airportName(current_user,airportcode):
-    #print("test")
-    airportname = getAirportNameLufthansa(airportcode)
-    #print(airportname)
-    return (airportname)
-
-@server.route('/live/codeshares/<date>/<flightnumber>', methods=['GET'])
-@token_required
-@cache.cached(timeout=60) #cache requests for 1 minute 60s
-def get_flightCodesharesLive(current_user,date,flightnumber):
-    #print(date)
-    #print(flightnumber)
-    flightCodeshares = getCodesharesLufthansa(flightnumber,date)
-    #print(flightCodeshares)
-    return (flightCodeshares)
+api.add_resource(OldCodeshares, '/codeshares/<string:date>/<string:flightnumber>', endpoint='codeshares')
 
 
-@server.route('/statday/<flightnumber>', methods=['GET'])
-@token_required
-@cache.cached(timeout=60) #cache requests for 1 minute 60s
-def get_flightStatDay(current_user,flightnumber):
-    #print(date)
-    #print(flightnumber)
-    flightStatDay = getSQLFlightPastStats(flightnumber)
-    #print(flightCodeshares)
-    return (flightStatDay)
+class Stat7Day(Resource):
+    @token_required
+    @cache.cached(timeout=3600)
+    def get(self, flightnumber):
+        return getSQLFlightStats(flightnumber,7)
+
+api.add_resource(Stat7Day, '/stat7/<string:flightnumber>', endpoint='stat7')
 
 
-@server.route('/notifications/register', methods=['POST'])
-@token_required
-def notificationsRegister(current_user):
-    if request.method == 'POST':
+class Stat30Day(Resource):
+    @token_required
+    @cache.cached(timeout=3600)
+    def get(self, flightnumber):
+        return getSQLFlightStats(flightnumber,30)
+
+api.add_resource(Stat30Day, '/stat30/<string:flightnumber>', endpoint='stat30')
+
+
+class StatDay(Resource):
+    @token_required
+    @cache.cached(timeout=3600)
+    def get(self, flightnumber):
+        return getSQLFlightPastStats(flightnumber)
+
+api.add_resource(StatDay, '/statday/<string:flightnumber>', endpoint='statday')
+
+
+class LiveFlight(Resource):
+    @token_required
+    @cache.cached(timeout=60)
+    def get(self, flightnumber, date):
+        return getFlightStatusLufthansa(flightnumber, date)
+
+api.add_resource(LiveFlight, '/live/flight/<string:date>/<string:flightnumber>', endpoint='live/flight')
+
+
+class LiveCodeshares(Resource):
+    @token_required
+    @cache.cached(timeout=60)
+    def get(self, flightnumber, date):
+        return getCodesharesLufthansa(flightnumber, date)
+
+api.add_resource(LiveCodeshares, '/live/codeshares/<string:date>/<string:flightnumber>', endpoint='live/codeshares')
+
+
+class AircraftImage(Resource):
+    @token_required
+    @cache.cached(timeout=432000)
+    def get(self, aircraftreg):
+        return getAircraftImageURL(aircraftreg)
+
+api.add_resource(AircraftImage, '/aircraftimage/<aircraftreg>', endpoint='aircraftimage')
+
+
+class AircraftLocation(Resource):
+    @token_required
+    @cache.cached(timeout=10)
+    def get(self, aircraftreg):
+        return getAircraftLocation(aircraftreg)
+
+api.add_resource(AircraftLocation, '/aircraftlocation/<aircraftreg>', endpoint='aircraftlocation')
+
+
+class AircraftName(Resource):
+    @token_required
+    @cache.cached(timeout=432000)
+    def get(self, aircraftmodelcode):
+        return getAircraftModelLufthansa(aircraftmodelcode)
+
+api.add_resource(AircraftName, '/info/aircraftname/<aircraftmodelcode>', endpoint='info/aircraftname')
+
+
+class AirlineName(Resource):
+    @token_required
+    @cache.cached(timeout=432000)
+    def get(self, airlinecode):
+        return getAirlineNameLufthansa(airlinecode)
+
+api.add_resource(AirlineName, '/info/airlinename/<airlinecode>', endpoint='info/airlinename')
+
+
+class AirportName(Resource):
+    @token_required
+    @cache.cached(timeout=432000)
+    def get(self, airportcode):
+        return getAirportNameLufthansa(airportcode)
+
+api.add_resource(AirportName, '/info/airportname/<airportcode>', endpoint='info/airportname')
+
+
+class NotificationRegister(Resource):
+    @token_required
+    def post(self):
+        token = post.form.get('token')
+        airline = post.form.get('airline')
+        flightnumber = post.form.get('flightnumber')
+        date = post.form.get('date')
+        return registerFlight(token, airline, flightnumber, date)
+
+api.add_resource(NotificationRegister, '/notifications/register', endpoint='/notifications/register')
+
+
+class NotificationUnRegister(Resource):
+    @token_required
+    def post(self):
         token = request.form.get('token')
         airline = request.form.get('airline')
         flightnumber = request.form.get('flightnumber')
         date = request.form.get('date')
-        info = registerFlight(token, airline, flightnumber, date)
-        return info
-    return (jsonify({'info': 'REQUEST ERROR'}))
+        return unregisterFlight(token, airline, flightnumber, date)
 
-@server.route('/notifications/unregister', methods=['POST'])
-@token_required
-def notificationsUnregister(current_user):
-    if request.method == 'POST':
-        token = request.form.get('token')
-        airline = request.form.get('airline')
-        flightnumber = request.form.get('flightnumber')
-        date = request.form.get('date')
-        info = unregisterFlight(token, airline, flightnumber, date)
-        return info
-    return (jsonify({'info': 'REQUEST ERROR'}))
-
-
-
-
-
-
-
-#testno
-#flightCodesharesOPEN!!!
-#@server.route('/open/codeshares/<date>/<flightnumber>', methods=['GET'])
-#def get_flightCodesharesOpen(date,flightnumber):
-#    #print(date)
-#    #print(flightnumber)
-#    flightCodeshares = getSQLFlightCodeshares(flightnumber,date)
-#    #print(flightCodeshares)
-#    return (flightCodeshares)
+api.add_resource(NotificationUnRegister, '/notifications/unregister', endpoint='/notifications/unregister')
 
 
 
 #if __name__ == '__main__':
 #   server.run(debug=True)
+
+
 
 

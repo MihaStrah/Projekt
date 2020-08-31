@@ -2,6 +2,7 @@ mysql-connector
 Flask
 Flask-SQLAlchemy
 Flask-Caching
+flask-restful
 oauth2==1.9.0.post1
 requests
 requests-cache

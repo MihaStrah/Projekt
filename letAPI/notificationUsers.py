@@ -26,6 +26,10 @@ def registerFlight(token, airline, flightnumber, date):
         flightString = (airlineString + flightnumberString).upper()
         tokenString = re.search("[0-9A-z]{1,64}", token).group()
         dateString = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
+    except:
+        return abort(400, message="Invalid Request")
+
+    try:
         logger.info("registerFlight: %s, %s, %s, %s", token, airline, flightnumber, date)
         logger.info("registerFlight String: %s, %s, %s, %s", tokenString, airlineString, flightnumberString, dateString)
         conn = sqlite3.connect('notificationsDB/notificationUsers.db')
@@ -34,11 +38,10 @@ def registerFlight(token, airline, flightnumber, date):
         conn.commit()
         conn.close()
         logger.info("registerFlight OK: %s, %s, %s, %s", tokenString, airlineString, flightnumberString, dateString)
-
-
-        return jsonify({'info': 'OK'})
+        return jsonify({"info":"OK"}), 200
     except:
-        return jsonify({'info': 'ERROR'})
+        return abort(500, message="API Error")
+
 
 def unregisterFlight(token, airline, flightnumber, date):
     try:
@@ -50,7 +53,10 @@ def unregisterFlight(token, airline, flightnumber, date):
         tokenString = re.search("[0-9A-z]{1,64}", token).group()
         dateString = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
 
+    except:
+        return abort(400, message="Invalid Request")
 
+    try:
         if ((airlineString.upper() == "ALL") and (flightnumberString == "000")):
             logger.info("unregisterALLFlights: %s, %s, %s, %s", token, airline, flightnumber, date)
             logger.info("unregisterALLFlights String: %s, %s, %s, %s", tokenString, airlineString, flightnumberString,
@@ -64,7 +70,7 @@ def unregisterFlight(token, airline, flightnumber, date):
             conn.close()
             logger.info("unregisterALLFlight OK: %s, %s, %s, %s", tokenString, airlineString, flightnumberString,
                         dateString)
-            return jsonify({'info': 'OK'})
+            return jsonify({'info': 'OK'}), 200
 
         else:
             logger.info("unregisterFlight: %s, %s, %s, %s", token, airline, flightnumber, date)
@@ -79,7 +85,7 @@ def unregisterFlight(token, airline, flightnumber, date):
             conn.close()
             logger.info("unregisterFlight OK: %s, %s, %s, %s", tokenString, airlineString, flightnumberString,
                         dateString)
-            return jsonify({'info': 'OK'})
+            return jsonify({'info': 'OK'}), 200
 
     except:
-        return jsonify({'info': 'ERROR'})
+        return abort(500, message="API Error")

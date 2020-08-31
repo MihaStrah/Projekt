@@ -7,15 +7,23 @@ import json
 from flask import jsonify
 from liveLufthansa import getFlightStatusLufthansa
 
+from flask_restful import Resource, Api, abort
+
 logger = logging.getLogger(__name__)
 
-def getSQLFlightStatus(flight,date):
+
+
+def getSQLFlightStatus(flight, date):
     host, port, database, user, password = readDBAccount()
-    date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
-    airlineid = re.search("[A-z]{1,2}", flight).group()
-    flightnumber = re.search("[0-9]{1,4}", flight).group()
-    #padding to min length 3
-    flightnumber = str(flightnumber).zfill(3)
+
+    try:
+        date = re.match("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
+        airlineid = re.search("[A-z]{1,2}", flight).group()
+        flightnumber = re.search("[0-9]{1,4}", flight).group()
+        #padding to min length 3
+        flightnumber = str(flightnumber).zfill(3)
+    except:
+        return abort(400, message="Invalid Request")
 
     i=0
     while i < 10:
@@ -33,7 +41,7 @@ def getSQLFlightStatus(flight,date):
                 time.sleep(3)
             if (i == 10):
                 logger.error("DB error, ABORT")
-                return jsonify({'info': 'database error'})
+                return abort(500, message="Database Error")
             else:
                 logger.info("DB error, retry")
             pass
@@ -53,7 +61,7 @@ def getSQLFlightStatus(flight,date):
             logger.error("DB error: %s", error)
             if (i==3):
                 logger.error("DB error, ABORT")
-                return jsonify({'info': 'database error'})
+                return abort(500, message="Database Error")
             else:
                 logger.info("DB error, retry")
             pass
@@ -63,19 +71,22 @@ def getSQLFlightStatus(flight,date):
         mariadb_connection.close()
 
         if returnrow is None:
-            newstatus = jsonify({'info': 'flight does not exist'})
+            return abort(404, message="Flight Not Found")
         else:
-            newstatus = (flight_status(returnrow[0],returnrow[1],returnrow[2],returnrow[3],returnrow[4],returnrow[5],returnrow[6],returnrow[7],returnrow[8],returnrow[9],returnrow[10],returnrow[11],returnrow[12],returnrow[13],returnrow[14],returnrow[15],returnrow[16],returnrow[17],returnrow[18],returnrow[19],returnrow[20])).toJson()
-
-    return newstatus
+            newstatus = (FlightStatus(returnrow[0],returnrow[1],returnrow[2],returnrow[3],returnrow[4],returnrow[5],returnrow[6],returnrow[7],returnrow[8],returnrow[9],returnrow[10],returnrow[11],returnrow[12],returnrow[13],returnrow[14],returnrow[15],returnrow[16],returnrow[17],returnrow[18],returnrow[19],returnrow[20]))
+            return newstatus.toJson(), 200
 
 
 def getSQLFlightStats(flight,days):
     host, port, database, user, password = readDBAccount()
-    airlineid = re.search("[A-z]{1,2}", flight).group()
-    flightnumber = re.search("[0-9]{1,5}", flight).group()
-    #padding to min length 3
-    flightnumber = str(flightnumber).zfill(3)
+
+    try:
+        airlineid = re.search("[A-z]{1,2}", flight).group()
+        flightnumber = re.search("[0-9]{1,5}", flight).group()
+        #padding to min length 3
+        flightnumber = str(flightnumber).zfill(3)
+    except:
+        return abort(400, message="Invalid Request")
 
     i=0
     while i < 10:
@@ -96,7 +107,7 @@ def getSQLFlightStats(flight,days):
                 logger.error("DB error, ABORT")
                 return jsonify({'info': 'database error'})
             else:
-                logger.info("DB error, retry")
+                return abort(500, message="Database Error")
             pass
 
     i = 0
@@ -121,7 +132,7 @@ def getSQLFlightStats(flight,days):
             logger.error("DB error: %s", error)
             if (i==3):
                 logger.error("DB error, ABORT")
-                return jsonify({'info': 'database error'})
+                return abort(500, message="Database Error")
             else:
                 logger.info("DB error, retry")
             pass
@@ -130,21 +141,23 @@ def getSQLFlightStats(flight,days):
 
 
         if returnrow is None:
-            flightStats = jsonify({'info': 'flight statistics does not exist'})
+            return abort(404, message="Flight Not Found")
         else:
-            flightStats = (flight_stats(returnrow[0],returnrow[1],returnrow[2],returnrow[3],returnrow[4],returnrow[5],returnrow[6],returnrow[7],returnrow[8],returnrow[9],returnrow[10],returnrow[11],returnrow[12],returnrow[13],returnrow[14],returnrow[15])).toJson()
-
-
-    return flightStats
+            flightStats = (FlightStats(returnrow[0],returnrow[1],returnrow[2],returnrow[3],returnrow[4],returnrow[5],returnrow[6],returnrow[7],returnrow[8],returnrow[9],returnrow[10],returnrow[11],returnrow[12],returnrow[13],returnrow[14],returnrow[15]))
+            return flightStats.toJson(), 200
 
 
 #this one also gets data from lufthansa for last day
 def getSQLFlightPastStats(flight):
     host, port, database, user, password = readDBAccount()
-    airlineid = re.search("[A-z]{1,2}", flight).group()
-    flightnumber = re.search("[0-9]{1,5}", flight).group()
-    #padding to min length 3
-    flightnumber = str(flightnumber).zfill(3)
+
+    try:
+        airlineid = re.search("[A-z]{1,2}", flight).group()
+        flightnumber = re.search("[0-9]{1,5}", flight).group()
+        #padding to min length 3
+        flightnumber = str(flightnumber).zfill(3)
+    except:
+        return abort(400, message="Invalid Request")
 
     flightString = airlineid + flightnumber
 
@@ -169,7 +182,7 @@ def getSQLFlightPastStats(flight):
             #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("DB error, ABORT")
-                return jsonify({'info': 'database error'})
+                return abort(500, message="Database Error")
             else:
                 logger.info("DB error, retry")
             pass
@@ -188,7 +201,7 @@ def getSQLFlightPastStats(flight):
             logger.error("DB error: %s", error)
             if (i==3):
                 logger.error("DB error, ABORT")
-                return jsonify({'info': 'database error'})
+                return abort(500, message="Database Error")
             else:
                 logger.info("DB error, retry")
             pass
@@ -196,39 +209,43 @@ def getSQLFlightPastStats(flight):
         flightPastStatArray = []
 
         try:
+            i = 0
             for depscheduled, deptimestatus, arrtimestatus, flightstatus in cursor:
-                flightPastStat = flight_paststat(depscheduled, deptimestatus, arrtimestatus, flightstatus)
-                flightPastStatArray.append(flightPastStat)
-
+                i = 1
+                flightPastStat = FlightPastStat(depscheduled, deptimestatus, arrtimestatus, flightstatus)
+                flightPastStatArray.append(flightPastStat.toJson())
+            if i == 0:
+                return abort(404, message="Flight Not Found")
             try:
                 yesterdayStatus = json.loads(getFlightStatusLufthansa(flightString, yesterday))
-                flightPastStat = flight_paststat(yesterdayStatus["depscheduled"], yesterdayStatus["deptimestatus"], yesterdayStatus["arrtimestatus"], yesterdayStatus["flightstatus"])
+                flightPastStat = FlightPastStat(yesterdayStatus["depscheduled"], yesterdayStatus["deptimestatus"], yesterdayStatus["arrtimestatus"], yesterdayStatus["flightstatus"])
 
-                flightPastStatArray.append(flightPastStat)
+                flightPastStatArray.append(flightPastStat.toJson())
             except:
                 logger.info("No flight yesterday for past stat")
 
-            flightPastStats = flight_paststats(flightPastStatArray)
-            flightPastStatsJson = flightPastStats.toJson()
+            cursor.close()
+            mariadb_connection.close()
+            return flightPastStatArray, 200
 
         except:
+            cursor.close()
+            mariadb_connection.close()
             flightPastStatArray.clear()
-            flightPastStatsJson = jsonify({'info': 'flight statistics does not exist'})
-
-    cursor.close()
-    mariadb_connection.close()
-
-    return flightPastStatsJson
-
+            return abort(404, message="Flight Not Found")
 
 
 def getSQLFlightCodeshares(flight,date):
     host, port, database, user, password = readDBAccount()
-    date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
-    airlineid = re.search("[A-z]{1,2}", flight).group()
-    flightnumber = re.search("[0-9]{1,5}", flight).group()
-    #padding to min length 3
-    flightnumber = str(flightnumber).zfill(3)
+
+    try:
+        date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
+        airlineid = re.search("[A-z]{1,2}", flight).group()
+        flightnumber = re.search("[0-9]{1,5}", flight).group()
+        #padding to min length 3
+        flightnumber = str(flightnumber).zfill(3)
+    except:
+        return abort(400, message="Invalid Request")
 
     i=0
     while i < 10:
@@ -247,7 +264,7 @@ def getSQLFlightCodeshares(flight,date):
             #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("DB error, ABORT")
-                return jsonify({'info': 'database error'})
+                return abort(500, message="Database Error")
             else:
                 logger.info("DB error, retry")
             pass
@@ -267,7 +284,7 @@ def getSQLFlightCodeshares(flight,date):
             logger.error("DB error: %s", error)
             if (i==3):
                 logger.error("DB error, ABORT")
-                return jsonify({'info': 'database error'})
+                return abort(500, message="Database Error")
             else:
                 logger.info("DB error, retry")
             pass
@@ -281,20 +298,19 @@ def getSQLFlightCodeshares(flight,date):
         if returnrows:
             codeshares = []
             for row in returnrows:
-                flightoperating = (flight_codeshare(row[0], row[1]))
-                flightcodeshare = (flight_codeshare(row[2], row[3]))
-                codeshares.append(flightcodeshare.__dict__)
+                flightoperating = (FlightCodeshare(row[0], row[1]))
+                flightcodeshare = (FlightCodeshare(row[2], row[3]))
+                codeshares.append(flightcodeshare.toJson())
 
-            #print(json.dumps(codeshares))
-            operatingcodeshares = operating_codeshares(flightoperating,codeshares)
-            operatingcodeshares = operatingcodeshares.toJson()
+            operatingcodeshares = OperatingCodeshares(flightoperating.toJson(),codeshares)
+            cursor.close()
+            mariadb_connection.close()
+            return operatingcodeshares.toJson(), 200
         else:
-            operatingcodeshares = jsonify({'info': 'no codeshare flights'})
+            cursor.close()
+            mariadb_connection.close()
+            return abort(404, message="Flight Not Found")
 
-    cursor.close()
-    mariadb_connection.close()
-
-    return operatingcodeshares
 
 def readDBAccount():
     import os
@@ -310,7 +326,9 @@ def readDBAccount():
     f.close()
     return host, port, database, user, password
 
-class flight_status:
+
+
+class FlightStatus:
     depairport = ""
     depscheduled = ""
     depscheduledUTC = ""
@@ -334,7 +352,8 @@ class flight_status:
     flightstatus = ""
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        #return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
 
     def __init__(self, depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus):
         self.depairport = depairport
@@ -360,7 +379,7 @@ class flight_status:
         self.flightstatus = flightstatus
 
 
-class flight_stats:
+class FlightStats:
     allflights = ""
     cancelled = ""
     dep_OT = ""
@@ -379,7 +398,8 @@ class flight_stats:
     averageTimeArr_DL = ""
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        #return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
 
     def __init__(self, allflights, cancelled, dep_OT, dep_FE, dep_DL, averageTimeDep, averageTimeDep_OT, averageTimeDep_FE, averageTimeDep_DL, arr_OT, arr_FE, arr_DL, averageTimeArr, averageTimeArr_OT, averageTimeArr_FE, averageTimeArr_DL):
         self.allflights = allflights
@@ -400,15 +420,15 @@ class flight_stats:
         self.averageTimeArr_DL = averageTimeArr_DL
 
 
-
-class flight_paststat:
+class FlightPastStat:
     depscheduled = ""
     deptimestatus = ""
     arrtimestatus = ""
     flightstatus = ""
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        #return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
 
     def __init__(self, depscheduled, deptimestatus, arrtimestatus, flightstatus):
         self.depscheduled = depscheduled
@@ -416,44 +436,42 @@ class flight_paststat:
         self.arrtimestatus = arrtimestatus
         self.flightstatus = flightstatus
 
-class flight_paststats:
-    flightDayArray = [flight_paststat]
-
-    def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
-
-    def __init__(self, flightDayArray):
-        self.flightDayArray = flightDayArray
 
 
-class flight_codeshare:
+class FlightCodeshare:
     airlineid = ""
     flightnumber = ""
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
+        #return json.dumps(self, default=lambda o: o.__dict__)
+
 
     def __init__(self, airlineid, flightnumber):
         self.airlineid = airlineid
         self.flightnumber = flightnumber
 
-class flight_operating:
+
+class FlightOperating:
     airlineid = ""
     flightnumber = ""
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        #return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
 
     def __init__(self, airlineid, flightnumber):
         self.airlineid = airlineid
         self.flightnumber = flightnumber
 
-class operating_codeshares:
-    operating = flight_operating
-    codeshares = []
+
+class OperatingCodeshares:
+    operating = ""
+    codeshares = ""
 
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
+        #return json.dumps(self, default=lambda o: o.__dict__)
+        return self.__dict__
 
     def __init__(self, operating, codeshares):
         self.operating = operating
