@@ -250,7 +250,7 @@ api.add_resource(NotificationUnRegister, '/notifications/unregister', endpoint='
 
 class AppleGet(Resource):
     def get(self):
-        return {"appclips": {"apps": ["7YNLV7443U.com.MihaStrah.FlightTracker.Clip"]}}, 200
+        return {"appclips": {"apps": ["7YNLV7443U.com.MihaStrah.FlightTracker.AppClip"]}}, 200
 
 api.add_resource(AppleGet, '/apple-app-site-association', endpoint='/apple-app-site-association')
 
