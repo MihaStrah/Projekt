@@ -252,7 +252,7 @@ class AppleGet(Resource):
     def get(self):
         return {"appclips": {"apps": ["7YNLV7443U.com.MihaStrah.FlightTracker.Clip"]}}, 200
 
-api.add_resource(AppleGet, '/', endpoint='/apple-app-site-association')
+api.add_resource(AppleGet, '/apple-app-site-association', endpoint='/apple-app-site-association')
 
 
 
