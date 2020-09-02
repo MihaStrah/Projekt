@@ -164,7 +164,7 @@ def getSQLFlightPastStats(flight):
     daybeforeyesterday = (datetime.date.today() - datetime.timedelta(days=2)).strftime("%Y-%m-%d")
     yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
     startdate = (datetime.date.today() - datetime.timedelta(days=90)).strftime("%Y-%m-%d")
-    enddate = (datetime.date.today() - datetime.timedelta(days=3)).strftime("%Y-%m-%d")
+    enddate = (datetime.date.today() - datetime.timedelta(days=2)).strftime("%Y-%m-%d")
 
     i=0
     while i < 10:
