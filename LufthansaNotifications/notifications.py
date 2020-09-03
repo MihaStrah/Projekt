@@ -8,6 +8,7 @@ from applePush import sendMultipleNotifications
 
 logger = logging.getLogger(__name__)
 
+#preverimo MQTT sporočilo če vsebuje posodobitev o nekem letu, ki je v bazi naročenih uporabnikov
 def check(data):
     update = json.loads(data)
 
@@ -21,8 +22,8 @@ def check(data):
     conn = sqlite3.connect('notificationsDB/notificationUsers.db')
     c = conn.cursor()
 
+    #pridobimo APNS žetone za uporabnike, ki so naročeni na let
     c.execute('SELECT token FROM notifications WHERE flight == ? AND date == ?', (flightString, dateString))
-    #c.execute('SELECT token FROM notifications WHERE flight == ? AND date == ?', ("LH997", "2020-08-12"))
     rows = c.fetchall()
     conn.close()
 
@@ -31,11 +32,10 @@ def check(data):
     for row in rows:
         tokens.append(row[0])
 
-    #tokens.append("435a901c94d133a2a2a8c7325973563c9a6aee76227f24f888e41e6300ce1047")
-
     if len(tokens) > 0:
-        #sendMultipleNotifications(tokens, title, body, flightString, dateString)
         logger.info("subscribed: : %s, %s, %s, %s, %s", tokens, title, body, flightString, dateString)
+
+        #pošljemo obvestilo vsem naročenim uporabnikom
         sendMultipleNotifications(tokens, title, body, update["Update"]["FlightNumber"],
                                   update["Update"]["ScheduledFlightDate"])
 

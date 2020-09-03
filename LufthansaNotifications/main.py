@@ -7,19 +7,15 @@ import ssl
 import paho.mqtt.client as mqtt
 from notifications import check
 
-
-
-##IS DEPENDED ON DATABASE FROM LETAPI!
-
+#za delovanje je potrebna baza iz "letAPI"
 
 def main():
-    #set database
-
-    # Enable logging
+    #nastavimo dnevnik
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         level=logging.INFO, filename="LufthansaNotifications_logs_out/LufthansaNotificationsPythonScriptLog.log", filemode='a')
     logger = logging.getLogger(__name__)
 
+    #nastavimo podatke za MQTT odjemalca
     client = mqtt.Client(client_id="lufthansanotificationinstance1", clean_session=True, userdata=None, transport="tcp")
     client.on_connect = on_connect
     client.on_message = on_message
@@ -27,33 +23,25 @@ def main():
         tls_version=ssl.PROTOCOL_TLS, ciphers=None)
     client.enable_logger(logger=logger)
 
+    #povežemo se na MQTT strežnik Lufthanse
     client.connect("A35IXNRWYOLJWQ.iot.eu-central-1.amazonaws.com", port=8883, keepalive=60)
 
-    # Blocking call that processes network traffic, dispatches callbacks and
-    # handles reconnecting.
-    # Other loop*() functions are available that give a threaded interface and a
-    # manual interface.
     client.loop_forever()
 
-# The callback for when the client receives a CONNACK response from the server.
+#ob povezavi se naročimo na vse teme
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
-
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
+    logger.info("Connected with result code %s", str(rc))
     client.subscribe("prd/FlightUpdate/#")
 
-# The callback for when a PUBLISH message is received from the server.
+#ob prihodu sporočila preverimo vsebino
 def on_message(client, userdata, msg):
-    #print(msg.topic+" "+str(msg.payload))
     check(msg.payload)
 
-
+#ob padcu povezave
 def on_disconnect(client, userdata, rc):
     if rc != 0:
-        print("Unexpected disconnection.")
+        logger.info("Unexpected disconnection.")
 
-
-
+#zagon programa
 if __name__ == '__main__':
     main()

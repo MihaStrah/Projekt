@@ -9,13 +9,13 @@ import datetime
 import logging
 
 def job():
-    #preverimo uro, in ob 18 uri po strežniškem času (UTC) nadaljujemo
-    if (datetime.datetime.now().strftime("%H") == "20"):
+    #preverimo uro, in ob 18 uri po strežniškem času nadaljujemo
+    if (datetime.datetime.now().strftime("%H") == "18"):
 
         #določimo dan, za katerega bomo pridobivali lete
         dateFlight = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
-        #pošljemo sporočilo o začetku in vpišemo v beležnik
+        #pošljemo sporočilo o začetku in vpišemo v dnevnik
         notification = "DATETIME: {} ::: Job in progress ... getting flights for date: {}".format(datetime.datetime.now(), dateFlight)
         logger.info("Hour OK, started job, getting flights for date: %s", dateFlight)
         sendTG = telegram_bot_sendtext(notification)
@@ -24,11 +24,11 @@ def job():
         #pridobimo nov token za Lufthansa API
         token = getNewToken()
 
-        #pridobimo vse možne lete, za katere bomo preverili status
+        #pridobimo vse možne lete za katere bomo preverili status
         allflights, allids = getAllFLights()
 
-        #preverimo status leta na Lufthansa API in let vpišemo v bazo
-        getFlightStatusWriteSql(token,allflights,allids,dateFlight,4)
+        #preverimo status vsakega leta na Lufthansa API in let vpišemo v bazo
+        getFlightStatusWriteSql(token, allflights, allids, dateFlight, 4)
 
         #vpišemo v beležnik
         logger.info("Ended job, all flights processed for date: %s", dateFlight)
@@ -37,7 +37,7 @@ def job():
         #pridobimo deljene lete iz Lufthansa API in jih vpišemo v bazo
         getandwriteCodeshares(dateFlight)
 
-        #pošljemo sporočilo o koncu in vpišemo v beležnik
+        #pošljemo sporočilo o koncu in vpišemo v dnevnik
         notification = "DATETIME: {} ::: End of job, all flights processed (regular + codeshare) for date: {}".format(datetime.datetime.now(), dateFlight)
         logger.info("Ended job, all codeshare flights processed for date: %s", dateFlight)
         sendTG = telegram_bot_sendtext(notification)
@@ -46,7 +46,7 @@ def job():
     logger.info("Hour NOT OK, sleeping")
     return
 
-#konfiguracija beležnika
+#konfiguracija dnevnika
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO, filename="lhgetdata_logs_out/lhgetdataPythonScriptLog.log", filemode='a')
 logger = logging.getLogger(__name__)

@@ -1,11 +1,13 @@
 import requests
 
+#pošiljanje sporočila
 def telegram_bot_sendtext(bot_message):
     bot_token, bot_chatID = readTGAccount()
     send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
     response = requests.get(send_text)
     return response.json()
 
+#preberemo podatke Telegram
 def readTGAccount():
     import os
     path = os.path.abspath(os.path.dirname(__file__))

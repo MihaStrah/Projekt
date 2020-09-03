@@ -11,8 +11,7 @@ from flask_restful import Resource, Api, abort
 logger = logging.getLogger(__name__)
 
 
-# API https://www.airport-data.com
-
+#pridobitev URL slike letala iz airport-data.com API
 def getAircraftImageURL(aircraftreg):
 
     try :
@@ -21,14 +20,11 @@ def getAircraftImageURL(aircraftreg):
         return abort(400, message="Invalid Request")
 
     try:
-        #try with aircraftregstring with "-" on second character
         N = 1
         newaircraftregstring = aircraftregstring[: N] + "-" + aircraftregstring[N:]
         URL = (f"https://www.airport-data.com/api/ac_thumb.json?r={newaircraftregstring}&n=1")
-        # print(URL)
         r = requests.get(url=URL)
         data = r.json()
-        # print(data)
         aircraftImageURL = data["data"][0]["image"]
         aircraftImageURL = aircraftImageURL.replace('/thumbnails', '')
         photographer = data["data"][0]["photographer"]
@@ -40,13 +36,11 @@ def getAircraftImageURL(aircraftreg):
 
     if (aircraftImageURL == ""):
         try:
-            #try with aircraftregstring with "-" on third character
             N = 2
             newaircraftregstring = aircraftregstring[: N] + "-" + aircraftregstring[N:]
             URL = (f"https://www.airport-data.com/api/ac_thumb.json?r={newaircraftregstring}&n=1")
             r = requests.get(url=URL)
             data = r.json()
-            # print(data)
             aircraftImageURL = data["data"][0]["image"]
             aircraftImageURL = aircraftImageURL.replace('/thumbnails', '')
             photographer = data["data"][0]["photographer"]
@@ -62,7 +56,6 @@ def getAircraftImageURL(aircraftreg):
             except:
                 return abort(500, message="API Error")
             try:
-                #try with icao24
                 URL = (f"https://www.airport-data.com/api/ac_thumb.json?m={icao24}&n=1")
                 r = requests.get(url=URL)
                 data = r.json()
@@ -71,15 +64,13 @@ def getAircraftImageURL(aircraftreg):
                 photographer = data["data"][0]["photographer"]
                 aircraftimage = AircraftImage(aircraftImageURL, photographer)
                 logger.info("airport-data image API call successful")
-
             except:
                 logger.info("airport-data image API call unsuccessful")
                 return abort(404, message="Image URL Not Found")
 
     return aircraftimage.toJson(), 200
 
-
-
+#pridobitev icao24 iz baze
 def getSQLicao24(aircraftreg):
     aircraftregstring = re.search("[a-zA-Z0-9]{5,6}", aircraftreg).group().lower()
     host, port, database, user, password = readDBAccount()
@@ -97,7 +88,6 @@ def getSQLicao24(aircraftreg):
                 time.sleep(1)
             if (i > 5):
                 time.sleep(1)
-            # print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("DB error, ABORT")
                 icao24 = ""
@@ -120,8 +110,6 @@ def getSQLicao24(aircraftreg):
                 time.sleep(1)
             if (i > 2):
                 time.sleep(1)
-            # print("Mariadb Error: {}".format(error))
-            # print("Retry DB SELECT " + str(i))
             logger.error("DB error: %s", error)
             if (i == 3):
                 logger.error("DB error, ABORT")
@@ -139,19 +127,19 @@ def getSQLicao24(aircraftreg):
     return icao24
 
 
+#razred URL slike letala
 class AircraftImage:
     aircraftimage= ""
     photographer = ""
 
     def toJson(self):
-        #return json.dumps(self, default=lambda o: o.__dict__)
         return self.__dict__
 
     def __init__(self, aircraftImageURL, photographer):
         self.aircraftimage = aircraftImageURL
         self.photographer = photographer
 
-
+#branje konfiguracije podatkovne baze
 def readDBAccount():
     import os
     path = os.path.abspath(os.path.dirname(__file__))

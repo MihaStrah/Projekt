@@ -8,6 +8,7 @@ import sqlite3
 
 logger = logging.getLogger(__name__)
 
+#nastavitev baze uporabnikov obvestil
 def setDatabase():
     try:
         conn = sqlite3.connect('notificationsDB/notificationUsers.db')
@@ -18,6 +19,7 @@ def setDatabase():
     except:
         print("notificationUsers DB already exists")
 
+#registracija za obvestila o letu
 def registerFlight(token, airline, flightnumber, date):
     try:
         airlineString = re.search("[A-z]{1,2}", airline).group()
@@ -42,7 +44,7 @@ def registerFlight(token, airline, flightnumber, date):
     except:
         return abort(500, message="API Error")
 
-
+#izbris registracije za obvestila o letu
 def unregisterFlight(token, airline, flightnumber, date):
     try:
         airlineString = re.search("[A-z]{1,3}", airline).group()

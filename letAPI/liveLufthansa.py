@@ -6,15 +6,14 @@ import re
 import logging
 from flask import jsonify, request
 from flask_restful import Resource, Api, abort
-
 import requests_cache
 
-
-#cache for external API requests (1 minute)
+#za zunanje povezave na Lufthansa API uporabimo predpomnjenje 60 sekund
 requests_cache.install_cache(cache_name='lufthansa_cache', backend='sqlite', expire_after=60)
 
 logger = logging.getLogger(__name__)
 
+#pridobivanje žetona za Lufthansa API pred zahtevami
 def getFlightStatusObjectLufthansa(flight, date):
     try:
         token = getToken()
@@ -57,12 +56,8 @@ def getAirportNameLufthansa(airportid):
         return abort(500, message="API Error")
     return getAirport(token, airportid)
 
-
-
-
-
+#pridobitev aktualnih podatkov o letu iz Lufthansa API
 def getFlight(token, flight, date):
-
     try:
         date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
         flight = re.search("^[A-z]{1,2}[0-9]{1,6}$", flight).group()
@@ -70,23 +65,17 @@ def getFlight(token, flight, date):
         return abort(400, message="Invalid Request")
 
     url = (f"https://api.lufthansa.com/v1/operations/flightstatus/{flight}/{date}")
-    #print(url)
     bearer = (f"Bearer {token}")
     headers = {"Authorization":bearer, "Accept":"application/json"}
-    #print (bearer)
     i = 0
     while i<5:
         try:
             request = requests.get(url = url, headers = headers)
-            #print(request)
             data = request.json()
-            #print(data)
             i = 5
-            #print("Used Cache: %s" % request.from_cache)
             logger.info("(Used cache: %s) LH API response: %s", str(request.from_cache), data)
         except:
             time.sleep(2)
-            #print("retry " + str(i))
             i = i + 1
             logger.info("LH API error, retry")
             if (i==5):
@@ -202,7 +191,6 @@ def getFlight(token, flight, date):
                               arractualUTC, arrterminal, arrgate, arrtimestatus, aircraftcode,
                               aircraftreg, airlineid, flightnumber, flightstatus)
 
-    #check status for operating carrier flight if not operating carrier
     operating = (f"{newstatus.airlineid}{newstatus.flightnumber}")
     if (operating != flight.upper() and operating != ""):
         getFlight(token, operating, date)
@@ -212,7 +200,7 @@ def getFlight(token, flight, date):
     else:
         return newstatus.toJson(), 200
 
-
+#pridobitev naziva letala iz Lufthansa API
 def getAircraft(token, aircraftcode):
     try:
         aircraftcode = re.search("[A-z0-9]{1,10}", aircraftcode).group()
@@ -220,22 +208,17 @@ def getAircraft(token, aircraftcode):
         return abort(400, message="Invalid Request")
 
     url = (f"https://api.lufthansa.com/v1/mds-references/aircraft/{aircraftcode}")
-    #print(url)
     bearer = (f"Bearer {token}")
     headers = {"Authorization":bearer, "Accept":"application/json"}
-    #print (bearer)
     i = 0
     while i<3:
         try:
             request = requests.get(url = url, headers = headers)
-            #print(request)
             data = request.json()
-            #print(data)
             i = 3
             logger.info("LH API response: %s", data)
         except:
             time.sleep(2)
-            #print("retry " + str(i))
             i = i + 1
             if (i==3):
                 logger.error("LH API error, ABORT")
@@ -252,7 +235,7 @@ def getAircraft(token, aircraftcode):
 
     return aircraftinfo.toJson(), 200
 
-
+#pridobitev naziva letalske družbe iz Lufthansa API
 def getAirline(token, airlinecode):
     try:
         airlinecode = re.search("[A-z]{1,5}", airlinecode).group()
@@ -260,23 +243,18 @@ def getAirline(token, airlinecode):
         return abort(400, message="Invalid Request")
 
     url = (f"https://api.lufthansa.com/v1/mds-references/airlines/{airlinecode}")
-    #print(url)
     bearer = (f"Bearer {token}")
     headers = {"Authorization":bearer, "Accept":"application/json"}
-    #print (bearer)
     i = 0
     while i<3:
         try:
             request = requests.get(url = url, headers = headers)
-            #print(request)
             data = request.json()
-            #print(data)
             i = 3
             logger.info("LH API response: %s", data)
 
         except:
             time.sleep(2)
-            #print("retry " + str(i))
             i = i + 1
             if (i==3):
                 logger.error("LH API error, ABORT")
@@ -293,7 +271,7 @@ def getAirline(token, airlinecode):
 
     return airlineinfo.toJson(), 200
 
-
+#pridobitev naziva letališča iz Lufthansa API
 def getAirport(token, airportname):
     try:
         airportname = re.search("[A-z]{1,5}", airportname).group()
@@ -301,22 +279,17 @@ def getAirport(token, airportname):
         return abort(400, message="Invalid Request")
 
     url = (f"https://api.lufthansa.com/v1/mds-references/airports/{airportname}?lang=EN&LHoperated=0")
-    #print(url)
     bearer = (f"Bearer {token}")
     headers = {"Authorization":bearer, "Accept":"application/json"}
-    #print (bearer)
     i = 0
     while i<3:
         try:
             request = requests.get(url = url, headers = headers)
-            #print(request)
             data = request.json()
-            #print(data)
             i = 3
             logger.info("LH API response: %s", data)
         except:
             time.sleep(5)
-            #print("retry " + str(i))
             i = i + 1
             if (i==3):
                 logger.error("LH API error, ABORT")
@@ -334,7 +307,7 @@ def getAirport(token, airportname):
 
     return airportinfo.toJson(), 200
 
-
+#pridobitev skupnih oznak leta iz Lufthansa API
 def getCodeshares(token, flight, date):
     try:
         date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
@@ -347,16 +320,13 @@ def getCodeshares(token, flight, date):
     flight = airlineid + flightnumber
 
     url = 'https://api.lufthansa.com/v1/operations/customerflightinformation' + '/' + flight + '/' + date
-    #print(url)
     bearer = "Bearer " + token
     headers = {"Authorization":bearer, "Accept":"application/json"}
     i = 0
     while i<10:
         try:
             request = requests.get(url=url, headers=headers)
-            #print(request)
             data = request.json()
-            #print(data)
             i = 10
             logger.info("(Used cache: %s) Successfull request to Lufthansa API for CODESHARE flight:  %s, date: %s ; %s", str(request.from_cache), flight, date, data)
         except:
@@ -365,7 +335,6 @@ def getCodeshares(token, flight, date):
                 time.sleep(180)
             if (i > 5):
                 time.sleep(600)
-            #print("Retry LH " + str(i))
             i = i + 1
             if (i == 10):
                 logger.error("Error (abort) request to Lufthansa API for CODESHARE flight:  %s, date: %s", flight, date)
@@ -403,30 +372,23 @@ def getCodeshares(token, flight, date):
     except:
         return abort(404, message="Flight Not Found")
 
-
-
+#pridobitev aktualnega statusa za let za potrebe podatkov o starih statusih iz Lufthansa API
 def getFlightObject(token, flight, date):
     date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
     flight = re.search("^[A-z]{1,2}[0-9]{1,6}$", flight).group()
 
     url = (f"https://api.lufthansa.com/v1/operations/flightstatus/{flight}/{date}")
-    #print(url)
     bearer = (f"Bearer {token}")
     headers = {"Authorization":bearer, "Accept":"application/json"}
-    #print (bearer)
     i = 0
     while i<5:
         try:
             request = requests.get(url = url, headers = headers)
-            #print(request)
             data = request.json()
-            #print(data)
             i = 5
-            #print("Used Cache: %s" % request.from_cache)
             logger.info("(Used cache: %s) LH API response: %s", str(request.from_cache), data)
         except:
             time.sleep(2)
-            #print("retry " + str(i))
             i = i + 1
             logger.info("LH API error, retry")
             if (i==5):
@@ -542,7 +504,6 @@ def getFlightObject(token, flight, date):
                               arractualUTC, arrterminal, arrgate, arrtimestatus, aircraftcode,
                               aircraftreg, airlineid, flightnumber, flightstatus)
 
-    #check status for operating carrier flight if not operating carrier
     operating = (f"{newstatus.airlineid}{newstatus.flightnumber}")
     if (operating != flight.upper() and operating != ""):
         getFlight(token, operating, date)
@@ -552,12 +513,7 @@ def getFlightObject(token, flight, date):
     else:
         return newstatus.toJson()
 
-
-
-
-
-
-
+#pridobitev Lufthansa API žetona (shranjen ali nov)
 token = "null"
 expires_date = "2000-01-01 00:00:00.0"
 def getToken():
@@ -568,13 +524,13 @@ def getToken():
         token, expires_date = getNewToken()
     return token
 
+#pridobitev novega Lufthansa API žetona
 def getNewToken():
     url = 'https://api.lufthansa.com/v1/oauth/token'
     consumer = oauth.Consumer(key ='', secret='')
     client = oauth.Client(consumer)
     id, secret = readLHAccount()
     params = "client_id=" + id + "&" + "client_secret=" + secret + "&grant_type=client_credentials"
-    #print(params)
     i = 0
     while i < 10:
         try:
@@ -583,14 +539,12 @@ def getNewToken():
                             method = "POST",
                             body=params,
                             headers={'Content-type': 'application/x-www-form-urlencoded'}
-                            #force_auth_header=True
                             )
             content_string = content.decode("utf-8")
             data = json.loads(content_string)
             access_token = data["access_token"]
             expires_in = data["expires_in"]
             expires_date = datetime.datetime.now() + datetime.timedelta(0, (expires_in - 15))
-            #print("New token, expires: ", expires_date)
             logger.info("LH API new token, expires: %s", expires_date)
             pass
             i=10
@@ -600,7 +554,6 @@ def getNewToken():
                 time.sleep(180)
             if (i>5):
                 time.sleep(600)
-            #print("Retry LH token " + str(i))
             i = i + 1
             if (i == 10):
                 logger.error("LH API error, ABORT")
@@ -610,7 +563,7 @@ def getNewToken():
 
     return access_token, expires_date
 
-
+#branje Lufthansa računa
 def readLHAccount():
     import os
     path = os.path.abspath(os.path.dirname(__file__))
@@ -622,7 +575,7 @@ def readLHAccount():
     f.close()
     return id,secret
 
-
+#razred aktualnega statusa leta
 class flight_status:
     depairport = ""
     depscheduled = ""
@@ -651,7 +604,6 @@ class flight_status:
     flightstatus = ""
 
     def toJson(self):
-        #return json.dumps(self, default=lambda o: o.__dict__)
         return self.__dict__
 
     def __init__(self, depairport,depscheduled,depscheduledUTC, depestimated, depestimatedUTC, depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC, arrestimated, arrestimatedUTC, arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus):
@@ -681,35 +633,33 @@ class flight_status:
         self.flightnumber = flightnumber
         self.flightstatus = flightstatus
 
-
+#razred naziva letala
 class AircraftInfo:
     aircraftName= ""
 
     def toJson(self):
-        #return json.dumps(self, default=lambda o: o.__dict__)
         return self.__dict__
 
     def __init__(self, aircraftName):
         self.aircraftName = aircraftName
 
-
+#razred naziva letalske družbe
 class AirlineInfo:
     airlineName = ""
 
     def toJson(self):
-        #return json.dumps(self, default=lambda o: o.__dict__)
         return self.__dict__
 
     def __init__(self, airlineName):
         self.airlineName = airlineName
 
+#razred naziva in lokacije letališča
 class AirportInfo:
     airportName = ""
     latitude = 0
     longitude = 0
 
     def toJson(self):
-        #return json.dumps(self, default=lambda o: o.__dict__)
         return self.__dict__
 
     def __init__(self, airportName, latitude, longitude):
@@ -717,39 +667,36 @@ class AirportInfo:
         self.latitude = latitude
         self.longitude = longitude
 
-
-
-
+#razred podatkov o skupnih oznakah leta
 class FlightCodeshare:
     airlineid = ""
     flightnumber = ""
 
     def toJson(self):
-        #return json.dumps(self, default=lambda o: o.__dict__)
         return self.__dict__
 
     def __init__(self, airlineid, flightnumber):
         self.airlineid = airlineid
         self.flightnumber = flightnumber
 
+#razred dejanskega leta
 class FlightOperating:
     airlineid = ""
     flightnumber = ""
 
     def toJson(self):
-        #return json.dumps(self, default=lambda o: o.__dict__)
         return self.__dict__
 
     def __init__(self, airlineid, flightnumber):
         self.airlineid = airlineid
         self.flightnumber = flightnumber
 
+#razred skupnih oznak leta
 class OperatingCodeshares:
     operating = FlightOperating
     codeshares = []
 
     def toJson(self):
-        #return json.dumps(self, default=lambda o: o.__dict__)
         return self.__dict__
 
     def __init__(self, operating, codeshares):

@@ -2,14 +2,15 @@ import time
 import mysql.connector as mariadb
 import re
 import logging
+
 logger = logging.getLogger(__name__)
 
+#pridobitev statusa leta iz baze
 def getSQLFlightStatus(flight,date):
     host, port, database, user, password = readDBAccount()
     date = re.search("^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$", date).group()
     airlineid = re.search("[A-z]{1,2}", flight).group()
     flightnumber = re.search("[0-9]{1,6}", flight).group()
-    #padding to min length 3
     flightnumber = str(flightnumber).zfill(3)
 
     i=0
@@ -26,7 +27,6 @@ def getSQLFlightStatus(flight,date):
                 time.sleep(2)
             if (i > 5):
                 time.sleep(3)
-            #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("DB error, ABORT")
             else:
@@ -36,17 +36,12 @@ def getSQLFlightStatus(flight,date):
     i = 0
     while i < 3:
         try:
-            #search in DB for operating and for codeshare (returns operating flight)
             cursor.execute("SELECT depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus,flightnumberkey from allflightsstatus where id in (select operating_id from codeshares where DATE(depscheduled)=DATE(%(date)s) and ((codeshare_airlineid=%(airlineid)s and codeshare_flightnumber=%(flightnumber)s) OR (operating_airlineid=%(airlineid)s and operating_flightnumber=%(flightnumber)s ))) or DATE(depscheduled)=DATE(%(date)s) and airlineid=%(airlineid)s and flightnumber=%(flightnumber)s order by id DESC limit 1;",{'airlineid': str(airlineid), 'flightnumber': str(flightnumber), 'date': str(date)})
-            #search in DB only for operating flights
-            #cursor.execute("SELECT depairport,depscheduled,depscheduledUTC,depactual,depactualUTC,depterminal,depgate,deptimestatus,arrairport,arrscheduled,arrscheduledUTC,arractual,arractualUTC,arrterminal,arrgate,arrtimestatus,aircraftcode,aircraftreg,airlineid,flightnumber,flightstatus,flightnumberkey from allflightsstatus where airlineid=%(airlineid)s and flightnumber=%(flightnumber)s and DATE(depscheduled)=DATE(%(date)s) limit 1;", {'airlineid': str(airlineid), 'flightnumber': str(flightnumber),'date': str(date)})
             mariadb_connection.close()
             i = 3
         except mariadb.Error as error:
             i = i + 1
             time.sleep(2)
-            #print("Mariadb Error: {}".format(error))
-            #print("Retry DB SELECT " + str(i))
             logger.error("DB error: %s", error)
             if (i==3):
                 logger.error("DB error, ABORT")
@@ -62,8 +57,7 @@ def getSQLFlightStatus(flight,date):
 
     return newstatus
 
-
-#user with select priviledges
+#branje konfiguracije podatkovne baze
 def readDBAccount():
     import os
     path = os.path.abspath(os.path.dirname(__file__))
@@ -78,7 +72,7 @@ def readDBAccount():
     f.close()
     return host, port, database, user, password
 
-
+#razred statusa leta
 class flight_status:
     depairport = ""
     depscheduled = ""

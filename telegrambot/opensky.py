@@ -3,8 +3,10 @@ import mysql.connector as mariadb
 import re
 import requests
 import logging
+
 logger = logging.getLogger(__name__)
 
+#pridobitev icao24 iz baze
 def getSQLicao24(registration):
     host, port, database, user, password = readDBAccount()
 
@@ -22,7 +24,6 @@ def getSQLicao24(registration):
                 time.sleep(2)
             if (i > 5):
                 time.sleep(3)
-            #print("Retry DB " + str(i))
             if (i == 10):
                 logger.error("DB error, ABORT")
             else:
@@ -44,8 +45,6 @@ def getSQLicao24(registration):
                 time.sleep(2)
             if (i > 2):
                 time.sleep(3)
-            #print("Mariadb Error: {}".format(error))
-            #print("Retry DB SELECT " + str(i))
             logger.error("DB error: %s", error)
             if (i == 3):
                 logger.error("DB error, ABORT")
@@ -61,8 +60,7 @@ def getSQLicao24(registration):
 
     return icao24
 
-
-#API https://www.airport-data.com
+#pridobitev URL slike letala iz airport-data.com API
 def getAircraftImage(registration):
     icao24 = getSQLicao24(registration)
 
@@ -72,10 +70,8 @@ def getAircraftImage(registration):
 
     try:
         URL = (f"https://www.airport-data.com/api/ac_thumb.json?m={icao24}&n=1")
-        #print(URL)
         r = requests.get(url=URL)
         data = r.json()
-        #print(data)
         aircraftimage = data["data"][0]["image"]
         aircraftimage = aircraftimage.replace('/thumbnails', '')
         logger.info("airport-data image API call successful")
@@ -85,14 +81,11 @@ def getAircraftImage(registration):
 
     if (aircraftimage == ""):
         try:
-            #try with registration with "-"
             N=1
             registration = registration[ : N] + "-" + registration[N : ]
             URL = (f"https://www.airport-data.com/api/ac_thumb.json?r={registration}&n=1")
-            #print(URL)
             r = requests.get(url=URL)
             data = r.json()
-            #print(data)
             aircraftimage = data["data"][0]["image"]
             aircraftimage = aircraftimage.replace('/thumbnails', '')
             logger.info("airport-data image API call successful")
@@ -101,14 +94,11 @@ def getAircraftImage(registration):
             logger.info("airport-data image API call unsuccessful, trying with '-' option 2")
         if (aircraftimage == ""):
             try:
-                # try with registration with "-"
                 N = 2
                 registration = registration[: N] + "-" + registration[N:]
                 URL = (f"https://www.airport-data.com/api/ac_thumb.json?r={registration}&n=1")
-                #print(URL)
                 r = requests.get(url=URL)
                 data = r.json()
-                #print(data)
                 aircraftimage = data["data"][0]["image"]
                 aircraftimage = aircraftimage.replace('/thumbnails', '')
             except:
@@ -118,7 +108,6 @@ def getAircraftImage(registration):
     return aircraftimage
 
 
-#user with select priviledges
 def readDBAccount():
     import os
     path = os.path.abspath(os.path.dirname(__file__))
@@ -132,4 +121,3 @@ def readDBAccount():
     password = lines[4]
     f.close()
     return host, port, database, user, password
-

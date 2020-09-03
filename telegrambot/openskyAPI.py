@@ -2,25 +2,21 @@ import requests
 from aircraftlocations import boundingBox
 import datetime
 import logging
+
 logger = logging.getLogger(__name__)
 
-#https://opensky-network.org/apidoc/rest.html
-
+#pridobitev aktualnih letal v območju
 def getAirplanesAboveMe(latitude, longtitude, range):
     lamin,lomin,lamax,lomax = boundingBox(latitude, longtitude, range)
 
     username, password = readOSAccount()
 
-
     states = []
 
     try:
         URL = (f"https://opensky-network.org/api/states/all?lamin={lamin}&lomin={lomin}&lamax={lamax}&lomax={lomax}")
-        #print(URL)
         r = requests.get(url=URL, auth=(username, password))
-        #print(r)
         data = r.json()
-        #print(data)
         logger.info("opensky API call successful: %s", data)
     except:
         states.clear()
@@ -29,8 +25,6 @@ def getAirplanesAboveMe(latitude, longtitude, range):
     try:
         states.clear()
         statesdata = data["states"]
-        #print(statesdata)
-        #print(statesdata[0])
         for statedata in statesdata:
             icao24 = statedata[0]
             callsign = statedata[1]
@@ -52,16 +46,13 @@ def getAirplanesAboveMe(latitude, longtitude, range):
 
             new_airplane_status = airplane_status(icao24,callsign,origin_country,time_position,last_contact,longitude,latitude,baro_altitude,on_ground,velocity,true_track,vertical_rate,sensors,geo_altitude,squawk,spi,position_source)
             states.append(new_airplane_status)
-            #print(new_airplane_status)
     except:
         states.clear()
         logger.error("opensky data not resolved")
-    #print("STATES:")
-    #print(states)
 
     return states
 
-
+#branje podatkov opensky računa
 def readOSAccount():
     import os
     path = os.path.abspath(os.path.dirname(__file__))
@@ -74,7 +65,7 @@ def readOSAccount():
     return username, password
 
 
-
+#razred lokacije letala
 class airplane_status:
     icao24 = ""
     callsign = ""

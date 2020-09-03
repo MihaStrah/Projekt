@@ -10,13 +10,15 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
 import time
 from openskyAPI import getAirplanesAboveMe
 
-# Enable logging
+#nastavimo beleženje
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO, filename="telegrambot_logs_out/telegrambotPythonScriptLog.log", filemode='a')
 logger = logging.getLogger(__name__)
 
+#možne veje
 START, FLIGHT, FLIGHTDATE, STATUSMORE, REQLOCATION, LOCATION = range(6)
 
+#definiramo delovanje Bota
 def start(update, context):
     reply_keyboard = [['OK']]
     update.message.reply_text(
@@ -24,14 +26,12 @@ def start(update, context):
 
     return START
 
-
 def flight(update, context):
     reply_keyboard = [['AC875', 'LH111', 'LH2368', 'TP6703', 'OU416']]
     update.message.reply_text(
         'Flight Number <i>(LH000)</i>:', parse_mode='HTML', reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return FLIGHT
-
 
 def flightdate(update, context):
     reply_keyboard = [[str(datetime.date.today() - datetime.timedelta(days=2)), str(datetime.date.today() - datetime.timedelta(days=1)), str(datetime.date.today()), str(datetime.date.today() + datetime.timedelta(days=1)), str(datetime.date.today() + datetime.timedelta(days=2))]]
@@ -42,14 +42,12 @@ def flightdate(update, context):
 
     return FLIGHTDATE
 
-
 def flightstatus(update, context):
     context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=ChatAction.TYPING)
     reply_keyboard = [['Departure', 'Arrival', 'Equipment', 'Done']]
     user = update.message.from_user
     logger.info("%s: $Date of$ %s", user.first_name, update.message.text)
     context.user_data['flightdate'] = update.message.text
-    #delete previous flight data
     context.user_data['aircraftmodel'] = ""
     context.user_data['marketingairlinename'] = ""
     context.user_data['depairportname'] = ""
@@ -67,7 +65,6 @@ def flightstatus(update, context):
         logger.info("%s: $Getting flight from DB$ $flight: %s, date: %s$", user.first_name, context.user_data["flight"],
                     context.user_data["flightdate"])
         flightstatus = getSQLFlightStatus(context.user_data["flight"], context.user_data["flightdate"])
-
 
     context.user_data['flightstatus'] = flightstatus
     if (flightstatus.depairport != ""):
@@ -93,7 +90,6 @@ def departure(update, context):
     user = update.message.from_user
     logger.info("%s: $Option: %s$", user.first_name, update.message.text)
     flightstatus = context.user_data['flightstatus']
-
 
     global timestatuscodes, timestatusdef
     if (flightstatus.deptimestatusdef in timestatuscodes):
@@ -141,8 +137,6 @@ def arrival(update, context):
 
     return STATUSMORE
 
-
-
 def equipment(update, context):
     context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=ChatAction.TYPING)
     reply_keyboard = [['Departure', 'Arrival', 'Done']]
@@ -166,9 +160,6 @@ def equipment(update, context):
         update.message.reply_photo(photo=(f"{context.user_data['aircraftimage']}"))
         logger.info("%s $Sending aircraft image on link %s$", user.first_name, context.user_data['aircraftimage'])
     return STATUSMORE
-
-
-
 
 
 def reqlocation(update, context):
@@ -200,16 +191,6 @@ def location(update, context):
     update.message.reply_text(txt,parse_mode='HTML')
     return REQLOCATION
 
-
-
-
-
-
-
-
-
-
-
 def cancel(update, context):
     user = update.message.from_user
     logger.info("%s: #User canceled the conversation.#", user.first_name)
@@ -218,17 +199,13 @@ def cancel(update, context):
 
     return ConversationHandler.END
 
-
 def error(update, context):
-    """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, context.error)
     print('Update "%s" caused error "%s"', update, context.error)
 
-
+#zagon in konfiguracija Bota
 def main():
-    
     logger.info("telegrambot started")
-    print("telegrambot started, logging in telegrambotPythonScriptLog.log")
     bot_token = readTGAccount()
     updater = Updater(bot_token, use_context=True)
 
@@ -274,6 +251,8 @@ def main():
 
     updater.idle()
 
+
+#branje Telegram računa
 def readTGAccount():
     import os
     path = os.path.abspath(os.path.dirname(__file__))
@@ -284,11 +263,12 @@ def readTGAccount():
     f.close()
     return bot_token
 
+#definicije statusov
 flightstatuscodes = ["CD","DP","LD","RT","NA"]
 flightstatusdef = ["Flight Cancelled","Flight Departed","Flight Landed","Flight Rerouted","No status"]
 timestatuscodes = ["FE","NI","OT","DL","NO"]
 timestatusdef = ["Flight Early","Next Information","Flight On Time","Flight Delayed","No status"]
 
-
+#zagon programa
 if __name__ == '__main__':
     main()

@@ -1,16 +1,11 @@
 import math
 import logging
+
 logger = logging.getLogger(__name__)
 
-#https://wiki.openstreetmap.org/wiki/API_v0.6
-#https://www.epochconverter.com
-#https://www.epochconverter.com
-#https://jsoneditoronline.org/#left=local.pojiho&right=local.hiraco
-#https://pypi.org/project/LatLon/
+#izračun okvirja lokacije
+#VIR: https://stackoverflow.com/questions/238260/how-to-calculate-the-bounding-box-for-a-given-lat-lng-location
 
-
-
-#$$$ FROM https://stackoverflow.com/questions/238260/how-to-calculate-the-bounding-box-for-a-given-lat-lng-location
 # degrees to radians
 def deg2rad(degrees):
     return math.pi*degrees/180.0
@@ -50,4 +45,3 @@ def boundingBox(latitudeInDegrees, longitudeInDegrees, halfSideInKm):
     lonMax = lon + halfSide/pradius
 
     return (rad2deg(latMin), rad2deg(lonMin), rad2deg(latMax), rad2deg(lonMax))
-#$$$ FROM https://stackoverflow.com/questions/238260/how-to-calculate-the-bounding-box-for-a-given-lat-lng-location

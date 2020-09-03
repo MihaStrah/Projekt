@@ -9,9 +9,8 @@ from flask_restful import Resource, Api, abort
 import logging
 logger = logging.getLogger(__name__)
 
-
+#pridobitev trenutne lokacije letala iz opensky-network.org API
 def getAircraftLocation(aircraftreg):
-
     try:
         aircraftregstring = re.search("[a-zA-Z0-9]{5,6}", aircraftreg).group().upper()
     except:
@@ -38,7 +37,6 @@ def getAircraftLocation(aircraftreg):
         logger.info("opensky API call unsuccessful")
         return abort(500, message="API Error")
 
-
     try:
         state = data["states"][0]
         longitude = state[5]
@@ -52,7 +50,7 @@ def getAircraftLocation(aircraftreg):
         logger.info("opensky data not resolved, aircraft not found")
         return abort(404, message="Aircraft Not Found")
 
-
+#razred trenutne lokacije letala
 class location:
     longitude = ""
     latitude = ""
@@ -69,10 +67,8 @@ class location:
 
     def toJson(self):
         return self.__dict__
-        #return json.dumps(self, default=lambda o: o.__dict__)
 
-
-
+#branje podatkov opensky računa
 def readOSAccount():
     import os
     path = os.path.abspath(os.path.dirname(__file__))
@@ -83,4 +79,3 @@ def readOSAccount():
     password = lines[1]
     f.close()
     return username, password
-
