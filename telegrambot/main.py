@@ -1,7 +1,7 @@
 import logging
 import datetime
 import re
-from opensky import getAircraftImage
+from aircraft import getAircraftImage
 from getflight import getFlightStatus, getAircraftModel, getAirlineName, getAirportName
 from sqldata import getSQLFlightStatus
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, Message, ChatAction, KeyboardButton)
@@ -15,7 +15,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO, filename="telegrambot_logs_out/telegrambotPythonScriptLog.log", filemode='a')
 logger = logging.getLogger(__name__)
 
-#možne veje
+#stanja
 START, FLIGHT, FLIGHTDATE, STATUSMORE, REQLOCATION, LOCATION = range(6)
 
 #definiramo delovanje Bota
