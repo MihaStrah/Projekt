@@ -1,0 +1,1371 @@
+{
+  "openapi" : "3.0.0",
+  "servers" : [ {
+    "description" : "LH FlightTracker API",
+    "url" : "https://letinfo.duckdns.org"
+  } ],
+  "info" : {
+    "description" : "API For LH FLightTracker App",
+    "version" : "1.0.0",
+    "title" : "LH FLightTracker API",
+    "contact" : {
+      "email" : "miha.strah@student.um.si"
+    }
+  },
+  "components" : {
+    "securitySchemes" : {
+      "BasicAuth" : {
+        "type" : "http",
+        "scheme" : "basic"
+      },
+      "JWT" : {
+        "type" : "apiKey",
+        "in" : "header",
+        "name" : "X-Access-Tokens"
+      }
+    },
+    "schemas" : {
+      "Token" : {
+        "description" : "JWT Token",
+        "properties" : {
+          "expires" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "token" : {
+            "type" : "string",
+            "format" : "byte"
+          }
+        }
+      },
+      "FlightStatus" : {
+        "description" : "Flight Status",
+        "type" : "object",
+        "properties" : {
+          "depairport" : {
+            "type" : "string",
+            "description" : "Departure airport code",
+            "example" : "AMS"
+          },
+          "depscheduled" : {
+            "type" : "string",
+            "description" : "Local scheduled departure time",
+            "example" : "2020-08-01T18:30"
+          },
+          "depscheduledUTC" : {
+            "type" : "string",
+            "description" : "UTC scheduled departure time",
+            "example" : "2020-08-01T16:30Z"
+          },
+          "depactual" : {
+            "type" : "string",
+            "description" : "Local actual departure time",
+            "example" : "2020-08-01T18:21"
+          },
+          "depactualUTC" : {
+            "type" : "string",
+            "description" : "UTC actual departure time",
+            "example" : "2020-08-01T16:21Z"
+          },
+          "depterminal" : {
+            "type" : "string",
+            "description" : "Departure terminal",
+            "example" : ""
+          },
+          "depgate" : {
+            "type" : "string",
+            "description" : "Departure gate",
+            "example" : "B15"
+          },
+          "deptimestatus" : {
+            "type" : "string",
+            "description" : "Departure time status code",
+            "enum" : [ "FE", "OT", "DL", false ],
+            "example" : "FE"
+          },
+          "arrairport" : {
+            "type" : "string",
+            "description" : "Arrival airport code",
+            "example" : "FRA"
+          },
+          "arrscheduled" : {
+            "type" : "string",
+            "description" : "Local scheduled arrival time",
+            "example" : "2020-08-01T19:35"
+          },
+          "arrscheduledUTC" : {
+            "type" : "string",
+            "description" : "UTC scheduled arrival time",
+            "example" : "2020-08-01T17:35Z"
+          },
+          "arractual" : {
+            "type" : "string",
+            "description" : "Local actual arrival time",
+            "example" : "2020-08-01T19:21"
+          },
+          "arractualUTC" : {
+            "type" : "string",
+            "description" : "UTC actual arrival time",
+            "example" : "2020-08-01T17:21Z"
+          },
+          "arrterminal" : {
+            "type" : "string",
+            "description" : "Arrival terminal",
+            "example" : "1"
+          },
+          "arrgate" : {
+            "type" : "string",
+            "description" : "Arrival gate",
+            "example" : "ASW"
+          },
+          "arrtimestatus" : {
+            "type" : "string",
+            "description" : "Arrival time status code",
+            "enum" : [ "FE", "OT", "DL", false ],
+            "example" : "FE"
+          },
+          "aircraftcode" : {
+            "type" : "string",
+            "description" : "Aircraft code",
+            "example" : "32N"
+          },
+          "aircraftreg" : {
+            "type" : "string",
+            "description" : "Aircraft registration",
+            "example" : "DAINM"
+          },
+          "airlineid" : {
+            "type" : "string",
+            "description" : "Operating airline ID",
+            "example" : "LH"
+          },
+          "flightnumber" : {
+            "type" : "string",
+            "description" : "Operating flight number",
+            "example" : "997"
+          },
+          "flightstatus" : {
+            "type" : "string",
+            "description" : "Flight status code",
+            "enum" : [ "CD", "DP", "LD", "RT", "NA" ],
+            "example" : "LD"
+          }
+        }
+      },
+      "Flight" : {
+        "description" : "Flight",
+        "type" : "object",
+        "properties" : {
+          "airlineid" : {
+            "type" : "object",
+            "description" : "Airline ID",
+            "example" : "LH"
+          },
+          "flightumber" : {
+            "type" : "object",
+            "description" : "Flight Number",
+            "example" : "997"
+          }
+        }
+      },
+      "Codeshares" : {
+        "description" : "Flight Codeshares",
+        "type" : "object",
+        "properties" : {
+          "operating" : {
+            "$ref" : "#/components/schemas/Flight"
+          },
+          "codeshares" : {
+            "type" : "array",
+            "description" : "Array of codeshare Flights",
+            "items" : {
+              "$ref" : "#/components/schemas/Flight"
+            },
+            "example" : [ {
+              "airlineid" : "AI",
+              "flightnumber" : "8538"
+            } ]
+          }
+        }
+      },
+      "FlightStat" : {
+        "description" : "Flight Statistics",
+        "type" : "object",
+        "properties" : {
+          "allflights" : {
+            "type" : "integer",
+            "description" : "Number of all flights",
+            "example" : 7
+          },
+          "cancelled" : {
+            "type" : "integer",
+            "description" : "Number of cancelled flights",
+            "example" : 0
+          },
+          "dep_OT" : {
+            "type" : "integer",
+            "description" : "Number of flights that departed on time",
+            "example" : 1
+          },
+          "dep_FE" : {
+            "type" : "integer",
+            "description" : "Number of flights that departed on early",
+            "example" : 4
+          },
+          "dep_DL" : {
+            "type" : "integer",
+            "description" : "Number of flights that departed delayed",
+            "example" : 2
+          },
+          "averageTimeDep" : {
+            "type" : "integer",
+            "nullable" : true,
+            "description" : "Avarage departure time",
+            "example" : 5
+          },
+          "averageTimeDep_OT" : {
+            "type" : "integer",
+            "nullable" : true,
+            "description" : "Avarage departure time (when flight on time)",
+            "example" : 4
+          },
+          "averageTimeDep_FE" : {
+            "type" : "integer",
+            "nullable" : true,
+            "description" : "Avarage departure time (when flight early)",
+            "example" : -5
+          },
+          "averageTimeDep_DL" : {
+            "type" : "integer",
+            "nullable" : true,
+            "description" : "Avarage departure time (when flight delayed)",
+            "example" : 26
+          },
+          "arr_OT" : {
+            "type" : "integer",
+            "description" : "Number of flights that arrived on time",
+            "example" : 0
+          },
+          "arr_FE" : {
+            "type" : "integer",
+            "description" : "Number of flights that arrived early",
+            "example" : 5
+          },
+          "arr_DL" : {
+            "type" : "integer",
+            "description" : "Number of flights that arrived with delay",
+            "example" : 2
+          },
+          "averageTimeArr" : {
+            "type" : "integer",
+            "nullable" : true,
+            "description" : "Avarage arrival time",
+            "example" : -4
+          },
+          "averageTimeArr_OT" : {
+            "type" : "integer",
+            "nullable" : true,
+            "description" : "Avarage arrival time (when flight on time)",
+            "example" : null
+          },
+          "averageTimeArr_FE" : {
+            "type" : "integer",
+            "nullable" : true,
+            "description" : "Avarage arrival time (when flight early)",
+            "example" : -12
+          },
+          "averageTimeArr_DL" : {
+            "type" : "integer",
+            "nullable" : true,
+            "description" : "Avarage arrival time (when flight delayed)",
+            "example" : 15
+          }
+        }
+      },
+      "FlightStatDay" : {
+        "description" : "Flight Status for day",
+        "type" : "object",
+        "properties" : {
+          "depscheduled" : {
+            "type" : "object",
+            "description" : "Local scheduled departure time",
+            "example" : "LH"
+          },
+          "deptimestatus" : {
+            "type" : "string",
+            "description" : "Departure time status",
+            "enum" : [ "FE", "OT", "DL", false ],
+            "example" : "FE"
+          },
+          "arrtimestatus" : {
+            "type" : "string",
+            "description" : "Arrival time status",
+            "enum" : [ "FE", "OT", "DL", false ],
+            "example" : "OT"
+          },
+          "flightstatus" : {
+            "type" : "string",
+            "description" : "Flight Status",
+            "enum" : [ "CD", "DP", "LD", "RT", "NA" ],
+            "example" : "LD"
+          }
+        }
+      },
+      "FlightStatDays" : {
+        "description" : "Flight Status for multiple days",
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/FlightStatDay"
+        },
+        "example" : [ {
+          "depscheduled" : "2020-08-01T18:30",
+          "deptimestatus" : "DL",
+          "arrtimestatus" : "OT",
+          "flightstatus" : "LD"
+        } ]
+      },
+      "LiveFlightStatus" : {
+        "description" : "Flight Status",
+        "type" : "object",
+        "properties" : {
+          "depairport" : {
+            "type" : "string",
+            "description" : "Departure airport code",
+            "example" : "AMS"
+          },
+          "depscheduled" : {
+            "type" : "string",
+            "description" : "Local scheduled departure time",
+            "example" : "2020-08-01T18:30"
+          },
+          "depscheduledUTC" : {
+            "type" : "string",
+            "description" : "UTC scheduled departure time",
+            "example" : "2020-08-01T16:30Z"
+          },
+          "depestimated" : {
+            "type" : "string",
+            "description" : "Local estimated departure time",
+            "example" : "2020-08-01T16:30"
+          },
+          "depestimatedUTC" : {
+            "type" : "string",
+            "description" : "UTC estimated departure time",
+            "example" : "2020-08-01T16:30Z"
+          },
+          "depactual" : {
+            "type" : "string",
+            "description" : "Local actual departure time",
+            "example" : "2020-08-01T18:21"
+          },
+          "depactualUTC" : {
+            "type" : "string",
+            "description" : "UTC actual departure time",
+            "example" : "2020-08-01T16:21Z"
+          },
+          "depterminal" : {
+            "type" : "string",
+            "description" : "Departure terminal",
+            "example" : ""
+          },
+          "depgate" : {
+            "type" : "string",
+            "description" : "Departure gate",
+            "example" : "B15"
+          },
+          "deptimestatus" : {
+            "type" : "string",
+            "description" : "Departure time status code",
+            "enum" : [ "FE", "OT", "DL", false ],
+            "example" : "FE"
+          },
+          "arrairport" : {
+            "type" : "string",
+            "description" : "Arrival airport code",
+            "example" : "FRA"
+          },
+          "arrscheduled" : {
+            "type" : "string",
+            "description" : "Local scheduled arrival time",
+            "example" : "2020-08-01T19:35"
+          },
+          "arrscheduledUTC" : {
+            "type" : "string",
+            "description" : "UTC scheduled arrival time",
+            "example" : "2020-08-01T17:35Z"
+          },
+          "arrestimated" : {
+            "type" : "string",
+            "description" : "Local estimated arrival time",
+            "example" : "2020-08-01T19:35"
+          },
+          "arrestimatedUTC" : {
+            "type" : "string",
+            "description" : "UTC estimated arrival time",
+            "example" : "2020-08-01T17:35Z"
+          },
+          "arractual" : {
+            "type" : "string",
+            "description" : "Local actual arrival time",
+            "example" : "2020-08-01T19:21"
+          },
+          "arractualUTC" : {
+            "type" : "string",
+            "description" : "UTC actual arrival time",
+            "example" : "2020-08-01T17:21Z"
+          },
+          "arrterminal" : {
+            "type" : "string",
+            "description" : "Arrival terminal",
+            "example" : "1"
+          },
+          "arrgate" : {
+            "type" : "string",
+            "description" : "Arrival gate",
+            "example" : "ASW"
+          },
+          "arrtimestatus" : {
+            "type" : "string",
+            "description" : "Arrival time status code",
+            "enum" : [ "FE", "OT", "DL", false ],
+            "example" : "FE"
+          },
+          "aircraftcode" : {
+            "type" : "string",
+            "description" : "Aircraft code",
+            "example" : "32N"
+          },
+          "aircraftreg" : {
+            "type" : "string",
+            "description" : "Aircraft registration",
+            "example" : "DAINM"
+          },
+          "airlineid" : {
+            "type" : "string",
+            "description" : "Operating airline ID",
+            "example" : "LH"
+          },
+          "flightnumber" : {
+            "type" : "string",
+            "description" : "Operating flight number",
+            "example" : "997"
+          },
+          "flightstatus" : {
+            "type" : "string",
+            "description" : "Flight status code",
+            "enum" : [ "CD", "DP", "LD", "RT", "NA" ],
+            "example" : "LD"
+          }
+        }
+      },
+      "AircraftImage" : {
+        "description" : "Aircraft Image URL and photographer",
+        "type" : "object",
+        "properties" : {
+          "aircraftimage" : {
+            "type" : "string",
+            "format" : "uri",
+            "description" : "URL of aircraft image",
+            "example" : "https://cdn.airport-data.com/images/aircraft/001/549/001549082.jpg"
+          },
+          "photographer" : {
+            "type" : "string",
+            "description" : "Photographer",
+            "example" : "Bradley Bygrave"
+          }
+        }
+      },
+      "AircraftName" : {
+        "description" : "Aircraft name",
+        "type" : "object",
+        "properties" : {
+          "aircraftName" : {
+            "type" : "string",
+            "description" : "Aircraft name",
+            "example" : "Airbus A320neo"
+          }
+        }
+      },
+      "AircraftLocation" : {
+        "description" : "Aircraft Location",
+        "type" : "object",
+        "properties" : {
+          "longitude" : {
+            "type" : "number",
+            "format" : "double",
+            "description" : "Location longitude",
+            "example" : "8.5646"
+          },
+          "latitude" : {
+            "type" : "number",
+            "format" : "double",
+            "description" : "Location latitude",
+            "example" : "50.0361"
+          },
+          "baro_altitude" : {
+            "type" : "number",
+            "format" : "double",
+            "description" : "Location barometric altitude",
+            "example" : "160.02"
+          },
+          "velocity" : {
+            "type" : "number",
+            "format" : "double",
+            "description" : "Location velocity",
+            "example" : "62.68"
+          },
+          "true_track" : {
+            "type" : "number",
+            "format" : "double",
+            "description" : "Location track",
+            "example" : "69.33"
+          }
+        }
+      },
+      "AirlineName" : {
+        "description" : "Airline name",
+        "type" : "object",
+        "properties" : {
+          "airlineName" : {
+            "type" : "string",
+            "description" : "Airline name",
+            "example" : "Lufthansa"
+          }
+        }
+      },
+      "AirportName" : {
+        "description" : "Airport name and location",
+        "type" : "object",
+        "properties" : {
+          "airportName" : {
+            "type" : "string",
+            "description" : "Airport name",
+            "example" : "Frankfurt"
+          },
+          "longitude" : {
+            "type" : "number",
+            "format" : "double",
+            "description" : "Location longitude",
+            "example" : "8.5646"
+          },
+          "latitude" : {
+            "type" : "number",
+            "format" : "double",
+            "description" : "Location latitude",
+            "example" : "50.0361"
+          }
+        }
+      }
+    }
+  },
+  "paths" : {
+    "/login" : {
+      "post" : {
+        "security" : [ {
+          "BasicAuth" : [ ]
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "JSON response with token and expiration date",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          }
+        }
+      }
+    },
+    "/flight/{date}/{flight}" : {
+      "get" : {
+        "summary" : "Returns flight status for flights older than 3 days.",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "description" : "Date of flight",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "examples" : {
+            "date" : {
+              "value" : "2020-08-01"
+            }
+          }
+        }, {
+          "name" : "flight",
+          "in" : "path",
+          "description" : "Airline and flight number",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "[A-z]{1,2}[0-9]{1,4}"
+          },
+          "examples" : {
+            "LH flight 997" : {
+              "value" : "LH997"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FlightStatus"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Flight Not Found"
+          },
+          "500" : {
+            "description" : "Database Error"
+          }
+        }
+      }
+    },
+    "/codeshares/{date}/{flight}" : {
+      "get" : {
+        "summary" : "Returns flight codeshares for flights older than 3 days.",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "description" : "Date of flight",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "examples" : {
+            "date" : {
+              "value" : "2020-08-01"
+            }
+          }
+        }, {
+          "name" : "flight",
+          "in" : "path",
+          "description" : "Airline and flight number",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "[A-z]{1,2}[0-9]{1,4}"
+          },
+          "examples" : {
+            "LH flight 997" : {
+              "value" : "LH997"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Codeshares"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Flight Not Found"
+          },
+          "500" : {
+            "description" : "Database Error"
+          }
+        }
+      }
+    },
+    "/stat7/{flight}" : {
+      "get" : {
+        "summary" : "Returns flight statistics for past 7 days.",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "parameters" : [ {
+          "name" : "flight",
+          "in" : "path",
+          "description" : "Airline and flight number",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "[A-z]{1,2}[0-9]{1,4}"
+          },
+          "examples" : {
+            "LH flight 997" : {
+              "value" : "LH997"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FlightStat"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Flight Not Found"
+          },
+          "500" : {
+            "description" : "Database Error"
+          }
+        }
+      }
+    },
+    "/stat30/{flight}" : {
+      "get" : {
+        "summary" : "Returns flight statistics for past 30 days.",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "parameters" : [ {
+          "name" : "flight",
+          "in" : "path",
+          "description" : "Airline and flight number",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "[A-z]{1,2}[0-9]{1,4}"
+          },
+          "examples" : {
+            "LH flight 997" : {
+              "value" : "LH997"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FlightStat"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Flight Not Found"
+          },
+          "500" : {
+            "description" : "Database Error"
+          }
+        }
+      }
+    },
+    "/statday/{flight}" : {
+      "get" : {
+        "summary" : "Returns daily flight status for past 90 days.",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "parameters" : [ {
+          "name" : "flight",
+          "in" : "path",
+          "description" : "Airline and flight number",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "[A-z]{1,2}[0-9]{1,4}"
+          },
+          "examples" : {
+            "LH flight 997" : {
+              "value" : "LH997"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FlightStatDays"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Flight Not Found"
+          },
+          "500" : {
+            "description" : "Database Error"
+          }
+        }
+      }
+    },
+    "/live/flight/{date}/{flight}" : {
+      "get" : {
+        "summary" : "Returns live flight status for flights younger than 3 days and not older than 7 days.",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "description" : "Date of flight",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "examples" : {
+            "date" : {
+              "value" : "2020-08-01"
+            }
+          }
+        }, {
+          "name" : "flight",
+          "in" : "path",
+          "description" : "Airline and flight number",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "[A-z]{1,2}[0-9]{1,4}"
+          },
+          "examples" : {
+            "LH flight 997" : {
+              "value" : "LH997"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LiveFlightStatus"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Flight Not Found"
+          },
+          "500" : {
+            "description" : "API Error"
+          }
+        }
+      }
+    },
+    "/live/codeshares/{date}/{flight}" : {
+      "get" : {
+        "summary" : "Returns live flight codeshares for flights younger than 3 days and not older than 7 days.",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "description" : "Date of flight",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "examples" : {
+            "date" : {
+              "value" : "2020-08-01"
+            }
+          }
+        }, {
+          "name" : "flight",
+          "in" : "path",
+          "description" : "Airline and flight number",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "[A-z]{1,2}[0-9]{1,4}"
+          },
+          "examples" : {
+            "LH flight 997" : {
+              "value" : "LH997"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Codeshares"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Flight Not Found"
+          },
+          "500" : {
+            "description" : "API Error"
+          }
+        }
+      }
+    },
+    "/aircraftimage/{aircraftreg}" : {
+      "get" : {
+        "summary" : "Returns aircraft image URL.",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "parameters" : [ {
+          "name" : "aircraftreg",
+          "in" : "path",
+          "description" : "Aircraft registration",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "[a-zA-Z0-9]{5,6}"
+          },
+          "examples" : {
+            "Aircraft registration DAILL" : {
+              "value" : "DAILL"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AircraftImage"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Image URL Not Found"
+          },
+          "500" : {
+            "description" : "API Error"
+          }
+        }
+      }
+    },
+    "/aircraftlocation/{aircraftreg}" : {
+      "get" : {
+        "summary" : "Returns aircraft current location.",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "parameters" : [ {
+          "name" : "aircraftreg",
+          "in" : "path",
+          "description" : "Aircraft registration",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "[a-zA-Z0-9]{5,6}"
+          },
+          "examples" : {
+            "Aircraft registration DAILL" : {
+              "value" : "DAILL"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AircraftLocation"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Aircraft Not Found"
+          },
+          "500" : {
+            "description" : "API Error"
+          }
+        }
+      }
+    },
+    "/info/aircraftname/{aircraftmodelcode}" : {
+      "get" : {
+        "summary" : "Returns aircraft name.",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "parameters" : [ {
+          "name" : "aircraftmodelcode",
+          "in" : "path",
+          "description" : "Aircraft model code",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "[A-z0-9]{1,10}"
+          },
+          "examples" : {
+            "Aircraft model Airbus A320neo" : {
+              "value" : "32N"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AircraftName"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Aircraft Not Found"
+          },
+          "500" : {
+            "description" : "API Error"
+          }
+        }
+      }
+    },
+    "/info/airlinename/{airlinecode}" : {
+      "get" : {
+        "summary" : "Returns airline name.",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "parameters" : [ {
+          "name" : "airlinecode",
+          "in" : "path",
+          "description" : "Airline code",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "[A-z]{1,5}"
+          },
+          "examples" : {
+            "Airline Lufthansa" : {
+              "value" : "LH"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AirlineName"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Airport Not Found"
+          },
+          "500" : {
+            "description" : "API Error"
+          }
+        }
+      }
+    },
+    "/info/airportname/{airportcode}" : {
+      "get" : {
+        "summary" : "Returns airport name.",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "parameters" : [ {
+          "name" : "airportcode",
+          "in" : "path",
+          "description" : "Airport code",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "[A-z]{1,5}"
+          },
+          "examples" : {
+            "Airport Frankfurt" : {
+              "value" : "FRA"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AirportName"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Airline Not Found"
+          },
+          "500" : {
+            "description" : "API Error"
+          }
+        }
+      }
+    },
+    "/notifications/register" : {
+      "post" : {
+        "summary" : "Register for flight notifications (APNS).",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/x-www-form-urlencoded" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "token" : {
+                    "type" : "string",
+                    "description" : "APNS token",
+                    "example" : "0123456789012345678901234567890123456789012345678901234567890123"
+                  },
+                  "airline" : {
+                    "type" : "string",
+                    "description" : "Airline code",
+                    "example" : "LH"
+                  },
+                  "flightnumber" : {
+                    "type" : "string",
+                    "description" : "Flight number",
+                    "example" : "997"
+                  },
+                  "date" : {
+                    "type" : "string",
+                    "description" : "Flight date",
+                    "example" : "2020-08-01"
+                  }
+                },
+                "required" : [ "token", "airline", "flightnumber", "date" ]
+              },
+              "examples" : {
+                "Register one flight" : {
+                  "value" : {
+                    "token" : "0123456789012345678901234567890123456789012345678901234567890123",
+                    "airline" : "LH",
+                    "flightnumber" : "997",
+                    "date" : "2020-08-01"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "info" : {
+                      "type" : "string",
+                      "description" : "OK",
+                      "example" : "OK"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "API Error"
+          }
+        }
+      }
+    },
+    "/notifications/unregister" : {
+      "post" : {
+        "summary" : "Unregister for flight notifications (APNS).",
+        "security" : [ {
+          "JWT" : [ ]
+        } ],
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/x-www-form-urlencoded" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "token" : {
+                    "type" : "string",
+                    "description" : "APNS token",
+                    "example" : "0123456789012345678901234567890123456789012345678901234567890123"
+                  },
+                  "airline" : {
+                    "type" : "string",
+                    "description" : "Airline code",
+                    "example" : "LH"
+                  },
+                  "flightnumber" : {
+                    "type" : "string",
+                    "description" : "Flight number",
+                    "example" : "997"
+                  },
+                  "date" : {
+                    "type" : "string",
+                    "description" : "Flight date",
+                    "example" : "2020-08-01"
+                  }
+                },
+                "required" : [ "token", "airline", "flightnumber", "date" ]
+              },
+              "examples" : {
+                "Unregister one flight" : {
+                  "value" : {
+                    "token" : "0123456789012345678901234567890123456789012345678901234567890123",
+                    "airline" : "LH",
+                    "flightnumber" : "997",
+                    "date" : "2020-08-01"
+                  }
+                },
+                "Unregister all flights for token" : {
+                  "value" : {
+                    "token" : "0123456789012345678901234567890123456789012345678901234567890123",
+                    "airline" : "ALL",
+                    "flightnumber" : "000",
+                    "date" : "2020-08-01"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "JSON response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "info" : {
+                      "type" : "string",
+                      "description" : "OK",
+                      "example" : "OK"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "API Error"
+          }
+        }
+      }
+    }
+  }
+}
