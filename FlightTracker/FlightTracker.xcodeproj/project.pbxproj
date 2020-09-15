@@ -1,0 +1,737 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1102879B24FE9898000C26C4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11B697D024B8A572009A6856 /* Assets.xcassets */; };
+		111C977C24DC202C0040A550 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111C977B24DC202C0040A550 /* MapView.swift */; };
+		111C978624DC5CA90040A550 /* AirportMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111C978524DC5CA90040A550 /* AirportMapView.swift */; };
+		1184DFA424F9664D00C8060D /* AircraftMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1184DFA324F9664D00C8060D /* AircraftMapView.swift */; };
+		1184DFA824F96CCB00C8060D /* MapViewAircraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1184DFA724F96CCB00C8060D /* MapViewAircraft.swift */; };
+		11863EAC24CAFE3F0096A268 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11863EAB24CAFE3F0096A268 /* MainView.swift */; };
+		11863EAE24CB31250096A268 /* ExistingFlightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11863EAD24CB31250096A268 /* ExistingFlightView.swift */; };
+		118D359A24C87F9D00828ECD /* StatisticsCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D359924C87F9D00828ECD /* StatisticsCalendarView.swift */; };
+		118D35A424C882C000828ECD /* RKViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D359D24C8828D00828ECD /* RKViewController.swift */; };
+		118D35A524C882C000828ECD /* RKManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D359E24C8828D00828ECD /* RKManager.swift */; };
+		118D35A624C882C000828ECD /* RKWeekdayHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D359F24C8828D00828ECD /* RKWeekdayHeader.swift */; };
+		118D35A724C882C000828ECD /* RKMonth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D35A024C8828D00828ECD /* RKMonth.swift */; };
+		118D35A824C882C000828ECD /* RKCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D35A124C8828D00828ECD /* RKCell.swift */; };
+		118D35A924C882C000828ECD /* RKColorSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D35A224C8828D00828ECD /* RKColorSettings.swift */; };
+		118D35AA24C882C000828ECD /* RKDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D35A324C8828D00828ECD /* RKDate.swift */; };
+		118D35B724C98E0E00828ECD /* StatisticsPillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D35B624C98E0E00828ECD /* StatisticsPillView.swift */; };
+		1191391024E5C65100A606FB /* FlightSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1191390F24E5C65100A606FB /* FlightSearchView.swift */; };
+		11B127A724E288AB0094BF7F /* MapLineOverlayRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B127A424E288AB0094BF7F /* MapLineOverlayRenderer.swift */; };
+		11B127A824E288AB0094BF7F /* ControlPointUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B127A524E288AB0094BF7F /* ControlPointUtilities.swift */; };
+		11B127A924E288AB0094BF7F /* LineOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B127A624E288AB0094BF7F /* LineOverlay.swift */; };
+		11B5665224EE627300383C90 /* LetApiConf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5665124EE627300383C90 /* LetApiConf.swift */; };
+		11B697CB24B8A56F009A6856 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B697CA24B8A56F009A6856 /* AppDelegate.swift */; };
+		11B697CD24B8A56F009A6856 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B697CC24B8A56F009A6856 /* SceneDelegate.swift */; };
+		11B697CF24B8A56F009A6856 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B697CE24B8A56F009A6856 /* ContentView.swift */; };
+		11B697D124B8A572009A6856 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11B697D024B8A572009A6856 /* Assets.xcassets */; };
+		11B697D424B8A572009A6856 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11B697D324B8A572009A6856 /* Preview Assets.xcassets */; };
+		11B697E724B8E835009A6856 /* LetApiToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B697E624B8E835009A6856 /* LetApiToken.swift */; };
+		11BDD88624E6A0C8003DBFAE /* FlightCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BDD88524E6A0C8003DBFAE /* FlightCard.swift */; };
+		11CA80F324C0622500B52613 /* ExistingFlightInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CA80F224C0622500B52613 /* ExistingFlightInfoView.swift */; };
+		11CBC40B24FE79E1006393F9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11CBC40A24FE79E1006393F9 /* LaunchScreen.storyboard */; };
+		11CBC42B24FE831B006393F9 /* FlightTrackerAppClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CBC42A24FE831B006393F9 /* FlightTrackerAppClipApp.swift */; };
+		11CBC42D24FE831B006393F9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CBC42C24FE831B006393F9 /* ContentView.swift */; };
+		11CBC43224FE831D006393F9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11CBC43124FE831D006393F9 /* Preview Assets.xcassets */; };
+		11CBC43724FE831D006393F9 /* FlightTrackerAppClip.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 11CBC42824FE831B006393F9 /* FlightTrackerAppClip.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		11CBC43C24FE84A2006393F9 /* RKWeekdayHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D359F24C8828D00828ECD /* RKWeekdayHeader.swift */; };
+		11CBC43D24FE84A2006393F9 /* RKCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D35A124C8828D00828ECD /* RKCell.swift */; };
+		11CBC43E24FE84A2006393F9 /* RKViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D359D24C8828D00828ECD /* RKViewController.swift */; };
+		11CBC43F24FE84A2006393F9 /* RKManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D359E24C8828D00828ECD /* RKManager.swift */; };
+		11CBC44024FE84A2006393F9 /* RKMonth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D35A024C8828D00828ECD /* RKMonth.swift */; };
+		11CBC44124FE84A2006393F9 /* RKColorSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D35A224C8828D00828ECD /* RKColorSettings.swift */; };
+		11CBC44224FE84A2006393F9 /* RKDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D35A324C8828D00828ECD /* RKDate.swift */; };
+		11CBC44324FE84A5006393F9 /* LineOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B127A624E288AB0094BF7F /* LineOverlay.swift */; };
+		11CBC44424FE84A5006393F9 /* MapLineOverlayRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B127A424E288AB0094BF7F /* MapLineOverlayRenderer.swift */; };
+		11CBC44524FE84A5006393F9 /* ControlPointUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B127A524E288AB0094BF7F /* ControlPointUtilities.swift */; };
+		11CBC44624FE84D8006393F9 /* DAKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F77D4724BCA11A009920FC /* DAKeychain.swift */; };
+		11CBC44724FE84D8006393F9 /* LetApiConf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B5665124EE627300383C90 /* LetApiConf.swift */; };
+		11CBC44824FE84D8006393F9 /* AsyncImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F77D4D24BF16C6009920FC /* AsyncImageLoader.swift */; };
+		11CBC44924FE84D8006393F9 /* AircraftImageOnlyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E2107D24C6DDBE00331E27 /* AircraftImageOnlyView.swift */; };
+		11CBC44A24FE84D8006393F9 /* LetApiToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B697E624B8E835009A6856 /* LetApiToken.swift */; };
+		11CBC44B24FE84D8006393F9 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E2107F24C7338400331E27 /* StatisticsView.swift */; };
+		11CBC44C24FE84D8006393F9 /* FlightSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1191390F24E5C65100A606FB /* FlightSearchView.swift */; };
+		11CBC44D24FE84D8006393F9 /* ExistingFlightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11863EAD24CB31250096A268 /* ExistingFlightView.swift */; };
+		11CBC44E24FE84D8006393F9 /* AircraftMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1184DFA324F9664D00C8060D /* AircraftMapView.swift */; };
+		11CBC44F24FE84D8006393F9 /* AirportMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111C978524DC5CA90040A550 /* AirportMapView.swift */; };
+		11CBC45024FE84D8006393F9 /* MapViewAircraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1184DFA724F96CCB00C8060D /* MapViewAircraft.swift */; };
+		11CBC45124FE84D8006393F9 /* ExistingFlightInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CA80F224C0622500B52613 /* ExistingFlightInfoView.swift */; };
+		11CBC45224FE84D8006393F9 /* StatisticsCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D359924C87F9D00828ECD /* StatisticsCalendarView.swift */; };
+		11CBC45324FE84D8006393F9 /* StatisticsPillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118D35B624C98E0E00828ECD /* StatisticsPillView.swift */; };
+		11CBC45424FE84D8006393F9 /* FlightStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F77D4524BC94C6009920FC /* FlightStatus.swift */; };
+		11CBC45524FE84D8006393F9 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111C977B24DC202C0040A550 /* MapView.swift */; };
+		11CBC45624FE8586006393F9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11CBC40A24FE79E1006393F9 /* LaunchScreen.storyboard */; };
+		11E2107E24C6DDBE00331E27 /* AircraftImageOnlyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E2107D24C6DDBE00331E27 /* AircraftImageOnlyView.swift */; };
+		11E2108024C7338400331E27 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E2107F24C7338400331E27 /* StatisticsView.swift */; };
+		11F77D4424BC58AD009920FC /* AdditionalLibraries in Resources */ = {isa = PBXBuildFile; fileRef = 11F77D4324BC58AD009920FC /* AdditionalLibraries */; };
+		11F77D4624BC94C6009920FC /* FlightStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F77D4524BC94C6009920FC /* FlightStatus.swift */; };
+		11F77D4824BCA11A009920FC /* DAKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F77D4724BCA11A009920FC /* DAKeychain.swift */; };
+		11F77D4E24BF16C7009920FC /* AsyncImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F77D4D24BF16C6009920FC /* AsyncImageLoader.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		11CBC43524FE831D006393F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 11B697BF24B8A56F009A6856 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 11CBC42724FE831B006393F9;
+			remoteInfo = FlightTrackerAppClip;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1119E8F924FE444700380024 /* Embed App Clips */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
+			dstSubfolderSpec = 16;
+			files = (
+				11CBC43724FE831D006393F9 /* FlightTrackerAppClip.app in Embed App Clips */,
+			);
+			name = "Embed App Clips";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		11B127BA24E2BDD60094BF7F /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		111C977B24DC202C0040A550 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		111C978524DC5CA90040A550 /* AirportMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportMapView.swift; sourceTree = "<group>"; };
+		1184DFA324F9664D00C8060D /* AircraftMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AircraftMapView.swift; sourceTree = "<group>"; };
+		1184DFA724F96CCB00C8060D /* MapViewAircraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewAircraft.swift; sourceTree = "<group>"; };
+		11863EAB24CAFE3F0096A268 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		11863EAD24CB31250096A268 /* ExistingFlightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExistingFlightView.swift; sourceTree = "<group>"; };
+		118D359924C87F9D00828ECD /* StatisticsCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsCalendarView.swift; sourceTree = "<group>"; };
+		118D359D24C8828D00828ECD /* RKViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RKViewController.swift; sourceTree = "<group>"; };
+		118D359E24C8828D00828ECD /* RKManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RKManager.swift; sourceTree = "<group>"; };
+		118D359F24C8828D00828ECD /* RKWeekdayHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RKWeekdayHeader.swift; sourceTree = "<group>"; };
+		118D35A024C8828D00828ECD /* RKMonth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RKMonth.swift; sourceTree = "<group>"; };
+		118D35A124C8828D00828ECD /* RKCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RKCell.swift; sourceTree = "<group>"; };
+		118D35A224C8828D00828ECD /* RKColorSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RKColorSettings.swift; sourceTree = "<group>"; };
+		118D35A324C8828D00828ECD /* RKDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RKDate.swift; sourceTree = "<group>"; };
+		118D35B624C98E0E00828ECD /* StatisticsPillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsPillView.swift; sourceTree = "<group>"; };
+		1191390F24E5C65100A606FB /* FlightSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightSearchView.swift; sourceTree = "<group>"; };
+		11B127A424E288AB0094BF7F /* MapLineOverlayRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapLineOverlayRenderer.swift; sourceTree = "<group>"; };
+		11B127A524E288AB0094BF7F /* ControlPointUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlPointUtilities.swift; sourceTree = "<group>"; };
+		11B127A624E288AB0094BF7F /* LineOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LineOverlay.swift; sourceTree = "<group>"; };
+		11B127C024E2C8630094BF7F /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		11B127C224E2C8630094BF7F /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
+		11B5665124EE627300383C90 /* LetApiConf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LetApiConf.swift; sourceTree = "<group>"; };
+		11B697C724B8A56F009A6856 /* FlightTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlightTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		11B697CA24B8A56F009A6856 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		11B697CC24B8A56F009A6856 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		11B697CE24B8A56F009A6856 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		11B697D024B8A572009A6856 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		11B697D324B8A572009A6856 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		11B697D824B8A572009A6856 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		11B697E624B8E835009A6856 /* LetApiToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LetApiToken.swift; sourceTree = "<group>"; };
+		11B697EC24B9107F009A6856 /* FlightTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FlightTracker.entitlements; sourceTree = "<group>"; };
+		11BDD88524E6A0C8003DBFAE /* FlightCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightCard.swift; sourceTree = "<group>"; };
+		11CA80F224C0622500B52613 /* ExistingFlightInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExistingFlightInfoView.swift; sourceTree = "<group>"; };
+		11CBC40A24FE79E1006393F9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		11CBC42824FE831B006393F9 /* FlightTrackerAppClip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlightTrackerAppClip.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		11CBC42A24FE831B006393F9 /* FlightTrackerAppClipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightTrackerAppClipApp.swift; sourceTree = "<group>"; };
+		11CBC42C24FE831B006393F9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		11CBC43124FE831D006393F9 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		11CBC43324FE831D006393F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		11CBC43424FE831D006393F9 /* FlightTrackerAppClip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FlightTrackerAppClip.entitlements; sourceTree = "<group>"; };
+		11E2107D24C6DDBE00331E27 /* AircraftImageOnlyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AircraftImageOnlyView.swift; sourceTree = "<group>"; };
+		11E2107F24C7338400331E27 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
+		11F77D4324BC58AD009920FC /* AdditionalLibraries */ = {isa = PBXFileReference; lastKnownFileType = folder; path = AdditionalLibraries; sourceTree = "<group>"; };
+		11F77D4524BC94C6009920FC /* FlightStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightStatus.swift; sourceTree = "<group>"; };
+		11F77D4724BCA11A009920FC /* DAKeychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAKeychain.swift; sourceTree = "<group>"; };
+		11F77D4D24BF16C6009920FC /* AsyncImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImageLoader.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		11B697C424B8A56F009A6856 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		11CBC42524FE831B006393F9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1102615A24B9AAAB0031BCBA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				11B127C024E2C8630094BF7F /* UserNotifications.framework */,
+				11B127C224E2C8630094BF7F /* UserNotificationsUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		118D359C24C8828D00828ECD /* SwiftUICalendar */ = {
+			isa = PBXGroup;
+			children = (
+				118D359D24C8828D00828ECD /* RKViewController.swift */,
+				118D359E24C8828D00828ECD /* RKManager.swift */,
+				118D359F24C8828D00828ECD /* RKWeekdayHeader.swift */,
+				118D35A024C8828D00828ECD /* RKMonth.swift */,
+				118D35A124C8828D00828ECD /* RKCell.swift */,
+				118D35A224C8828D00828ECD /* RKColorSettings.swift */,
+				118D35A324C8828D00828ECD /* RKDate.swift */,
+			);
+			path = SwiftUICalendar;
+			sourceTree = "<group>";
+		};
+		11B127A324E288180094BF7F /* curvyRoute */ = {
+			isa = PBXGroup;
+			children = (
+				11B127A524E288AB0094BF7F /* ControlPointUtilities.swift */,
+				11B127A624E288AB0094BF7F /* LineOverlay.swift */,
+				11B127A424E288AB0094BF7F /* MapLineOverlayRenderer.swift */,
+			);
+			path = curvyRoute;
+			sourceTree = "<group>";
+		};
+		11B697BE24B8A56F009A6856 = {
+			isa = PBXGroup;
+			children = (
+				11B697C924B8A56F009A6856 /* FlightTracker */,
+				11CBC42924FE831B006393F9 /* FlightTrackerAppClip */,
+				11B697C824B8A56F009A6856 /* Products */,
+				1102615A24B9AAAB0031BCBA /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		11B697C824B8A56F009A6856 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				11B697C724B8A56F009A6856 /* FlightTracker.app */,
+				11CBC42824FE831B006393F9 /* FlightTrackerAppClip.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		11B697C924B8A56F009A6856 /* FlightTracker */ = {
+			isa = PBXGroup;
+			children = (
+				11CBC40A24FE79E1006393F9 /* LaunchScreen.storyboard */,
+				11F77D4324BC58AD009920FC /* AdditionalLibraries */,
+				11B697CA24B8A56F009A6856 /* AppDelegate.swift */,
+				1184DFA724F96CCB00C8060D /* MapViewAircraft.swift */,
+				11F77D4724BCA11A009920FC /* DAKeychain.swift */,
+				11B697CC24B8A56F009A6856 /* SceneDelegate.swift */,
+				11B697CE24B8A56F009A6856 /* ContentView.swift */,
+				111C977B24DC202C0040A550 /* MapView.swift */,
+				111C978524DC5CA90040A550 /* AirportMapView.swift */,
+				1184DFA324F9664D00C8060D /* AircraftMapView.swift */,
+				11B697E624B8E835009A6856 /* LetApiToken.swift */,
+				11B5665124EE627300383C90 /* LetApiConf.swift */,
+				11F77D4524BC94C6009920FC /* FlightStatus.swift */,
+				1191390F24E5C65100A606FB /* FlightSearchView.swift */,
+				11CA80F224C0622500B52613 /* ExistingFlightInfoView.swift */,
+				11E2107D24C6DDBE00331E27 /* AircraftImageOnlyView.swift */,
+				11863EAD24CB31250096A268 /* ExistingFlightView.swift */,
+				11BDD88524E6A0C8003DBFAE /* FlightCard.swift */,
+				11863EAB24CAFE3F0096A268 /* MainView.swift */,
+				118D359924C87F9D00828ECD /* StatisticsCalendarView.swift */,
+				11E2107F24C7338400331E27 /* StatisticsView.swift */,
+				118D35B624C98E0E00828ECD /* StatisticsPillView.swift */,
+				11F77D4D24BF16C6009920FC /* AsyncImageLoader.swift */,
+				11B127A324E288180094BF7F /* curvyRoute */,
+				118D359C24C8828D00828ECD /* SwiftUICalendar */,
+				11B697D024B8A572009A6856 /* Assets.xcassets */,
+				11B697EC24B9107F009A6856 /* FlightTracker.entitlements */,
+				11B697D824B8A572009A6856 /* Info.plist */,
+				11B697D224B8A572009A6856 /* Preview Content */,
+			);
+			path = FlightTracker;
+			sourceTree = "<group>";
+		};
+		11B697D224B8A572009A6856 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				11B697D324B8A572009A6856 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		11CBC42924FE831B006393F9 /* FlightTrackerAppClip */ = {
+			isa = PBXGroup;
+			children = (
+				11CBC42A24FE831B006393F9 /* FlightTrackerAppClipApp.swift */,
+				11CBC42C24FE831B006393F9 /* ContentView.swift */,
+				11CBC43324FE831D006393F9 /* Info.plist */,
+				11CBC43424FE831D006393F9 /* FlightTrackerAppClip.entitlements */,
+				11CBC43024FE831D006393F9 /* Preview Content */,
+			);
+			path = FlightTrackerAppClip;
+			sourceTree = "<group>";
+		};
+		11CBC43024FE831D006393F9 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				11CBC43124FE831D006393F9 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		11B697C624B8A56F009A6856 /* FlightTracker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 11B697DB24B8A572009A6856 /* Build configuration list for PBXNativeTarget "FlightTracker" */;
+			buildPhases = (
+				11B697C324B8A56F009A6856 /* Sources */,
+				11B697C424B8A56F009A6856 /* Frameworks */,
+				11B697C524B8A56F009A6856 /* Resources */,
+				11B127BA24E2BDD60094BF7F /* Embed App Extensions */,
+				1119E8F924FE444700380024 /* Embed App Clips */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				11CBC43624FE831D006393F9 /* PBXTargetDependency */,
+			);
+			name = FlightTracker;
+			packageProductDependencies = (
+			);
+			productName = FlightTracker;
+			productReference = 11B697C724B8A56F009A6856 /* FlightTracker.app */;
+			productType = "com.apple.product-type.application";
+		};
+		11CBC42724FE831B006393F9 /* FlightTrackerAppClip */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 11CBC43824FE831D006393F9 /* Build configuration list for PBXNativeTarget "FlightTrackerAppClip" */;
+			buildPhases = (
+				11CBC42424FE831B006393F9 /* Sources */,
+				11CBC42524FE831B006393F9 /* Frameworks */,
+				11CBC42624FE831B006393F9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FlightTrackerAppClip;
+			productName = FlightTrackerAppClip;
+			productReference = 11CBC42824FE831B006393F9 /* FlightTrackerAppClip.app */;
+			productType = "com.apple.product-type.application.on-demand-install-capable";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		11B697BF24B8A56F009A6856 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1200;
+				LastUpgradeCheck = 1150;
+				ORGANIZATIONNAME = "Miha Strah";
+				TargetAttributes = {
+					11B697C624B8A56F009A6856 = {
+						CreatedOnToolsVersion = 11.5;
+					};
+					11CBC42724FE831B006393F9 = {
+						CreatedOnToolsVersion = 12.0;
+					};
+				};
+			};
+			buildConfigurationList = 11B697C224B8A56F009A6856 /* Build configuration list for PBXProject "FlightTracker" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 11B697BE24B8A56F009A6856;
+			packageReferences = (
+			);
+			productRefGroup = 11B697C824B8A56F009A6856 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				11B697C624B8A56F009A6856 /* FlightTracker */,
+				11CBC42724FE831B006393F9 /* FlightTrackerAppClip */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		11B697C524B8A56F009A6856 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11F77D4424BC58AD009920FC /* AdditionalLibraries in Resources */,
+				11CBC40B24FE79E1006393F9 /* LaunchScreen.storyboard in Resources */,
+				11B697D424B8A572009A6856 /* Preview Assets.xcassets in Resources */,
+				11B697D124B8A572009A6856 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		11CBC42624FE831B006393F9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11CBC43224FE831D006393F9 /* Preview Assets.xcassets in Resources */,
+				1102879B24FE9898000C26C4 /* Assets.xcassets in Resources */,
+				11CBC45624FE8586006393F9 /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		11B697C324B8A56F009A6856 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1184DFA424F9664D00C8060D /* AircraftMapView.swift in Sources */,
+				118D35A424C882C000828ECD /* RKViewController.swift in Sources */,
+				111C978624DC5CA90040A550 /* AirportMapView.swift in Sources */,
+				11B5665224EE627300383C90 /* LetApiConf.swift in Sources */,
+				11863EAC24CAFE3F0096A268 /* MainView.swift in Sources */,
+				11B127A924E288AB0094BF7F /* LineOverlay.swift in Sources */,
+				118D35A524C882C000828ECD /* RKManager.swift in Sources */,
+				118D35A624C882C000828ECD /* RKWeekdayHeader.swift in Sources */,
+				118D35A724C882C000828ECD /* RKMonth.swift in Sources */,
+				118D35A824C882C000828ECD /* RKCell.swift in Sources */,
+				118D35A924C882C000828ECD /* RKColorSettings.swift in Sources */,
+				118D35AA24C882C000828ECD /* RKDate.swift in Sources */,
+				11F77D4E24BF16C7009920FC /* AsyncImageLoader.swift in Sources */,
+				118D35B724C98E0E00828ECD /* StatisticsPillView.swift in Sources */,
+				111C977C24DC202C0040A550 /* MapView.swift in Sources */,
+				11B697E724B8E835009A6856 /* LetApiToken.swift in Sources */,
+				11CA80F324C0622500B52613 /* ExistingFlightInfoView.swift in Sources */,
+				11E2108024C7338400331E27 /* StatisticsView.swift in Sources */,
+				11B697CB24B8A56F009A6856 /* AppDelegate.swift in Sources */,
+				11F77D4824BCA11A009920FC /* DAKeychain.swift in Sources */,
+				1184DFA824F96CCB00C8060D /* MapViewAircraft.swift in Sources */,
+				11B697CD24B8A56F009A6856 /* SceneDelegate.swift in Sources */,
+				11B127A824E288AB0094BF7F /* ControlPointUtilities.swift in Sources */,
+				11B697CF24B8A56F009A6856 /* ContentView.swift in Sources */,
+				11E2107E24C6DDBE00331E27 /* AircraftImageOnlyView.swift in Sources */,
+				118D359A24C87F9D00828ECD /* StatisticsCalendarView.swift in Sources */,
+				11F77D4624BC94C6009920FC /* FlightStatus.swift in Sources */,
+				11B127A724E288AB0094BF7F /* MapLineOverlayRenderer.swift in Sources */,
+				11863EAE24CB31250096A268 /* ExistingFlightView.swift in Sources */,
+				1191391024E5C65100A606FB /* FlightSearchView.swift in Sources */,
+				11BDD88624E6A0C8003DBFAE /* FlightCard.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		11CBC42424FE831B006393F9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11CBC44C24FE84D8006393F9 /* FlightSearchView.swift in Sources */,
+				11CBC43F24FE84A2006393F9 /* RKManager.swift in Sources */,
+				11CBC44624FE84D8006393F9 /* DAKeychain.swift in Sources */,
+				11CBC44F24FE84D8006393F9 /* AirportMapView.swift in Sources */,
+				11CBC44924FE84D8006393F9 /* AircraftImageOnlyView.swift in Sources */,
+				11CBC45024FE84D8006393F9 /* MapViewAircraft.swift in Sources */,
+				11CBC45424FE84D8006393F9 /* FlightStatus.swift in Sources */,
+				11CBC44E24FE84D8006393F9 /* AircraftMapView.swift in Sources */,
+				11CBC45124FE84D8006393F9 /* ExistingFlightInfoView.swift in Sources */,
+				11CBC44724FE84D8006393F9 /* LetApiConf.swift in Sources */,
+				11CBC44824FE84D8006393F9 /* AsyncImageLoader.swift in Sources */,
+				11CBC44524FE84A5006393F9 /* ControlPointUtilities.swift in Sources */,
+				11CBC44A24FE84D8006393F9 /* LetApiToken.swift in Sources */,
+				11CBC45324FE84D8006393F9 /* StatisticsPillView.swift in Sources */,
+				11CBC43D24FE84A2006393F9 /* RKCell.swift in Sources */,
+				11CBC44324FE84A5006393F9 /* LineOverlay.swift in Sources */,
+				11CBC44024FE84A2006393F9 /* RKMonth.swift in Sources */,
+				11CBC43E24FE84A2006393F9 /* RKViewController.swift in Sources */,
+				11CBC44424FE84A5006393F9 /* MapLineOverlayRenderer.swift in Sources */,
+				11CBC42D24FE831B006393F9 /* ContentView.swift in Sources */,
+				11CBC44B24FE84D8006393F9 /* StatisticsView.swift in Sources */,
+				11CBC45524FE84D8006393F9 /* MapView.swift in Sources */,
+				11CBC44124FE84A2006393F9 /* RKColorSettings.swift in Sources */,
+				11CBC42B24FE831B006393F9 /* FlightTrackerAppClipApp.swift in Sources */,
+				11CBC44224FE84A2006393F9 /* RKDate.swift in Sources */,
+				11CBC43C24FE84A2006393F9 /* RKWeekdayHeader.swift in Sources */,
+				11CBC45224FE84D8006393F9 /* StatisticsCalendarView.swift in Sources */,
+				11CBC44D24FE84D8006393F9 /* ExistingFlightView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		11CBC43624FE831D006393F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 11CBC42724FE831B006393F9 /* FlightTrackerAppClip */;
+			targetProxy = 11CBC43524FE831D006393F9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		11B697D924B8A572009A6856 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		11B697DA24B8A572009A6856 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		11B697DC24B8A572009A6856 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FlightTracker/FlightTracker.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 10;
+				DEVELOPMENT_ASSET_PATHS = "\"FlightTracker/Preview Content\"";
+				DEVELOPMENT_TEAM = 7YNLV7443U;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = FlightTracker/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.MihaStrah.FlightTracker;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		11B697DD24B8A572009A6856 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FlightTracker/FlightTracker.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 10;
+				DEVELOPMENT_ASSET_PATHS = "\"FlightTracker/Preview Content\"";
+				DEVELOPMENT_TEAM = 7YNLV7443U;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = FlightTracker/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.MihaStrah.FlightTracker;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		11CBC43924FE831D006393F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_ENTITLEMENTS = FlightTrackerAppClip/FlightTrackerAppClip.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 10;
+				DEVELOPMENT_ASSET_PATHS = "\"FlightTrackerAppClip/Preview Content\"";
+				DEVELOPMENT_TEAM = 7YNLV7443U;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = FlightTrackerAppClip/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.MihaStrah.FlightTracker.AppClip;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG APPCLIP";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		11CBC43A24FE831D006393F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_ENTITLEMENTS = FlightTrackerAppClip/FlightTrackerAppClip.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 10;
+				DEVELOPMENT_ASSET_PATHS = "\"FlightTrackerAppClip/Preview Content\"";
+				DEVELOPMENT_TEAM = 7YNLV7443U;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = FlightTrackerAppClip/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.MihaStrah.FlightTracker.AppClip;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				"SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*]" = APPCLIP;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		11B697C224B8A56F009A6856 /* Build configuration list for PBXProject "FlightTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				11B697D924B8A572009A6856 /* Debug */,
+				11B697DA24B8A572009A6856 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		11B697DB24B8A572009A6856 /* Build configuration list for PBXNativeTarget "FlightTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				11B697DC24B8A572009A6856 /* Debug */,
+				11B697DD24B8A572009A6856 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		11CBC43824FE831D006393F9 /* Build configuration list for PBXNativeTarget "FlightTrackerAppClip" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				11CBC43924FE831D006393F9 /* Debug */,
+				11CBC43A24FE831D006393F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 11B697BF24B8A56F009A6856 /* Project object */;
+}
